@@ -34,6 +34,6 @@ No build step, no libraries. Progress autosaves to localStorage and keeps earnin
 
 ## Balance
 
-`econ.js` holds every formula and number, with no DOM. `node sim.js active [hours]` runs a greedy headless player and prints the pacing: first pivot at about 20 minutes, then runs of 15–25 minutes that each push 5–15 incidents further. You can override any knob with `SLOP_<knob>=value`.
+`econ.js` holds every formula and number, with no DOM. `node sim.js active [hours]` runs a greedy headless player and prints the pacing: first pivot at about 20 minutes, then runs of 15–25 minutes that each push 5–15 incidents further. You can override any knob with `SLOP_<knob>=value`. `node test.js` asserts that every multiplier source (158 checks) moves damage, gold, cost or hype by exactly its advertised amount.
 
 No real servers were harmed. They were already like this.
