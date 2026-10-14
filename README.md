@@ -1,36 +1,39 @@
-# 💥 SLOP CANNON
+# SLOP CANNON: Idle Ops 💥
 
-Ship slop. Break prod. It's Friday, 4:59 PM.
-
-A first-person cannon game written in a single HTML file (Canvas 2D, Web Audio, no dependencies). Fire AI-generated slop code at a neon data center and take every production server down before the deploy window closes.
+An idle/incremental game in one HTML canvas. Hire AI agents to fire slop code at production servers, pivot to AI, rewrite it in Rust, and take down **us-east-1**.
 
 **▶ Play: https://bryantebeek.github.io/slop-cannon/**
+
+No build step, no libraries. Progress autosaves to localStorage and keeps earning while you're away.
+
+## The loop
+
+| Layer | What you do | Inspired by |
+|---|---|---|
+| **Cannon** | Hold the mouse on prod to fire. Calibre, crits, fire rate, and 4 modes (AI SLOP, NPM INSTALL, DROP TABLE, VIBE CODE) | Clicker Heroes' click hero |
+| **Agents** | 16 generators, from Intern to Simulation Admin, each firing its own slop lines. 7% cost growth, upgrades at 10/25/50/100/150/200/300 owned | Clicker Heroes, AdVenture Capitalist |
+| **Upgrades** | 112 per-agent tiers, synergies, global multipliers | Cookie Clicker |
+| **Incidents** | 10 servers per incident; overkill chains between servers; every 5th is a timed legacy boss; farm or auto-advance | Clicker Heroes zones |
+| **Zero-days** | Golden packages fly by: shoot them for frenzies, cash or hotfixes | Cookie Clicker golden cookies |
+| **Linter drones** | Block your agents' shots until you shoot them down | |
+| **🚀 Pivot to AI** | Prestige layer 1: hype = (era earnings ÷ 480)^0.2, +10% damage each, or spend it on the Board of Directors (Cron Job auto-fire, Hiring Manager auto-buy, offline earnings…) | AdVenture Capitalist angels, Clicker Heroes ancients, Egg, Inc. exponent |
+| **📝 Postmortems** | 8 challenge runs with nasty rules and permanent rewards | Antimatter Dimensions challenges |
+| **🦀 Rewrite It In Rust** | Prestige layer 2 at incident 120: crabs for the Borrow Checker tree | Realm Grinder / AD multi-layer prestige |
+| **🏆 Trophies & news** | 72 trophies (+3% each, 9 secret) and a Hacker News ticker that reacts to your progress | Cookie Clicker |
 
 ## Controls
 
 | Input | Action |
 |---|---|
-| Mouse | Aim (pointer lock) |
-| Click / Space (hold) | Fire |
-| 1–4 / wheel / Q E / right-click | Switch slop |
-| A D W S / arrows | Aim with keys |
+| Hold mouse / Space | Fire at the cursor |
+| 1-4 | Cannon mode |
+| ← / → | Previous / next incident |
+| F | Toggle farm / auto-advance |
+| B | Cycle buy amount (x1 / x10 / x25 / x100 / MAX) |
 | M | Mute |
-| Esc / P | Pause |
 
-## Slop arsenal
+## Balance
 
-1. **AI SLOP**: rapid-fire autocomplete (`as any`, `// @ts-ignore`, `eval(input)` …)
-2. **NPM INSTALL**: a cluster shell that bursts into `left-pad`, `is-odd` and friends
-3. **DROP TABLE**: a slow, huge area blast that tears through code review (`--no-verify`)
-4. **VIBE CODE**: homing vibes
-
-## Prod fights back
-
-- **Code review shields** block shots until you break them
-- **Linter drones** shoot your slop down mid-air
-- **On-call rollbacks** heal any server you leave alone for too long
-- Load balancers and the **legacy monolith** cause **cascading failures** when they go down
+`econ.js` holds every formula and number, with no DOM. `node sim.js active [hours]` runs a greedy headless player and prints the pacing: first pivot at about 20 minutes, then runs of 15–25 minutes that each push 5–15 incidents further. You can override any knob with `SLOP_<knob>=value`.
 
 No real servers were harmed. They were already like this.
-
-Run it locally by opening `index.html`, or with `python3 -m http.server`.
