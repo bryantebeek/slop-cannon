@@ -83,6 +83,10 @@ canvas{display:block;width:100%;height:100%;cursor:none;touch-action:none}
 .tab.sel{color:#fff;background:rgba(255,255,255,.08);box-shadow:inset 0 -2px var(--green)}
 .tab .new{display:none;position:absolute;top:-3px;right:-2px;background:var(--pink);color:#fff;font-size:8px;padding:1px 4px;border-radius:6px;animation:pulse 1s infinite}
 .tab.isnew .new{display:block}
+.tab .cnt{min-width:16px;padding:0 4px;border-radius:8px;background:#fff;color:#12051f;font-size:9px;font-weight:900;line-height:15px;text-align:center;box-shadow:0 0 8px rgba(255,255,255,.6)}
+.upbtn{display:block;width:100%;margin-top:6px;padding:5px 8px;text-align:left;border-radius:6px;border:1px solid rgba(255,255,255,.7);background:rgba(255,255,255,.1);color:#fff;font-weight:800;font-size:11px;box-shadow:0 0 12px rgba(255,255,255,.25);animation:pop .3s}
+.upbtn:hover{background:rgba(255,255,255,.2)}
+.upbtn.no{border-color:rgba(255,255,255,.3);color:rgba(255,255,255,.65);box-shadow:none}
 #buyAmt{display:flex;gap:4px;padding:8px 12px 0;align-items:center}
 #buyAmt::before{content:"BUY";color:var(--dim);font-size:10px;margin-right:4px;letter-spacing:1px}
 #buyAmt button{flex:1;padding:4px 0;border-radius:6px;border:1px solid var(--line);background:rgba(255,255,255,.03);font-weight:800;font-size:11px;color:var(--dim)}

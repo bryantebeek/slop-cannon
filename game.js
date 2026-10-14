@@ -569,7 +569,7 @@ const TABS = [
 let curTab = 'agents';
 const tabBar = $('#tabs'), tabBody = $('#tabBody'), tabBtns = {};
 for (const t of TABS) {
-  tabBtns[t.id] = h('button', { class: 'tab', onclick: () => { curTab = t.id; S.seenUnlocks['tab_' + t.id] = 1; structDirty = true; sfx.click(); } }, h('span', { class: 'ti' }, t.icon), h('span', { class: 'tn' }, t.name), h('span', { class: 'new' }, 'NEW'));
+  tabBtns[t.id] = h('button', { class: 'tab', onclick: () => { curTab = t.id; S.seenUnlocks['tab_' + t.id] = 1; structDirty = true; sfx.click(); } }, h('span', { class: 'ti' }, t.icon), h('span', { class: 'tn' }, t.name), h('span', { class: 'new' }, 'NEW'), h('span', { class: 'cnt' }));
   tabBar.append(tabBtns[t.id]);
 }
 document.querySelectorAll('#buyAmt button').forEach(b => b.onclick = () => { buyMode = b.dataset.n === 'max' ? 'max' : +b.dataset.n; sfx.click(); updateBuyAmt(); });
@@ -583,6 +583,7 @@ function tabsVisibility() {
     if (vis && b.hidden !== false) { b.hidden = false; if (!S.seenUnlocks['tab_' + t.id] && ['board', 'post', 'rust'].includes(t.id)) { b.classList.add('isnew'); toast(t.icon, `Unlocked: ${t.name}`, 'A new tab opened in the side panel.'); } }
     b.hidden = !vis;
     b.classList.toggle('sel', curTab === t.id);
+    if (t.id === 'upgrades') { const n = S.challenge === 'notests' ? 0 : E.UPGRADES.filter(u => u.kind !== 'cannon' && upgVisible(u) && E.upgCost(S, u) <= S.cash).length; setText(b.lastChild, n ? String(n) : ''); b.lastChild.hidden = !n; }
     if (S.seenUnlocks['tab_' + t.id]) b.classList.remove('isnew');
   }
   $('#buyAmt').hidden = !(curTab === 'agents' || curTab === 'cannon');
@@ -626,10 +627,12 @@ const BUILD = {
         list.append(el); return;
       }
       const owned = h('div', { class: 'aown' }), stat = h('div', { class: 'astat' }), bar = h('i'), next = h('div', { class: 'anext' });
+      const readyUpg = () => E.UPGRADES.find(u => u.kind === 'tier' && u.agent === i && !S.upg[u.id] && S.agents[i] >= u.at);
+      const upBtn = h('button', { class: 'upbtn', onclick: e => { e.stopPropagation(); const u = readyUpg(); if (u) buyUpg(u); } });
       const btn = costBtn('HIRE', () => buyAgent(i, buyCount(i)));
       const el = h('div', { class: 'row agent', style: `--c:${a.col}`, tip: () => agentTip(i) },
         h('div', { class: 'aicon' }, a.icon),
-        h('div', { class: 'amain' }, h('div', { class: 'aname' }, a.name, owned), h('div', { class: 'adesc' }, a.desc), stat, h('div', { class: 'aprog' }, bar), next),
+        h('div', { class: 'amain' }, h('div', { class: 'aname' }, a.name, owned), h('div', { class: 'adesc' }, a.desc), stat, h('div', { class: 'aprog' }, bar), next, upBtn),
         btn);
       list.append(el);
       rows.push(() => {
@@ -639,8 +642,9 @@ const BUILD = {
         setText(stat, S.agents[i] ? `${fmt(D.agentDps[i] / S.agents[i])} DPS each · ${fmt(D.agentDps[i])} total (${(D.agentDps[i] / tot * 100).toFixed(1)}%)` : `${fmt(a.dps * D.agentMult[i] * D.dmg)} DPS each`);
         const nt = E.TIER_AT.find(t => t > S.agents[i]), prev = [0, ...E.TIER_AT].filter(t => t <= S.agents[i]).pop();
         bar.style.transform = `scaleX(${nt ? (S.agents[i] - prev) / (nt - prev) : 1})`;
-        const ready = E.UPGRADES.filter(u => u.kind === 'tier' && u.agent === i && !S.upg[u.id] && S.agents[i] >= u.at).length;
-        setHTML(next, (ready ? `<span class="ready">● ${ready} upgrade${ready > 1 ? 's' : ''} ready to buy</span> · ` : '') + (nt ? `next upgrade unlocks at ${nt}` : 'all upgrades unlocked'));
+        setText(next, nt ? `next upgrade unlocks at ${nt}` : 'all upgrades unlocked');
+        const ru = readyUpg(); upBtn.hidden = !ru || S.challenge === 'notests';
+        if (ru) { const c = E.upgCost(S, ru); setText(upBtn, `⬆ ${ru.name} · ${a.name}s x${ru.eff.mult} · ${money(c)}`); upBtn.classList.toggle('no', c > S.cash); }
         setText(btn.lastChild, locked ? 'LOCKED' : money(c)); setText(btn.firstChild, locked ? 'POSTMORTEM' : `HIRE ×${n}`);
         btn.classList.toggle('no', locked || c > S.cash);
       });
