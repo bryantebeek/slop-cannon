@@ -19,11 +19,8 @@ function buy(S) {
     let best = null;
     const consider = (cost, mut, undo) => { if (!(cost > 0) || cost > S.cash * 50) return; const g = gain(S, mut, undo); const r = g / cost; if (g > 0 && (!best || r > best.r)) best = { r, cost, mut }; };
     E.AGENTS.forEach((a, i) => { if (S.challenge === 'legacy4' && i >= 4) return; if (i === 0 || S.agents[i - 1] > 0 || S.cash > a.cost) consider(E.agentCost(S, i), c => c.agents[i]++, c => c.agents[i]--); });
-    if (S.challenge !== 'notests') for (const u of E.UPGRADES) {
-      if (S.upg[u.id]) continue;
-      if (u.kind === 'tier' && S.agents[u.agent] < u.at) continue;
-      if (u.kind === 'syn' && (S.agents[u.a] < u.need[0] || S.agents[u.b] < u.need[1])) continue;
-      if (u.need && u.kind === 'global' && S.maxLevel < u.need) continue;
+    for (const u of E.UPGRADES) { // only cannon mods are bought; milestones switch on by themselves
+      if (u.kind !== 'cannon' || S.upg[u.id]) continue;
       consider(E.upgCost(S, u), c => { c.upg[u.id] = 1; }, c => { delete c.upg[u.id]; });
     }
     consider(E.cannonCost(S), c => c.cannon++, c => c.cannon--);

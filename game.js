@@ -44,7 +44,7 @@ const decodeSave = s => merge(E.fresh(), JSON.parse(decodeURIComponent(escape(at
 // ───────────── derived stats, buffs ─────────────
 let D = E.derive(S), dirty = true, structDirty = true;
 function markDirty(struct) { dirty = true; if (struct) structDirty = true; }
-function refresh() { if (dirty) { D = E.derive(S); dirty = false; } }
+function refresh() { if (dirty) { D = E.derive(S); dirty = false; checkMilestones(); } }
 let buffs = [];
 const dpsBuff = () => buffs.reduce((m, b) => m * (b.dps || 1), 1);
 const shotBuff = () => buffs.reduce((m, b) => m * (b.click || 1), 1);
@@ -74,15 +74,10 @@ function buyAgent(i, n) {
   const c = E.agentCost(S, i, n); if (c > S.cash) { sfx.deny(); return false; }
   S.cash -= c; S.agents[i] += n; markDirty(true); sfx.buy(); return true;
 }
-function upgVisible(u) {
-  if (S.upg[u.id]) return false;
-  if (u.kind === 'tier') return S.agents[u.agent] >= u.at;
-  if (u.kind === 'syn') return S.agents[u.a] >= u.need[0] && S.agents[u.b] >= u.need[1];
-  if (u.kind === 'global') return S.maxLevel >= u.need;
-  return S.runEarned * 4 >= u.cost || S.cash * 4 >= u.cost;
-}
+// Cannon mods are the only purchasable upgrades; they show up once you're within reach of their price.
+const modVisible = u => !S.upg[u.id] && (S.runEarned * 4 >= u.cost || S.cash * 4 >= u.cost);
 function buyUpg(u, quiet) {
-  if (S.upg[u.id] || S.challenge === 'notests') return false;
+  if (S.upg[u.id]) return false;
   const c = E.upgCost(S, u); if (c > S.cash) { if (!quiet) sfx.deny(); return false; }
   S.cash -= c; S.upg[u.id] = 1; markDirty(true); if (!quiet) sfx.buy();
   if (u.eff.weapon) { if (!quiet) S.weapon = u.eff.weapon; toast('🧨', `New cannon mode: ${E.WEAPONS[u.eff.weapon].name}`, `Press ${u.eff.weapon + 1} to switch. ${E.WEAPONS[u.eff.weapon].sub}.`); }
@@ -104,9 +99,20 @@ function autoHire() {
     S.cash -= E.agentCost(S, best); S.agents[best]++; markDirty(true); refresh();
   }
 }
-function autoUpgrade() {
-  if (S.challenge === 'notests') return;
-  for (const u of E.UPGRADES) if (upgVisible(u) && E.upgCost(S, u) <= S.cash) { buyUpg(u, true); refresh(); }
+function autoBuyCannon() {
+  for (const u of E.UPGRADES) if (u.kind === 'cannon' && modVisible(u) && E.upgCost(S, u) <= S.cash) { buyUpg(u, true); refresh(); }
+  const n = E.cannonMax(S, S.cash * .1); if (n > 0) { S.cash -= E.cannonCost(S, n); S.cannon += n; markDirty(); }
+}
+// Toast whenever a milestone switches on (agent tiers, synergies, company upgrades).
+let msOn = null;
+function checkMilestones() {
+  const now = new Set(E.milestones(S).map(u => u.id));
+  if (msOn) {
+    const fresh = [...now].filter(id => !msOn.has(id)).map(id => E.UPG[id]);
+    if (fresh.length === 1) { const u = fresh[0]; toast(u.icon, `Milestone: ${u.name}`, u.flav, 'ms'); sfx.ach(); }
+    else if (fresh.length > 1) { toast('🎯', `${fresh.length} milestones reached`, fresh.map(u => u.name).join(' · '), 'ms'); sfx.ach(); }
+  }
+  msOn = now;
 }
 
 // ───────────── prestige ─────────────
@@ -366,7 +372,7 @@ function hurtDrone(d, n = 1) {
 }
 
 // ───────────── simulation ─────────────
-function resetRunRuntime() { buffs = []; drones = []; golden = null; G.combo = 0; startLevel(); }
+function resetRunRuntime() { buffs = []; drones = []; golden = null; G.combo = 0; msOn = null; startLevel(); }
 let hireT = 0, cargoT = 0, achT = 0, saveT = 0;
 function sim(dt) {
   refresh();
@@ -441,7 +447,7 @@ function sim(dt) {
   if (buffs.some(b => b.t <= 0)) { buffs = buffs.filter(b => b.t > 0); markDirty(); }
   G.comboT -= dt; if (G.comboT <= 0) G.combo = 0;
   if (D.hiring) { hireT -= dt; if (hireT <= 0) { hireT = 8 / D.hiring; autoHire(); } }
-  if (E.lv(S.rust, 'cargo')) { cargoT -= dt; if (cargoT <= 0) { cargoT = 1.5; autoUpgrade(); } }
+  if (E.lv(S.rust, 'cargo')) { cargoT -= dt; if (cargoT <= 0) { cargoT = 1.5; autoBuyCannon(); } }
   for (let i = later.length - 1; i >= 0; i--) { const l = later[i]; l.t -= dt; if (l.t <= 0) { later.splice(i, 1); l.f(); } }
   achT -= dt; if (achT <= 0) { achT = .5; checkAchievements(); }
   saveT -= dt; if (saveT <= 0) { saveT = 15; save(); }
@@ -557,7 +563,7 @@ ui.chBanner.addEventListener('click', e => { if (e.target.id === 'abandon') moda
 // ───────────── UI: panel tabs ─────────────
 const TABS = [
   { id: 'agents', icon: '🤖', name: 'Agents', show: () => true },
-  { id: 'upgrades', icon: '⬆️', name: 'Upgrades', show: () => true },
+  { id: 'upgrades', icon: '🎯', name: 'Milestones', show: () => true },
   { id: 'cannon', icon: '🔫', name: 'Cannon', show: () => true },
   { id: 'board', icon: '🚀', name: 'Pivot', show: () => S.pivots > 0 || S.allMax >= 15 || S.rusts > 0 },
   { id: 'post', icon: '📝', name: 'Postmortems', show: () => S.pivots >= E.CHALLENGE_PIVOTS || S.rusts > 0 },
@@ -583,7 +589,7 @@ function tabsVisibility() {
     if (vis && b.hidden !== false) { b.hidden = false; if (!S.seenUnlocks['tab_' + t.id] && ['board', 'post', 'rust'].includes(t.id)) { b.classList.add('isnew'); toast(t.icon, `Unlocked: ${t.name}`, 'A new tab opened in the side panel.'); } }
     b.hidden = !vis;
     b.classList.toggle('sel', curTab === t.id);
-    if (t.id === 'upgrades') { const n = S.challenge === 'notests' ? 0 : E.UPGRADES.filter(u => u.kind !== 'cannon' && upgVisible(u) && E.upgCost(S, u) <= S.cash).length; setText(b.lastChild, n ? String(n) : ''); b.lastChild.hidden = !n; }
+    if (t.id === 'cannon') { const n = E.UPGRADES.filter(u => u.kind === 'cannon' && modVisible(u) && E.upgCost(S, u) <= S.cash).length; setText(b.lastChild, n ? String(n) : ''); b.lastChild.hidden = !n; }
     if (S.seenUnlocks['tab_' + t.id]) b.classList.remove('isnew');
   }
   $('#buyAmt').hidden = !(curTab === 'agents' || curTab === 'cannon');
@@ -594,8 +600,8 @@ function buildTab() {
 }
 function structKey() {
   if (curTab === 'agents') return S.agents.map((n, i) => agentVisible(i) ? 1 : 0).join('') + S.challenge;
-  if (curTab === 'upgrades') return E.UPGRADES.filter(upgVisible).map(u => u.id).join() + '|' + Object.keys(S.upg).length + S.challenge;
-  if (curTab === 'cannon') return E.UPGRADES.filter(u => u.kind === 'cannon' && (upgVisible(u) || S.upg[u.id])).length + '';
+  if (curTab === 'upgrades') return E.milestones(S).length + '|' + S.agents.map((n, i) => agentVisible(i) ? 1 : 0).join('') + S.challenge;
+  if (curTab === 'cannon') return E.UPGRADES.filter(u => u.kind === 'cannon' && (modVisible(u) || S.upg[u.id])).length + '';
   if (curTab === 'board') return S.pivots + '' + S.rusts;
   if (curTab === 'post') return S.challenge + Object.keys(S.chDone).join();
   if (curTab === 'rust') return S.rusts + '';
@@ -627,12 +633,10 @@ const BUILD = {
         list.append(el); return;
       }
       const owned = h('div', { class: 'aown' }), stat = h('div', { class: 'astat' }), bar = h('i'), next = h('div', { class: 'anext' });
-      const readyUpg = () => E.UPGRADES.find(u => u.kind === 'tier' && u.agent === i && !S.upg[u.id] && S.agents[i] >= u.at);
-      const upBtn = h('button', { class: 'upbtn', onclick: e => { e.stopPropagation(); const u = readyUpg(); if (u) buyUpg(u); } });
       const btn = costBtn('HIRE', () => buyAgent(i, buyCount(i)));
       const el = h('div', { class: 'row agent', style: `--c:${a.col}`, tip: () => agentTip(i) },
         h('div', { class: 'aicon' }, a.icon),
-        h('div', { class: 'amain' }, h('div', { class: 'aname' }, a.name, owned), h('div', { class: 'adesc' }, a.desc), stat, h('div', { class: 'aprog' }, bar), next, upBtn),
+        h('div', { class: 'amain' }, h('div', { class: 'aname' }, a.name, owned), h('div', { class: 'adesc' }, a.desc), stat, h('div', { class: 'aprog' }, bar), next),
         btn);
       list.append(el);
       rows.push(() => {
@@ -642,31 +646,32 @@ const BUILD = {
         setText(stat, S.agents[i] ? `${fmt(D.agentDps[i] / S.agents[i])} DPS each · ${fmt(D.agentDps[i])} total (${(D.agentDps[i] / tot * 100).toFixed(1)}%)` : `${fmt(a.dps * D.agentMult[i] * D.dmg)} DPS each`);
         const nt = E.TIER_AT.find(t => t > S.agents[i]), prev = [0, ...E.TIER_AT].filter(t => t <= S.agents[i]).pop();
         bar.style.transform = `scaleX(${nt ? (S.agents[i] - prev) / (nt - prev) : 1})`;
-        setText(next, nt ? `next upgrade unlocks at ${nt}` : 'all upgrades unlocked');
-        const ru = readyUpg(); upBtn.hidden = !ru || S.challenge === 'notests';
-        if (ru) { const c = E.upgCost(S, ru); setText(upBtn, `⬆ ${ru.name} · ${a.name}s x${ru.eff.mult} · ${money(c)}`); upBtn.classList.toggle('no', c > S.cash); }
+        const nu = E.UPGRADES.find(u => u.kind === 'tier' && u.agent === i && u.at === nt);
+        setHTML(next, `<span class="ready">x${fmt(D.agentMult[i])}</span> · ` + (nu ? `next: <b>${nu.name}</b> (x${nu.eff.mult}) at ${nt} · ${nt - S.agents[i]} to go` : 'all milestones reached'));
         setText(btn.lastChild, locked ? 'LOCKED' : money(c)); setText(btn.firstChild, locked ? 'POSTMORTEM' : `HIRE ×${n}`);
         btn.classList.toggle('no', locked || c > S.cash);
       });
     });
-    tabBody.append(h('div', { class: 'hint' }, 'Agents fire slop at prod automatically. Every hire is 7% pricier; each owned milestone unlocks an upgrade.'), list);
+    tabBody.append(h('div', { class: 'hint' }, 'Agents fire slop at prod automatically. Every hire is 7% pricier. Owning 10, 25, 50, 100, 150, 200 and 300 of an agent multiplies its damage automatically.'), list);
     return () => rows.forEach(f => f());
   },
   upgrades() {
-    const avail = E.UPGRADES.filter(u => u.kind !== 'cannon' && upgVisible(u));
-    const tiles = [];
-    const grid = h('div', { class: 'grid' });
-    for (const u of avail) {
-      const t = h('button', { class: 'tile', onclick: () => buyUpg(u), tip: () => upgTip(u) }, h('span', {}, u.icon), h('i', { class: 'tc' }));
-      grid.append(t); tiles.push([t, u]);
-    }
-    const all = h('button', { class: 'btn', onclick: () => { let n = 0; for (const u of E.UPGRADES) if (u.kind !== 'cannon' && upgVisible(u) && buyUpg(u, true)) { n++; refresh(); } n ? sfx.buy() : sfx.deny(); } }, 'Buy all affordable');
-    const owned = E.UPGRADES.filter(u => S.upg[u.id] && u.kind !== 'cannon');
-    const og = h('div', { class: 'grid small' }, ...owned.map(u => h('div', { class: 'tile owned', tip: () => upgTip(u) }, h('span', {}, u.icon))));
-    if (S.challenge === 'notests') tabBody.append(h('div', { class: 'warn' }, '🧪 Postmortem "No Tests": upgrades are disabled.'));
-    tabBody.append(h('div', { class: 'sechead' }, h('span', {}, `Available (${avail.length})`), all), avail.length ? grid : h('div', { class: 'empty' }, 'Hire 10 of an agent to unlock its first upgrade.'),
-      h('div', { class: 'sechead' }, h('span', {}, `Owned (${owned.length})`)), og);
-    return () => tiles.forEach(([t, u]) => { const c = E.upgCost(S, u); t.classList.toggle('no', c > S.cash); setText(t.lastChild, fmt(c)); });
+    const all = E.UPGRADES.filter(u => u.kind !== 'cannon'), on = E.milestones(S);
+    const tile = (u, label) => h('div', { class: 'tile ms' + (E.reached(S, u) ? ' got' : ''), tip: () => upgTip(u) }, h('span', {}, u.icon), h('i', { class: 'tc' }, label));
+    if (S.challenge === 'notests') tabBody.append(h('div', { class: 'warn' }, '🧪 Postmortem "No Tests": milestones give no bonus this run.'));
+    tabBody.append(h('div', { class: 'card' }, h('div', { class: 'big' }, `${on.length} / ${all.length}`), h('div', { class: 'dim' }, 'Milestones switch on by themselves — no buying needed. Bright = active.')));
+    tabBody.append(h('div', { class: 'sechead' }, h('span', {}, 'Agent milestones'), h('span', { class: 'dim' }, 'at 10 · 25 · 50 · 100 · 150 · 200 · 300 owned')));
+    const list = h('div', { class: 'list' });
+    E.AGENTS.forEach((a, i) => {
+      if (!agentVisible(i)) return;
+      list.append(h('div', { class: 'mrow' }, h('div', { class: 'aicon', tip: () => agentTip(i) }, a.icon),
+        ...E.UPGRADES.filter(u => u.kind === 'tier' && u.agent === i).map(u => tile(u, `${u.at} · x${u.eff.mult}`))));
+    });
+    tabBody.append(list);
+    tabBody.append(h('div', { class: 'sechead' }, h('span', {}, 'Synergies'), h('span', { class: 'dim' }, 'own enough of both agents')),
+      h('div', { class: 'grid' }, ...all.filter(u => u.kind === 'syn').map(u => tile(u, `${u.need[0]}+${u.need[1]}`))));
+    tabBody.append(h('div', { class: 'sechead' }, h('span', {}, 'Company milestones'), h('span', { class: 'dim' }, 'reach the incident this run')),
+      h('div', { class: 'grid' }, ...all.filter(u => u.kind === 'global').map(u => tile(u, `#${u.need}`))));
   },
   cannon() {
     const lvl = h('div', { class: 'big' }), info = h('div', { class: 'statgrid' });
@@ -674,11 +679,11 @@ const BUILD = {
     const card = h('div', { class: 'card' }, h('div', { class: 'cardhead' }, h('div', {}, h('div', { class: 'dim' }, 'CANNON CALIBRE'), lvl), btn), info);
     const list = h('div', { class: 'list' }), rows = [];
     for (const u of E.UPGRADES.filter(u => u.kind === 'cannon')) {
-      if (!S.upg[u.id] && !upgVisible(u)) continue;
+      if (!S.upg[u.id] && !modVisible(u)) continue;
       const b = costBtn('BUY', () => buyUpg(u));
       const r = h('div', { class: 'row upg' + (S.upg[u.id] ? ' done' : '') }, h('div', { class: 'aicon' }, u.icon), h('div', { class: 'amain' }, h('div', { class: 'aname' }, u.name), h('div', { class: 'adesc' }, u.flav)), S.upg[u.id] ? h('div', { class: 'check' }, '✓') : b);
       list.append(r);
-      if (!S.upg[u.id]) rows.push(() => { const c = E.upgCost(S, u); setText(b.lastChild, money(c)); b.classList.toggle('no', c > S.cash || S.challenge === 'notests'); });
+      if (!S.upg[u.id]) rows.push(() => { const c = E.upgCost(S, u); setText(b.lastChild, money(c)); b.classList.toggle('no', c > S.cash); });
     }
     tabBody.append(h('div', { class: 'hint' }, 'Hold the mouse on the battlefield to fire. Shots scale with calibre and a % of your agent DPS. Shoot golden 0-DAYs and linter drones!'), card, h('div', { class: 'sechead' }, h('span', {}, 'Cannon mods')), list);
     return () => {
@@ -714,7 +719,7 @@ const BUILD = {
       setHTML(top.children[0], `🚀 ${fmt(S.hype)} <small>hype</small>`);
       setHTML(top.children[1], `Each hype gives <b>+${(E.hypeEach(S) * 100).toFixed(0)}%</b> damage (now <b>+${fmt(S.hype * E.hypeEach(S) * 100)}%</b>).<br>` +
         (S.maxLevel >= E.PIVOT_LEVEL ? `Pivoting now grants <b class="good">+${fmt(p)} hype</b> → <b>+${fmt((S.hype + p) * E.hypeEach(S) * 100)}%</b>.` : `Reach incident <b>${E.PIVOT_LEVEL}</b> this run to pivot (now ${S.maxLevel}). Pending: +${fmt(p)}.`) +
-        `<br><span class="dim">Hype = (downtime this era ÷ 480)^0.2. Earn more before pivoting for diminishing-but-real gains. Pivots: ${S.pivots}</span>`);
+        `<br><span class="dim">Hype = (downtime this era ÷ ${E.T.hypeDiv})^${E.T.hypeExp}. Earn more before pivoting for diminishing-but-real gains. Pivots: ${S.pivots}</span>`);
       pbtn.disabled = !ok; rows.forEach(f => f());
     };
   },
@@ -794,14 +799,18 @@ const BUILD = {
 };
 function agentTip(i) {
   const a = E.AGENTS[i], ups = E.UPGRADES.filter(u => u.kind === 'tier' && u.agent === i);
-  return `<b>${a.icon} ${a.name}</b><br><span class="dim">${a.desc}</span><br>Multiplier: x${fmt(D.agentMult[i])}<br>` + ups.map(u => {
-    const st = S.upg[u.id] ? ['good', '✓', ''] : S.agents[i] >= u.at ? ['ready', '●', ' — ready in Upgrades'] : ['dim', '·', ''];
-    return `<span class="${st[0]}">${st[1]} ${u.at}: ${u.name} (x${u.eff.mult})${st[2]}</span>`;
+  return `<b>${a.icon} ${a.name}</b><br><span class="dim">${a.desc}</span><br>Multiplier: <span class="ready">x${fmt(D.agentMult[i])}</span><br>` + ups.map(u => {
+    const got = E.reached(S, u);
+    return `<span class="${got ? 'ready' : 'dim'}">${got ? '✓' : '·'} ${u.at}: ${u.name} (x${u.eff.mult})</span>`;
   }).join('<br>');
 }
 function upgTip(u) {
-  const own = S.upg[u.id];
-  return `<b>${u.icon} ${u.name}</b><br>${u.flav}<br>${own ? '<span class="good">Owned ✓</span>' : `<span class="${E.upgCost(S, u) > S.cash ? 'bad' : 'good'}">${money(E.upgCost(S, u))}</span>`}`;
+  const got = E.reached(S, u);
+  const when = u.kind === 'tier' ? `own ${u.at} ${E.AGENTS[u.agent].name}s (${S.agents[u.agent]}/${u.at})`
+    : u.kind === 'syn' ? `own ${u.need[0]} ${E.AGENTS[u.a].name}s and ${u.need[1]} ${E.AGENTS[u.b].name}s`
+      : u.kind === 'global' ? `reach incident ${u.need} this run (best: ${S.maxLevel})` : '';
+  if (u.kind === 'cannon') return `<b>${u.icon} ${u.name}</b><br>${u.flav}<br>${S.upg[u.id] ? '<span class="good">Owned ✓</span>' : `<span class="${E.upgCost(S, u) > S.cash ? 'bad' : 'good'}">${money(E.upgCost(S, u))}</span>`}`;
+  return `<b>${u.icon} ${u.name}</b><br>${u.flav}<br>${got ? '<span class="ready">✓ Active</span>' : `<span class="dim">Unlocks when you ${when}</span>`}`;
 }
 function confirmPivot() {
   if (!canPivot()) return;

@@ -5,7 +5,7 @@ const ECON = (() => {
   // Balance knobs, tuned with sim.js (override any of them with SLOP_<knob>=value node sim.js).
   //  eff: DPS elasticity of the agent ladder · hpG/hpG2/knee: server HP growth per incident
   //  rewN/rewB: HP per $ (normal/boss) · hypeDiv/hypeExp: hype = (era earnings / div)^exp (Egg, Inc. uses ~0.14)
-  const T = { eff: .8, hpG: 1.55, hpG2: 1.65, knee: 100, rewN: 5, rewB: 2, hypeDiv: 480, hypeExp: .2 };
+  const T = { eff: .8, hpG: 1.55, hpG2: 1.65, knee: 100, rewN: 5, rewB: 2, hypeDiv: 40, hypeExp: .16 };
   if (typeof process !== 'undefined' && process.env) for (const k in T) if (process.env['SLOP_' + k]) T[k] = +process.env['SLOP_' + k];
   // ───────────── agents (generators) ─────────────
   // Costs/DPS follow Clicker Heroes' hero table: each tier is ~5x pricier and less cost-efficient,
@@ -52,7 +52,7 @@ const ECON = (() => {
   // Per-agent tier upgrades: unlocked at an owned count, cost is a multiple of the agent's base cost.
   const TIER_AT = [10, 25, 50, 100, 150, 200, 300];
   const TIER_K = [20, 80, 600, 2e4, 6e5, 2e7, 4e10];
-  const TIER_M = [2, 2, 2, 3, 3, 4, 5];
+  const TIER_M = [2, 2, 2, 2, 2, 3, 3];
   const TIER_NAMES = {
     intern: ['Free Pizza', 'Return Offer', 'Read the Docs (once)', 'Senior Title (No Raise)', 'Stack Overflow Premium', 'Tribal Knowledge', 'Tenure'],
     auto: ['Tab Tab Tab', 'Accept All', 'Multi-line Suggestions', 'Context Window', 'Accept While Sleeping', 'Predictive Merge', 'Autocomplete the Autocomplete'],
@@ -161,7 +161,15 @@ const ECON = (() => {
     return Math.max(0, Math.floor(Math.log(cash * (g - 1) / base + 1) / Math.log(g)));
   };
   const costMult = S => Math.pow(.97, lv(S.board, 'debt')) * Math.pow(.5, lv(S.rust, 'zerocost'));
-  const upgCost = (S, u) => u.cost * (S.chDone.notests ? .5 : 1);
+  const upgCost = (S, u) => u.cost;
+  // Multipliers are milestones (AdVenture Capitalist style): they switch on by themselves when reached.
+  // Agent tiers at N owned, synergies when both counts are met, company upgrades at an incident level.
+  // Only cannon mods (kind 'cannon') are bought with cash.
+  const reached = (S, u) => u.kind === 'tier' ? S.agents[u.agent] >= u.at
+    : u.kind === 'syn' ? S.agents[u.a] >= u.need[0] && S.agents[u.b] >= u.need[1]
+      : u.kind === 'global' ? S.maxLevel >= u.need : !!S.upg[u.id];
+  const active = (S, u) => u.kind === 'cannon' ? !!S.upg[u.id] : S.challenge !== 'notests' && reached(S, u);
+  const milestones = S => UPGRADES.filter(u => u.kind !== 'cannon' && active(S, u));
   const cannonCost = (S, n = 1) => { const b = 10 * Math.pow(1.09, S.cannon); return b * (Math.pow(1.09, n) - 1) / .09; };
   const cannonMax = (S, cash) => Math.max(0, Math.floor(Math.log(cash * .09 / (10 * Math.pow(1.09, S.cannon)) + 1) / Math.log(1.09)));
 
@@ -198,7 +206,7 @@ const ECON = (() => {
   const RUST = [
     { id: 'safety', icon: '🛡️', name: 'Memory Safety', desc: l => `All damage x${Math.pow(3, l)}`, next: 'x3 all damage', base: 1, g: 2 },
     { id: 'fearless', icon: '🧵', name: 'Fearless Concurrency', desc: l => `Hype gain x${Math.pow(2, l)}`, next: 'x2 hype gain', base: 1, g: 2 },
-    { id: 'cargo', icon: '📦', name: 'Cargo', desc: l => l ? 'Auto-buys affordable upgrades' : 'Auto-buy upgrades', next: 'unlock auto-upgrades', base: 2, g: 1, max: 1 },
+    { id: 'cargo', icon: '📦', name: 'Cargo', desc: l => l ? 'Auto-buys cannon mods and calibre' : 'Auto-buy cannon mods & calibre', next: 'unlock auto-buying', base: 2, g: 1, max: 1 },
     { id: 'clippy', icon: '📎', name: 'Clippy', desc: l => `Keep ${l * 10}% of Board levels on Rust reset`, next: '+10% Board kept', base: 1, g: 1.6, max: 10 },
     { id: 'zerocost', icon: '🪶', name: 'Zero-Cost Abstractions', desc: l => `Agents x${Math.pow(2, l)} cheaper`, next: 'agents half price', base: 2, g: 2.2 },
     { id: 'unsafe', icon: '☢️', name: 'unsafe {}', desc: l => `Crit damage x${Math.pow(2, l)}`, next: 'x2 crit damage', base: 1, g: 1.8 },
@@ -211,7 +219,7 @@ const ECON = (() => {
     { id: 'freeze', icon: '🥶', name: 'Code Freeze', rule: 'Agents deal no damage. Only the cannon fires.', goal: 20, reward: 'Shots deal +10% of DPS, forever.' },
     { id: 'friday', icon: '🍻', name: 'Friday 4:59 PM', rule: 'Boss timers are 10 seconds.', goal: 40, reward: 'Boss timer +10s and bosses drop x3 $.' },
     { id: 'legacy4', icon: '🏚️', name: 'Legacy Only', rule: 'Only the first 4 agents can be hired.', goal: 35, reward: 'The first 4 agents are x100 stronger.' },
-    { id: 'notests', icon: '🧪', name: 'No Tests', rule: 'Upgrades cannot be bought.', goal: 40, reward: 'Upgrades cost 50% less.' },
+    { id: 'notests', icon: '🧪', name: 'No Tests', rule: 'Milestones give no bonus.', goal: 40, reward: 'All agents x3.' },
     { id: 'ratelimit', icon: '🚦', name: '429 Too Many Requests', rule: 'Cannon fires 4x slower. Agents deal 1/3 damage.', goal: 45, reward: 'Fire rate +50%.' },
     { id: 'airgap', icon: '🔌', name: 'Air-Gapped', rule: 'No zero-days. Hype gives no bonus.', goal: 60, reward: 'Each hype gives +12% instead of +10%.' },
     { id: 'monorepo', icon: '🗿', name: 'Monorepo', rule: 'Agent cost growth is 12% per hire instead of 7%.', goal: 60, reward: 'All agents x10.' },
@@ -220,13 +228,13 @@ const ECON = (() => {
   const CHALLENGE_PIVOTS = 3;
 
   // ───────────── derived stats ─────────────
-  function owned(S, id) { return !!S.upg[id]; }
   function derive(S) {
     const ch = S.challenge, dn = S.chDone;
     let global = 1, gold = 1 + .2 * lv(S.board, 'growth'), pct = 0, crit = 0, critMult = 10, rate = 1, golden = 1 + .15 * lv(S.board, 'bounty');
     const agentMult = AGENTS.map(() => 1), weapons = [true, false, false, false];
-    for (const id in S.upg) {
-      const e = UPG[id] && UPG[id].eff; if (!e) continue;
+    for (const u of UPGRADES) {
+      if (!active(S, u)) continue;
+      const e = u.eff;
       if (e.agent !== undefined) agentMult[e.agent] *= e.mult;
       if (e.syn) agentMult[e.syn.a] *= 1 + e.syn.pct * S.agents[e.syn.b];
       if (e.weapon) weapons[e.weapon] = true;
@@ -240,6 +248,7 @@ const ECON = (() => {
     }
     if (dn.legacy4) for (let i = 0; i < 4; i++) agentMult[i] *= 100;
     if (dn.monorepo) global *= 10;
+    if (dn.notests) global *= 3;
     if (dn.freeze) pct += .1;
     if (dn.ratelimit) rate *= 1.5;
     pct += .05 * lv(S.rust, 'blazing');
@@ -284,7 +293,7 @@ const ECON = (() => {
   return {
     T, AGENTS, UPGRADES, UPG, TIER_AT, WEAPONS, BOARD, RUST, CHALLENGES, CHALLENGE_PIVOTS, PER_LEVEL, BOSS_EVERY, FINAL, PIVOT_LEVEL, RUST_LEVEL,
     isBoss, hp, reward, bossName, agentCost, maxAfford, upgCost, cannonCost, cannonMax, boardCost, rustCost, crabsFor,
-    hypeTotal, pendingHype, hypeEach, lv, derive, shotDamage, owned, newRun, fresh,
+    hypeTotal, pendingHype, hypeEach, lv, derive, shotDamage, reached, active, milestones, newRun, fresh,
   };
 })();
 if (typeof module !== 'undefined') module.exports = ECON;

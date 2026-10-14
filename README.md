@@ -11,12 +11,12 @@ No build step, no libraries. Progress autosaves to localStorage and keeps earnin
 | Layer | What you do | Inspired by |
 |---|---|---|
 | **Cannon** | Hold the mouse on prod to fire. Calibre, crits, fire rate, and 4 modes (AI SLOP, NPM INSTALL, DROP TABLE, VIBE CODE) | Clicker Heroes' click hero |
-| **Agents** | 16 generators, from Intern to Simulation Admin, each firing its own slop lines. 7% cost growth, upgrades at 10/25/50/100/150/200/300 owned | Clicker Heroes, AdVenture Capitalist |
-| **Upgrades** | 112 per-agent tiers, synergies, global multipliers | Cookie Clicker |
+| **Agents** | 16 generators, from Intern to Simulation Admin, each firing its own slop lines. 7% cost growth | Clicker Heroes |
+| **Milestones** | 129 automatic multipliers: per-agent tiers at 10/25/50/100/150/200/300 owned, cross-agent synergies, and company upgrades at incident levels. No buying needed | AdVenture Capitalist, Cookie Clicker |
 | **Incidents** | 10 servers per incident; overkill chains between servers; every 5th is a timed legacy boss; farm or auto-advance | Clicker Heroes zones |
 | **Zero-days** | Golden packages fly by: shoot them for frenzies, cash or hotfixes | Cookie Clicker golden cookies |
 | **Linter drones** | Block your agents' shots until you shoot them down | |
-| **🚀 Pivot to AI** | Prestige layer 1: hype = (era earnings ÷ 480)^0.2, +10% damage each, or spend it on the Board of Directors (Cron Job auto-fire, Hiring Manager auto-buy, offline earnings…) | AdVenture Capitalist angels, Clicker Heroes ancients, Egg, Inc. exponent |
+| **🚀 Pivot to AI** | Prestige layer 1: hype = (era earnings ÷ 40)^0.16, +10% damage each, or spend it on the Board of Directors (Cron Job auto-fire, Hiring Manager auto-buy, offline earnings…) | AdVenture Capitalist angels, Clicker Heroes ancients, Egg, Inc. exponent |
 | **📝 Postmortems** | 8 challenge runs with nasty rules and permanent rewards | Antimatter Dimensions challenges |
 | **🦀 Rewrite It In Rust** | Prestige layer 2 at incident 120: crabs for the Borrow Checker tree | Realm Grinder / AD multi-layer prestige |
 | **🏆 Trophies & news** | 72 trophies (+3% each, 9 secret) and a Hacker News ticker that reacts to your progress | Cookie Clicker |

@@ -9,13 +9,18 @@ const ratio = (key, mut, get = D => D[key]) => { const S = base(), a = get(E.der
 let n = 0;
 const check = (name, got, want) => { near(got, want, name); n++; };
 
-// per-agent tier upgrades, synergies, globals
+// milestones switch on by themselves: agent tiers at N owned, synergies at both counts, company upgrades at an incident
+const multAt = (i, n) => { const S = E.fresh(); S.agents[i] = n; return E.derive(S).agentMult[i]; };
 for (const u of E.UPGRADES.filter(u => u.kind === 'tier'))
-  check(`tier ${u.id}`, ratio(null, S => { S.upg[u.id] = 1; }, D => D.agentDps[u.agent]), u.eff.mult);
-for (const u of E.UPGRADES.filter(u => u.kind === 'syn'))
-  check(`synergy ${u.id}`, ratio(null, S => { S.upg[u.id] = 1; }, D => D.agentDps[u.a]), 1 + u.eff.syn.pct * 10);
-for (const u of E.UPGRADES.filter(u => u.eff.global)) check(`global ${u.id}`, ratio('dps', S => { S.upg[u.id] = 1; }), u.eff.global);
-for (const u of E.UPGRADES.filter(u => u.eff.gold)) check(`gold ${u.id}`, ratio('gold', S => { S.upg[u.id] = 1; }), u.eff.gold);
+  check(`tier ${u.id} switches on at ${u.at}`, multAt(u.agent, u.at) / multAt(u.agent, u.at - 1), u.eff.mult);
+for (const u of E.UPGRADES.filter(u => u.kind === 'syn')) {
+  const S = E.fresh(); S.agents[u.a] = u.need[0]; S.agents[u.b] = u.need[1] - 1; const off = E.derive(S).agentMult[u.a];
+  S.agents[u.b] = u.need[1]; check(`synergy ${u.id}`, E.derive(S).agentMult[u.a] / off, 1 + u.eff.syn.pct * u.need[1]);
+}
+const atLevel = (key, u) => { const S = base(); S.maxLevel = u.need - 1; const a = E.derive(S)[key]; S.maxLevel = u.need; return E.derive(S)[key] / a; };
+for (const u of E.UPGRADES.filter(u => u.eff.global)) check(`company ${u.id} at incident ${u.need}`, atLevel('dps', u), u.eff.global);
+for (const u of E.UPGRADES.filter(u => u.eff.gold)) check(`company gold ${u.id}`, atLevel('gold', u), u.eff.gold);
+{ const S = base(); S.agents[0] = 300; S.challenge = 'notests'; check('No Tests: milestones off', E.derive(S).agentMult[0], 1); }
 for (const u of E.UPGRADES.filter(u => u.eff.rate)) check(`rate ${u.id}`, ratio('rate', S => { S.upg[u.id] = 1; }), u.eff.rate);
 { const S = base(), ups = E.UPGRADES.filter(u => u.eff.pct); ups.forEach(u => S.upg[u.id] = 1); check('shot %-of-DPS upgrades add up', E.derive(S).pct, ups.reduce((a, u) => a + u.eff.pct, 0)); }
 
@@ -42,5 +47,5 @@ check('Monorepo reward', ratio('dps', S => { S.chDone.monorepo = 1; }), 10);
 check('Code Freeze: agents off', ratio('dps', S => { S.challenge = 'freeze'; }) + 1, 1);
 { const S = E.fresh(); S.eraEarned = 1e12; const raw = Math.pow(1e12 / E.T.hypeDiv, E.T.hypeExp); S.board.insider = 5; check('Insider Trading +50% hype', E.hypeTotal(S), Math.floor(raw * 1.5)); S.board.insider = 0; S.rust.fearless = 2; check('Fearless Concurrency x4 hype', E.hypeTotal(S), Math.floor(raw * 4)); }
 { const S = base(), c = E.agentCost(S, 3); S.board.debt = 4; check('Technical Debt', E.agentCost(S, 3) / c, Math.pow(.97, 4)); S.board.debt = 0; S.rust.zerocost = 1; check('Zero-Cost Abstractions', E.agentCost(S, 3) / c, .5); }
-{ const S = base(), c = E.upgCost(S, E.UPG.t0_0); S.chDone.notests = 1; check('No Tests reward', E.upgCost(S, E.UPG.t0_0) / c, .5); }
+check('No Tests reward', ratio('dps', S => { S.chDone.notests = 1; }), 3);
 console.log(`✓ ${n} multiplier checks passed`);

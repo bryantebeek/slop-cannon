@@ -84,9 +84,16 @@ canvas{display:block;width:100%;height:100%;cursor:none;touch-action:none}
 .tab .new{display:none;position:absolute;top:-3px;right:-2px;background:var(--pink);color:#fff;font-size:8px;padding:1px 4px;border-radius:6px;animation:pulse 1s infinite}
 .tab.isnew .new{display:block}
 .tab .cnt{min-width:16px;padding:0 4px;border-radius:8px;background:#fff;color:#12051f;font-size:9px;font-weight:900;line-height:15px;text-align:center;box-shadow:0 0 8px rgba(255,255,255,.6)}
-.upbtn{display:block;width:100%;margin-top:6px;padding:5px 8px;text-align:left;border-radius:6px;border:1px solid rgba(255,255,255,.7);background:rgba(255,255,255,.1);color:#fff;font-weight:800;font-size:11px;box-shadow:0 0 12px rgba(255,255,255,.25);animation:pop .3s}
-.upbtn:hover{background:rgba(255,255,255,.2)}
-.upbtn.no{border-color:rgba(255,255,255,.3);color:rgba(255,255,255,.65);box-shadow:none}
+.mrow{display:flex;align-items:center;gap:5px}
+.mrow .aicon{font-size:20px;width:30px}
+.mrow .tile{flex:1;min-width:0;font-size:17px}
+.tile.ms{border-color:var(--line);background:rgba(255,255,255,.02);cursor:default}
+.tile.ms span{filter:grayscale(1);opacity:.3}
+.tile.ms .tc{color:var(--dim);font-size:8px}
+.tile.ms.got{border-color:rgba(255,255,255,.75);background:radial-gradient(circle at 50% 35%,rgba(255,255,255,.22),rgba(255,255,255,.03));box-shadow:0 0 12px rgba(255,255,255,.18)}
+.tile.ms.got span{filter:none;opacity:1}
+.tile.ms.got .tc{color:#fff}
+.toast.ms{border-color:rgba(255,255,255,.7)}
 #buyAmt{display:flex;gap:4px;padding:8px 12px 0;align-items:center}
 #buyAmt::before{content:"BUY";color:var(--dim);font-size:10px;margin-right:4px;letter-spacing:1px}
 #buyAmt button{flex:1;padding:4px 0;border-radius:6px;border:1px solid var(--line);background:rgba(255,255,255,.03);font-weight:800;font-size:11px;color:var(--dim)}
