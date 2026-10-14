@@ -639,7 +639,8 @@ const BUILD = {
         setText(stat, S.agents[i] ? `${fmt(D.agentDps[i] / S.agents[i])} DPS each · ${fmt(D.agentDps[i])} total (${(D.agentDps[i] / tot * 100).toFixed(1)}%)` : `${fmt(a.dps * D.agentMult[i] * D.dmg)} DPS each`);
         const nt = E.TIER_AT.find(t => t > S.agents[i]), prev = [0, ...E.TIER_AT].filter(t => t <= S.agents[i]).pop();
         bar.style.transform = `scaleX(${nt ? (S.agents[i] - prev) / (nt - prev) : 1})`;
-        setText(next, nt ? `next upgrade unlocks at ${nt}` : 'all upgrades unlocked');
+        const ready = E.UPGRADES.filter(u => u.kind === 'tier' && u.agent === i && !S.upg[u.id] && S.agents[i] >= u.at).length;
+        setHTML(next, (ready ? `<span class="ready">● ${ready} upgrade${ready > 1 ? 's' : ''} ready to buy</span> · ` : '') + (nt ? `next upgrade unlocks at ${nt}` : 'all upgrades unlocked'));
         setText(btn.lastChild, locked ? 'LOCKED' : money(c)); setText(btn.firstChild, locked ? 'POSTMORTEM' : `HIRE ×${n}`);
         btn.classList.toggle('no', locked || c > S.cash);
       });
@@ -789,7 +790,10 @@ const BUILD = {
 };
 function agentTip(i) {
   const a = E.AGENTS[i], ups = E.UPGRADES.filter(u => u.kind === 'tier' && u.agent === i);
-  return `<b>${a.icon} ${a.name}</b><br><span class="dim">${a.desc}</span><br>Multiplier: x${fmt(D.agentMult[i])}<br>` + ups.map(u => `<span class="${S.upg[u.id] ? 'good' : 'dim'}">${S.upg[u.id] ? '✓' : '·'} ${u.at}: ${u.name} (x${u.eff.mult})</span>`).join('<br>');
+  return `<b>${a.icon} ${a.name}</b><br><span class="dim">${a.desc}</span><br>Multiplier: x${fmt(D.agentMult[i])}<br>` + ups.map(u => {
+    const st = S.upg[u.id] ? ['good', '✓', ''] : S.agents[i] >= u.at ? ['ready', '●', ' — ready in Upgrades'] : ['dim', '·', ''];
+    return `<span class="${st[0]}">${st[1]} ${u.at}: ${u.name} (x${u.eff.mult})${st[2]}</span>`;
+  }).join('<br>');
 }
 function upgTip(u) {
   const own = S.upg[u.id];
