@@ -907,8 +907,8 @@ function frame(now) {
   perfT += dt; perfN++;
   if (perfT > 1.5) { if (perfN / perfT < 50 && DPR > 1 && !document.hidden) { maxDPR = Math.max(1, DPR - .5); resize(); } perfT = 0; perfN = 0; }
   // camera follows the crosshair a little, for parallax
-  const ty = hoverCanvas ? Math.atan((aimX - W / 2) / F) * .3 : Math.sin(T * .2) * .08, tp = hoverCanvas ? .06 + Math.atan(-(aimY - H / 2) / F) * .22 : .06;
-  aimYaw = lerp(aimYaw, ty, Math.min(1, dt * 3)); aimPitch = lerp(aimPitch, clamp(tp, -.15, .3), Math.min(1, dt * 3));
+  const ty = hoverCanvas ? Math.atan((aimX - W / 2) / F) * .4 : Math.sin(T * .2) * .08, tp = hoverCanvas ? .06 + Math.atan(-(aimY - H / 2) / F) * .3 : .06;
+  aimYaw = lerp(aimYaw, ty, Math.min(1, dt * 3)); aimPitch = lerp(aimPitch, clamp(tp, -.15, .35), Math.min(1, dt * 3));
   const vy = (aimYaw - pYaw) / Math.max(dt, 1e-3), vp = (aimPitch - pPitch) / Math.max(dt, 1e-3); pYaw = aimYaw; pPitch = aimPitch;
   swayX = lerp(swayX, clamp(-vy * .03, -.09, .09), Math.min(1, dt * 8)); swayY = lerp(swayY, clamp(-vp * .03, -.06, .06), Math.min(1, dt * 8));
   cam.yaw = aimYaw; cam.pitch = aimPitch + recoil * .02; camUpdate();
@@ -916,6 +916,7 @@ function frame(now) {
   shake *= Math.exp(-dt * 7); hitMark = Math.max(0, hitMark - dt); redFlash = Math.max(0, redFlash - dt); comboPop = Math.max(0, comboPop - dt * 3);
   sim(dt);
   if (hoverCanvas) aimInfo = raycast([cam.x, cam.y, cam.z], screenRay(aimX, aimY));
+  updateBarrel(dt);
   updateParticles(dt);
   render(dt);
   uiT -= dt; if (uiT <= 0) { uiT = .1; updateUI(); }

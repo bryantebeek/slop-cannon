@@ -456,19 +456,41 @@ function drawLabels() {
 }
 
 // ───────────── drawing: cannon viewmodel ─────────────
-const cannonOff = () => [swayX + Math.sin(T * 1.6) * .006 + clamp((aimX - W / 2) / F, -1, 1) * .1, swayY - recoil * .04 + Math.cos(T * 3.2) * .004 - clamp((aimY - H / 2) / F, -1, 1) * .05, -recoil * .3];
-function muzzleWorld() { const [ox, oy, oz] = cannonOff(); return localToWorld(ox, -.6 + oy, 2.9 + oz); }
+// The barrel pivots at its breech and points its muzzle at the 3D point under the crosshair.
+// Everything is in camera-local space (x right, y up, z forward).
+const B_BASE = [0, -.86, .8], B_LEN = 2.116;
+let bDir = [0, .1229, .9924];
+const norm3 = v => { const L = Math.hypot(v[0], v[1], v[2]) || 1; return [v[0] / L, v[1] / L, v[2] / L]; };
+function updateBarrel(dt) {
+  const t = hoverCanvas && aimInfo ? toCam(...aimInfo.p) : [0, -.4, 60];
+  const d = norm3([t[0] - B_BASE[0], t[1] - B_BASE[1], t[2] - B_BASE[2]]), k = Math.min(1, dt * 16);
+  bDir = norm3(bDir.map((v, i) => lerp(v, d[i], k)));
+}
+const cannonOff = () => [swayX + Math.sin(T * 1.6) * .006, swayY - recoil * .04 + Math.cos(T * 3.2) * .004, -recoil * .3];
+function barrelAt(u) {
+  const [ox, oy] = cannonOff(), l = B_LEN * u - recoil * .3;
+  return [B_BASE[0] + ox + bDir[0] * l, B_BASE[1] + oy + bDir[1] * l, B_BASE[2] + bDir[2] * l];
+}
+function muzzleWorld() { return localToWorld(...barrelAt(1)); }
 function drawCannon(info) {
   const [ox, oy, oz] = cannonOff(), N = 18, sec = [];
+  const up = norm3([-bDir[0] * bDir[1], 1 - bDir[1] * bDir[1], -bDir[2] * bDir[1]]); // world-up, made perpendicular to the barrel
+  const scr = (P, s) => ({ x: W / 2 + P[0] * s, y: H / 2 - P[1] * s });
   for (let i = 0; i <= N; i++) {
     const u = i / N; let r = lerp(.42, .215, u), band = false;
     if (u > .86) { r *= 1.24; band = i === N - 2 || i === N; }
     else if (Math.abs(u - .33) < .03 || Math.abs(u - .6) < .03) { r *= 1.07; band = true; }
-    const z = lerp(.8, 2.9, u) + oz, y = lerp(-.86, -.6, u) + oy, s = F / z, x = lerp(0, ox, u) + ox * .3;
-    sec.push({ x: W / 2 + x * s, y: H / 2 - y * s, r: r * s, u, band });
+    const P = barrelAt(u), s = F / P[2], c = scr(P, s);
+    const rs = lerp(.42, .215, u) * .97, tp = [P[0] + up[0] * rs, P[1] + up[1] * rs, P[2] + up[2] * rs], ts = scr(tp, F / tp[2]); // top seam (ignores ring bulges) for the conduit
+    sec.push({ x: c.x, y: c.y, r: r * s, u, band, tx: ts.x, ty: ts.y });
+  }
+  // silhouette normal per section (perpendicular to the barrel's on-screen axis)
+  for (let i = 0; i <= N; i++) {
+    const a = sec[Math.max(0, i - 1)], b = sec[Math.min(N, i + 1)], L = Math.hypot(b.x - a.x, b.y - a.y) || 1;
+    sec[i].nx = -(b.y - a.y) / L; sec[i].ny = (b.x - a.x) / L;
   }
   const metal = (c, k) => {
-    const g = ctx.createLinearGradient(c.x - c.r, 0, c.x + c.r, 0);
+    const g = ctx.createLinearGradient(c.x - c.nx * c.r, c.y - c.ny * c.r, c.x + c.nx * c.r, c.y + c.ny * c.r);
     g.addColorStop(0, '#07080c'); g.addColorStop(.22, k ? '#2a2f3d' : '#333a4c'); g.addColorStop(.38, k ? '#7d88a5' : '#9aa6c4');
     g.addColorStop(.5, '#3d4558'); g.addColorStop(.78, '#1a1e28'); g.addColorStop(1, '#050608'); return g;
   };
@@ -476,7 +498,9 @@ function drawCannon(info) {
   circ(sec[N], metal(sec[N], 1));
   for (let i = N - 1; i >= 0; i--) {
     const a = sec[i], b = sec[i + 1], g = metal(a, a.band);
-    ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(b.x - b.r, b.y); ctx.lineTo(a.x - a.r, a.y); ctx.lineTo(a.x + a.r, a.y); ctx.lineTo(b.x + b.r, b.y); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = g; ctx.beginPath();
+    ctx.moveTo(b.x - b.nx * b.r, b.y - b.ny * b.r); ctx.lineTo(a.x - a.nx * a.r, a.y - a.ny * a.r);
+    ctx.lineTo(a.x + a.nx * a.r, a.y + a.ny * a.r); ctx.lineTo(b.x + b.nx * b.r, b.y + b.ny * b.r); ctx.closePath(); ctx.fill();
     circ(a, g);
     if (a.band) { ctx.strokeStyle = 'rgba(0,0,0,.55)'; ctx.lineWidth = Math.max(1, a.r * .03); ctx.beginPath(); ctx.arc(a.x, a.y, a.r, 0, 7); ctx.stroke(); }
   }
@@ -484,11 +508,11 @@ function drawCannon(info) {
   const wc = info.col;
   for (const [lw, al] of [[.08, .25], [.025, 1]]) {
     ctx.strokeStyle = wc; ctx.globalAlpha = al * (.7 + .3 * Math.sin(T * 4)); ctx.lineWidth = Math.max(1, sec[8].r * lw * 1.3); ctx.lineCap = 'round';
-    ctx.beginPath(); for (let i = 1; i < N - 3; i++) ctx.lineTo(sec[i].x, sec[i].y - sec[i].r * .97); ctx.stroke();
+    ctx.beginPath(); for (let i = 1; i < N - 3; i++) ctx.lineTo(sec[i].tx, sec[i].ty); ctx.stroke();
   }
-  const mb = sec[N - 1]; ctx.globalAlpha = .9; ctx.lineWidth = Math.max(1.5, mb.r * .12); ctx.setLineDash([mb.r * .18, mb.r * .14]);
-  ctx.beginPath(); ctx.arc(mb.x, mb.y, mb.r * .88, Math.PI * 1.15, Math.PI * 1.85); ctx.stroke(); ctx.setLineDash([]); ctx.lineCap = 'butt';
-  if (heat > .05) for (let i = N - 6; i <= N; i += 2) spr(SPR.fire, sec[i].x, sec[i].y - sec[i].r * .3, sec[i].r * 2.6, sec[i].r * 2.2, heat * .45);
+  const mb = sec[N - 1], va = Math.atan2(mb.ty - mb.y, mb.tx - mb.x); ctx.globalAlpha = .9; ctx.lineWidth = Math.max(1.5, mb.r * .12); ctx.setLineDash([mb.r * .18, mb.r * .14]);
+  ctx.beginPath(); ctx.arc(mb.x, mb.y, mb.r * .88, va - Math.PI * .35, va + Math.PI * .35); ctx.stroke(); ctx.setLineDash([]); ctx.lineCap = 'butt';
+  if (heat > .05) for (let i = N - 6; i <= N; i += 2) spr(SPR.fire, lerp(sec[i].x, sec[i].tx, .3), lerp(sec[i].y, sec[i].ty, .3), sec[i].r * 2.6, sec[i].r * 2.2, heat * .45);
   if (flash > 0) {
     const tip = sec[N], fs = F / (3.3 + oz), fx = tip.x, fy = tip.y;
     spr(SPR[info.spr], fx, fy, fs * 2.4 * flash, fs * 2.4 * flash, flash);
@@ -497,7 +521,9 @@ function drawCannon(info) {
     ctx.beginPath(); for (let i = 0; i < 7; i++) { const a = rand(0, 7), l = rand(.4, 1.1) * fs * flash; ctx.moveTo(fx, fy); ctx.lineTo(fx + Math.cos(a) * l, fy + Math.sin(a) * l); } ctx.stroke();
   }
   ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
-  monitor(-.78, -.3, -.44, -.5, 1.4, ox, oy, oz, (x, y, w, h, fs) => {
+  // monitors are bolted to the barrel: follow its swing at their mounting depth
+  const mount = barrelAt(.28), mx = mount[0] - B_BASE[0], my = mount[1] - B_BASE[1] - .0728;
+  monitor(-.78, -.3, -.44, -.5, 1.4, mx, my, oz, (x, y, w, h, fs) => {
     ctx.fillStyle = info.col; ctx.font = `800 ${fs * 1.15}px ${MONO}`; ctx.fillText(info.name, x, y + fs * 1.2);
     ctx.fillStyle = 'rgba(232,230,255,.65)'; ctx.font = `400 ${fs * .8}px ${MONO}`; ctx.fillText('SHOT ' + fmt(info.shot) + '  ·  ' + info.sub, x, y + fs * 2.4);
     ctx.fillStyle = 'rgba(255,255,255,.1)'; ctx.fillRect(x, y + fs * 3, w - fs, fs * .5); ctx.fillStyle = info.cool >= 1 ? info.col : '#ff4d6d'; ctx.fillRect(x, y + fs * 3, (w - fs) * info.cool, fs * .5);
@@ -505,7 +531,7 @@ function drawCannon(info) {
     const off = (T * 3) % 1, base = T * 3 | 0;
     for (let i = 0; i < 4; i++) ctx.fillText('> ' + SLOP[(base + i) % SLOP.length], x, y + fs * (4.6 + i * 1.05 - off * 1.05));
   });
-  monitor(.44, -.3, .78, -.5, 1.4, ox, oy, oz, (x, y, w, h, fs) => {
+  monitor(.44, -.3, .78, -.5, 1.4, mx, my, oz, (x, y, w, h, fs) => {
     ctx.font = `800 ${fs}px ${MONO}`; ctx.fillStyle = 'rgba(232,230,255,.75)'; ctx.fillText('INCIDENT #' + info.level, x, y + fs * 1.2);
     ctx.fillStyle = Math.sin(T * 6) > 0 ? '#ff4d6d' : '#7a2433'; ctx.fillText('BUILD: FAILING ✖', x, y + fs * 2.4);
     ctx.font = `400 ${fs * .8}px ${MONO}`; ctx.fillStyle = 'rgba(232,230,255,.65)';
