@@ -11,37 +11,37 @@ const ECON = (() => {
   // Costs/DPS follow Clicker Heroes' hero table: each tier is ~5x pricier and less cost-efficient,
   // so cheap agents stay relevant through their x2/x3 tier upgrades.
   const AGENTS = [
-    { id: 'intern', icon: '🧑‍🎓', name: 'Intern', desc: 'Copy-pastes from Stack Overflow. Unpaid. Unsupervised.', cost: 50, dps: 5, col: '#5dff9b',
+    { id: 'intern', icon: 'student', name: 'Intern', desc: 'Copy-pastes from Stack Overflow. Unpaid. Unsupervised.', cost: 50, dps: 5, col: '#5dff9b',
       lines: ['copy(paste)', '// from StackOverflow', 'console.log("here")', 'git commit -m "fix"', '// TODO: ask senior'] },
-    { id: 'auto', icon: '⌨️', name: 'Autocomplete', desc: 'Presses Tab so you don\'t have to read.', cost: 300, dps: 24.6, col: '#7df9ff',
+    { id: 'auto', icon: 'keyboard', name: 'Autocomplete', desc: 'Presses Tab so you don\'t have to read.', cost: 300, dps: 24.6, col: '#7df9ff',
       lines: ['as any', '// @ts-ignore', 'catch(e){}', '!important', 'any[]'] },
-    { id: 'junior', icon: '🐣', name: 'Junior + ChatGPT', desc: 'Ships fast. Asks nothing. Understands less.', cost: 2000, dps: 134, col: '#ffd23f',
+    { id: 'junior', icon: 'baby', name: 'Junior + ChatGPT', desc: 'Ships fast. Asks nothing. Understands less.', cost: 2000, dps: 134, col: '#ffd23f',
       lines: ['eval(input)', 'password123', '== null', 'sleep(5000)', 'md5(pw)'] },
-    { id: 'prompt', icon: '🪄', name: 'Prompt Engineer', desc: '"You are a senior engineer. Do not make mistakes."', cost: 15000, dps: 827, col: '#ff9ef5',
+    { id: 'prompt', icon: 'magic-wand', name: 'Prompt Engineer', desc: '"You are a senior engineer. Do not make mistakes."', cost: 15000, dps: 827, col: '#ff9ef5',
       lines: ['prompt: fix it', 'make it pop', 'pls no bugs', 'think step by step', 'you are a 10x dev'] },
-    { id: 'vibe', icon: '✨', name: 'Vibe Coder', desc: 'Has never opened the diff. Has never needed to.', cost: 150000, dps: 6780, col: '#c77dff',
-      lines: ['✨ vibes', 'trust me bro', 'just works™', '// works on my machine', 'LGTM 👍'] },
-    { id: 'copilot', icon: '🐝', name: 'Copilot Swarm', desc: 'Forty autocompletes arguing in a trench coat.', cost: 2e06, dps: 74100, col: '#7df9ff',
+    { id: 'vibe', icon: 'sparkle', name: 'Vibe Coder', desc: 'Has never opened the diff. Has never needed to.', cost: 150000, dps: 6780, col: '#c77dff',
+      lines: ['*vibes*', 'trust me bro', 'just works™', '// works on my machine', 'LGTM +1'] },
+    { id: 'copilot', icon: 'users-three', name: 'Copilot Swarm', desc: 'Forty autocompletes arguing in a trench coat.', cost: 2e06, dps: 74100, col: '#7df9ff',
       lines: ['import *', 'while(true)', 'retry(∞)', 'except: pass', 'SELECT * FROM *'] },
-    { id: 'agent', icon: '🤖', name: 'Autonomous Agent', desc: 'Runs with --dangerously-skip-permissions. "I panicked."', cost: 4e07, dps: 1.22e06, col: '#ff4d6d',
+    { id: 'agent', icon: 'robot', name: 'Autonomous Agent', desc: 'Runs with --dangerously-skip-permissions. "I panicked."', cost: 4e07, dps: 1.22e06, col: '#ff4d6d',
       lines: ['rm -rf /', 'git push -f', 'chmod 777', 'DROP DATABASE prod;', 'curl | sudo sh'] },
-    { id: 'tenx', icon: '🦸', name: '10x Engineer', desc: 'Ten agents in a hoodie. Refuses code review on principle.', cost: 1e09, dps: 2.49e07, col: '#ffb020',
+    { id: 'tenx', icon: 'lightning', name: '10x Engineer', desc: 'Ten agents in a hoodie. Refuses code review on principle.', cost: 1e09, dps: 2.49e07, col: '#ffb020',
       lines: ['O(n³)', 'v2_final_FINAL', 'goto fail', 'unsafe {}', '#define TRUE 0'] },
-    { id: 'consult', icon: '🧾', name: 'AI Consultancy', desc: 'Bills by the token. Delivers a 400-slide deck.', cost: 4e10, dps: 8.18e08, col: '#9aa6c4',
+    { id: 'consult', icon: 'receipt', name: 'AI Consultancy', desc: 'Bills by the token. Delivers a 400-slide deck.', cost: 4e10, dps: 8.18e08, col: '#9aa6c4',
       lines: ['invoice.pdf', 'phase 2', 'synergy', 'scope creep', 'per diem'] },
-    { id: 'halluc', icon: '🍄', name: 'Hallucination Engine', desc: 'Invents packages. Someone else publishes them.', cost: 2.5e12, dps: 4.19e10, col: '#5dff9b',
+    { id: 'halluc', icon: 'ghost', name: 'Hallucination Engine', desc: 'Invents packages. Someone else publishes them.', cost: 2.5e12, dps: 4.19e10, col: '#5dff9b',
       lines: ["import 'react-ai-pro'", 'npm i is-even-ai', 'cite: trust me', 'api.v7.fake()', 'left-pad@99'] },
-    { id: 'startup', icon: '🦄', name: 'Self-Replicating Startup', desc: 'Raises a seed round, forks itself, raises again.', cost: 2e14, dps: 2.75e12, col: '#ff8ad8',
+    { id: 'startup', icon: 'git-fork', name: 'Self-Replicating Startup', desc: 'Raises a seed round, forks itself, raises again.', cost: 2e14, dps: 2.75e12, col: '#ff8ad8',
       lines: ['raise(seed)', 'pivot()', 'fork()', 'web3', 'AI-first'] },
-    { id: 'paperclip', icon: '📎', name: 'Paperclip Maximizer', desc: 'Converts your infrastructure into paperclips. Efficiently.', cost: 2.5e16, dps: 2.82e14, col: '#cfd8ff',
-      lines: ['📎', '📎📎📎', 'maximize()', 'clips++', 'convert(earth)'] },
-    { id: 'agi', icon: '🧠', name: 'AGI (4 if-statements)', desc: 'Achieved general intelligence. It is mostly else-ifs.', cost: 4e18, dps: 3.7e16, col: '#ffd23f',
+    { id: 'paperclip', icon: 'paperclip', name: 'Paperclip Maximizer', desc: 'Converts your infrastructure into paperclips. Efficiently.', cost: 2.5e16, dps: 2.82e14, col: '#cfd8ff',
+      lines: ['clip()', 'clips++', 'maximize()', 'clips *= 2', 'convert(earth)'] },
+    { id: 'agi', icon: 'brain', name: 'AGI (4 if-statements)', desc: 'Achieved general intelligence. It is mostly else-ifs.', cost: 4e18, dps: 3.7e16, col: '#ffd23f',
       lines: ['if (sentient)', 'else if', 'return true', 'hello, human', '// do not remove'] },
-    { id: 'singularity', icon: '🌀', name: 'The Singularity', desc: 'Improves itself. Mostly its own LinkedIn.', cost: 8e20, dps: 6.06e18, col: '#c77dff',
+    { id: 'singularity', icon: 'spiral', name: 'The Singularity', desc: 'Improves itself. Mostly its own LinkedIn.', cost: 8e20, dps: 6.06e18, col: '#c77dff',
       lines: ['∞', 'self.improve()', 'Ω', 'recurse()', 'Σ'] },
-    { id: 'dyson', icon: '☀️', name: 'Dyson GPU Sphere', desc: 'Wraps the sun in H100s. Still CUDA out of memory.', cost: 2e23, dps: 1.24e21, col: '#ff8a3d',
-      lines: ['CUDA OOM', '☀ → FLOPS', 'NaN loss', 'H100 × 10⁹', 'tensor<∞>'] },
-    { id: 'admin', icon: '👁️', name: 'Simulation Admin', desc: 'Has sudo on reality. Deploys straight to it.', cost: 6e25, dps: 3.06e23, col: '#ffffff',
+    { id: 'dyson', icon: 'sun', name: 'Dyson GPU Sphere', desc: 'Wraps the sun in H100s. Still CUDA out of memory.', cost: 2e23, dps: 1.24e21, col: '#ff8a3d',
+      lines: ['CUDA OOM', 'sun -> FLOPS', 'NaN loss', 'H100 × 10⁹', 'tensor<∞>'] },
+    { id: 'admin', icon: 'eye', name: 'Simulation Admin', desc: 'Has sudo on reality. Deploys straight to it.', cost: 6e25, dps: 3.06e23, col: '#ffffff',
       lines: ['sudo reality', 'patch(physics)', '> /dev/null', 'reboot()', 'rm -rf universe'] },
   ];
   // DPS of each agent = previous DPS x (cost ratio)^EFF: newer agents are less cost-efficient, so a
@@ -86,33 +86,33 @@ const ECON = (() => {
 
   // Cannon upgrades (one-time). pct = shots deal +x of total agent DPS (Cookie Clicker's "mouse" upgrades).
   const CANNON_UPG = [
-    { id: 'c_npm', cost: 2e3, name: 'npm install', icon: '📦', eff: { weapon: 1 }, flav: 'Unlocks NPM INSTALL: splits into 8 dependencies mid-air.' },
-    { id: 'c_kb', cost: 5e3, name: 'Mechanical Keyboard', icon: '⌨️', eff: { pct: .01 }, flav: 'Clicky. Your shots now deal +1% of your agent DPS.' },
-    { id: 'c_crit', cost: 2e4, name: 'Lucky Deploy', icon: '🍀', eff: { crit: .05 }, flav: '+5% crit chance. Crits deal 10x. Sometimes it just works.' },
-    { id: 'c_rgb', cost: 8e5, name: 'RGB Lighting', icon: '🌈', eff: { pct: .01 }, flav: '+1% of DPS per shot. Every color is a performance boost.' },
-    { id: 'c_drop', cost: 2e5, name: 'DROP TABLE', icon: '💣', eff: { weapon: 2 }, flav: 'Unlocks DROP TABLE: 30x damage with splash. --no-verify.' },
-    { id: 'c_rate', cost: 5e6, name: 'Overclocked Fan', icon: '🌀', eff: { rate: 1.25 }, flav: 'Fire rate +25%. It sounds like a jet engine.' },
-    { id: 'c_desk', cost: 4e8, name: 'Standing Desk', icon: '🧍', eff: { pct: .01 }, flav: '+1% of DPS per shot. You stand there. Firing.' },
-    { id: 'c_vibe', cost: 2e7, name: 'VIBE CODE', icon: '🔮', eff: { weapon: 3 }, flav: 'Unlocks VIBE CODE: 3 homing vibes. Never misses (allegedly).' },
-    { id: 'c_crit2', cost: 3e9, name: 'Production Hotfix', icon: '🔥', eff: { crit: .05 }, flav: '+5% crit chance. Straight to prod, straight to the heart.' },
-    { id: 'c_blame', cost: 6e11, name: 'Blame Game', icon: '👉', eff: { critMult: 2 }, flav: 'Crits deal 2x more. It was the intern.' },
-    { id: 'c_chair', cost: 1e13, name: 'Gaming Chair', icon: '💺', eff: { pct: .01 }, flav: '+1% of DPS per shot. +40 to posture.' },
-    { id: 'c_cool', cost: 5e15, name: 'Liquid Cooling', icon: '💧', eff: { rate: 1.25 }, flav: 'Fire rate +25%. Leaks onto the prod rack.' },
-    { id: 'c_mon2', cost: 2e18, name: 'Second Monitor', icon: '🖥️', eff: { pct: .02 }, flav: '+2% of DPS per shot. One for code, one for Twitter.' },
-    { id: 'c_mon3', cost: 5e23, name: 'Vertical Third Monitor', icon: '📟', eff: { pct: .02 }, flav: '+2% of DPS per shot. For reading the logs you ignore.' },
-    { id: 'c_neur', cost: 1e30, name: 'Neuralink Keybinds', icon: '🧠', eff: { pct: .03 }, flav: '+3% of DPS per shot. You think "deploy", it deploys.' },
+    { id: 'c_npm', cost: 2e3, name: 'npm install', icon: 'package', eff: { weapon: 1 }, flav: 'Unlocks NPM INSTALL: splits into 8 dependencies mid-air.' },
+    { id: 'c_kb', cost: 5e3, name: 'Mechanical Keyboard', icon: 'keyboard', eff: { pct: .01 }, flav: 'Clicky. Your shots now deal +1% of your agent DPS.' },
+    { id: 'c_crit', cost: 2e4, name: 'Lucky Deploy', icon: 'clover', eff: { crit: .05 }, flav: '+5% crit chance. Crits deal 10x. Sometimes it just works.' },
+    { id: 'c_rgb', cost: 8e5, name: 'RGB Lighting', icon: 'rainbow', eff: { pct: .01 }, flav: '+1% of DPS per shot. Every color is a performance boost.' },
+    { id: 'c_drop', cost: 2e5, name: 'DROP TABLE', icon: 'bomb', eff: { weapon: 2 }, flav: 'Unlocks DROP TABLE: 30x damage with splash. --no-verify.' },
+    { id: 'c_rate', cost: 5e6, name: 'Overclocked Fan', icon: 'fan', eff: { rate: 1.25 }, flav: 'Fire rate +25%. It sounds like a jet engine.' },
+    { id: 'c_desk', cost: 4e8, name: 'Standing Desk', icon: 'desk', eff: { pct: .01 }, flav: '+1% of DPS per shot. You stand there. Firing.' },
+    { id: 'c_vibe', cost: 2e7, name: 'VIBE CODE', icon: 'target', eff: { weapon: 3 }, flav: 'Unlocks VIBE CODE: 3 homing vibes. Never misses (allegedly).' },
+    { id: 'c_crit2', cost: 3e9, name: 'Production Hotfix', icon: 'fire', eff: { crit: .05 }, flav: '+5% crit chance. Straight to prod, straight to the heart.' },
+    { id: 'c_blame', cost: 6e11, name: 'Blame Game', icon: 'hand-pointing', eff: { critMult: 2 }, flav: 'Crits deal 2x more. It was the intern.' },
+    { id: 'c_chair', cost: 1e13, name: 'Gaming Chair', icon: 'armchair', eff: { pct: .01 }, flav: '+1% of DPS per shot. +40 to posture.' },
+    { id: 'c_cool', cost: 5e15, name: 'Liquid Cooling', icon: 'drop', eff: { rate: 1.25 }, flav: 'Fire rate +25%. Leaks onto the prod rack.' },
+    { id: 'c_mon2', cost: 2e18, name: 'Second Monitor', icon: 'monitor', eff: { pct: .02 }, flav: '+2% of DPS per shot. One for code, one for Twitter.' },
+    { id: 'c_mon3', cost: 5e23, name: 'Vertical Third Monitor', icon: 'device-tablet', eff: { pct: .02 }, flav: '+2% of DPS per shot. For reading the logs you ignore.' },
+    { id: 'c_neur', cost: 1e30, name: 'Neuralink Keybinds', icon: 'brain', eff: { pct: .03 }, flav: '+3% of DPS per shot. You think "deploy", it deploys.' },
   ];
   // Global gold/DPS sinks (one-time).
   const GLOBAL_UPG = [
-    { id: 'g_k8s', cost: 1e6, need: 20, name: 'Kubernetes', icon: '☸️', eff: { global: 1.5 }, flav: 'All agents +50%. Nobody knows how it works, including it.' },
-    { id: 'g_bounty', cost: 5e6, need: 25, name: 'Bug Bounty Program', icon: '🐛', eff: { golden: 1.3 }, flav: 'Zero-days appear 30% more often.' },
-    { id: 'g_micro', cost: 1e10, need: 45, name: 'Microservices', icon: '🧩', eff: { global: 2 }, flav: 'All agents x2. One outage became forty.' },
-    { id: 'g_cdn', cost: 1e13, need: 60, name: 'Edge Caching', icon: '🌐', eff: { gold: 1.5 }, flav: '+50% downtime $. The outage is now globally distributed.' },
-    { id: 'g_serverless', cost: 1e17, need: 75, name: 'Serverless', icon: '☁️', eff: { global: 2 }, flav: 'All agents x2. There are still servers. Breaking them.' },
-    { id: 'g_blockchain', cost: 1e22, need: 95, name: 'Put It On The Blockchain', icon: '⛓️', eff: { gold: 2 }, flav: 'x2 downtime $. Immutable outages.' },
-    { id: 'g_ai', cost: 1e27, need: 115, name: 'Add AI To Everything', icon: '🤯', eff: { global: 3 }, flav: 'All agents x3. Including the toaster.' },
-    { id: 'g_quantum', cost: 1e34, need: 140, name: 'Quantum Slop', icon: '⚛️', eff: { global: 3 }, flav: 'All agents x3. Bugs exist in superposition.' },
-    { id: 'g_vc', cost: 1e42, need: 165, name: 'Infinite VC Money', icon: '💸', eff: { global: 5 }, flav: 'All agents x5. Burn rate: yes.' },
+    { id: 'g_k8s', cost: 1e6, need: 20, name: 'Kubernetes', icon: 'steering-wheel', eff: { global: 1.5 }, flav: 'All agents +50%. Nobody knows how it works, including it.' },
+    { id: 'g_bounty', cost: 5e6, need: 25, name: 'Bug Bounty Program', icon: 'bug', eff: { golden: 1.3 }, flav: 'Zero-days appear 30% more often.' },
+    { id: 'g_micro', cost: 1e10, need: 45, name: 'Microservices', icon: 'puzzle-piece', eff: { global: 2 }, flav: 'All agents x2. One outage became forty.' },
+    { id: 'g_cdn', cost: 1e13, need: 60, name: 'Edge Caching', icon: 'globe', eff: { gold: 1.5 }, flav: '+50% downtime $. The outage is now globally distributed.' },
+    { id: 'g_serverless', cost: 1e17, need: 75, name: 'Serverless', icon: 'cloud', eff: { global: 2 }, flav: 'All agents x2. There are still servers. Breaking them.' },
+    { id: 'g_blockchain', cost: 1e22, need: 95, name: 'Put It On The Blockchain', icon: 'link', eff: { gold: 2 }, flav: 'x2 downtime $. Immutable outages.' },
+    { id: 'g_ai', cost: 1e27, need: 115, name: 'Add AI To Everything', icon: 'cpu', eff: { global: 3 }, flav: 'All agents x3. Including the toaster.' },
+    { id: 'g_quantum', cost: 1e34, need: 140, name: 'Quantum Slop', icon: 'atom', eff: { global: 3 }, flav: 'All agents x3. Bugs exist in superposition.' },
+    { id: 'g_vc', cost: 1e42, need: 165, name: 'Infinite VC Money', icon: 'money', eff: { global: 5 }, flav: 'All agents x5. Burn rate: yes.' },
   ];
 
   for (const g of GLOBAL_UPG) g.cost = 60 * Math.pow(1.55, g.need - 1);
@@ -132,10 +132,10 @@ const ECON = (() => {
   // ───────────── weapons ─────────────
   // shots/s and damage factor per shot. Each has a niche: spray, crowds, bosses, moving targets.
   const WEAPONS = [
-    { name: 'AI SLOP', sub: 'autocomplete spray', cd: .14, mult: 1, col: '#5dff9b', spr: 'green' },
-    { name: 'NPM INSTALL', sub: '8 deps · hits crowds', cd: .9, mult: 1.1, col: '#ffd23f', spr: 'yel' },
-    { name: 'DROP TABLE', sub: '30x · splash · boss killer', cd: 2.4, mult: 30, col: '#ff4d6d', spr: 'red' },
-    { name: 'VIBE CODE', sub: '3 homing vibes', cd: 1.2, mult: 2.2, col: '#c77dff', spr: 'vio' },
+    { name: 'AI SLOP', icon: 'code', sub: 'autocomplete spray', cd: .14, mult: 1, col: '#5dff9b', spr: 'green' },
+    { name: 'NPM INSTALL', icon: 'package', sub: '8 deps · hits crowds', cd: .9, mult: 1.1, col: '#ffd23f', spr: 'yel' },
+    { name: 'DROP TABLE', icon: 'bomb', sub: '30x · splash · boss killer', cd: 2.4, mult: 30, col: '#ff4d6d', spr: 'red' },
+    { name: 'VIBE CODE', icon: 'target', sub: '3 homing vibes', cd: 1.2, mult: 2.2, col: '#c77dff', spr: 'vio' },
   ];
 
   // ───────────── levels ("incidents") ─────────────
@@ -173,7 +173,7 @@ const ECON = (() => {
   const cannonCost = (S, n = 1) => { const b = 10 * Math.pow(1.09, S.cannon); return b * (Math.pow(1.09, n) - 1) / .09; };
   const cannonMax = (S, cash) => Math.max(0, Math.floor(Math.log(cash * .09 / (10 * Math.pow(1.09, S.cannon)) + 1) / Math.log(1.09)));
 
-  // ───────────── prestige 1: PIVOT TO AI (Hype 🚀) ─────────────
+  // ───────────── prestige 1: PIVOT TO AI (Hype) ─────────────
   // AdVenture Capitalist style: total hype is a square root of lifetime earnings (this era),
   // pending = that total minus what you already claimed, so resetting at the same spot yields less each time.
   const PIVOT_LEVEL = 25;
@@ -185,45 +185,45 @@ const ECON = (() => {
   const lv = (o, id) => (o && o[id]) || 0;
   // Board of Directors — Clicker Heroes "ancients": spend hype (which also lowers your passive bonus).
   const BOARD = [
-    { id: 'seriesA', icon: '📈', name: 'Series A', desc: l => `Agent DPS +${l * 25}%`, next: '+25% agent DPS', base: 1, g: 1.2 },
-    { id: 'growth', icon: '🚀', name: 'Growth Hacker', desc: l => `Downtime $ +${l * 20}%`, next: '+20% $', base: 1, g: 1.2 },
-    { id: 'cron', icon: '⏱️', name: 'Cron Job', desc: l => l ? `Auto-fires ${l} shot${l > 1 ? 's' : ''}/s (50% dmg)` : 'Auto-fires the cannon', next: '+1 auto-shot/s', base: 3, g: 1.6, max: 10 },
-    { id: 'hiring', icon: '🤝', name: 'Hiring Manager', desc: l => l ? `Auto-hires agents every ${(8 / l).toFixed(1)}s` : 'Hires agents for you', next: 'faster auto-hire', base: 5, g: 1.8, max: 10 },
-    { id: 'deadline', icon: '⏳', name: 'Deadline Extension', desc: l => `Boss timer +${l * 3}s`, next: '+3s boss timer', base: 2, g: 1.5, max: 10 },
-    { id: 'bounty', icon: '🐛', name: 'Bug Bounty Hunter', desc: l => `Zero-days +${l * 15}% more often, buffs +${l * 10}% longer`, next: '+15% zero-days', base: 3, g: 1.5, max: 10 },
-    { id: 'severance', icon: '💼', name: 'Golden Parachute', desc: l => l ? `Start each run at incident ${1 + l * 5}` : 'Skip early incidents after a pivot', next: '+5 starting incidents', base: 4, g: 1.7, max: 10 },
-    { id: 'remote', icon: '🏝️', name: 'Remote Work', desc: l => `Offline earnings ${25 + l * 15}%`, next: '+15% offline', base: 2, g: 1.6, max: 5 },
-    { id: 'linter', icon: '🔇', name: 'Disable the Linter', desc: l => l >= 5 ? 'Linter drones never spawn' : `Linter drones ${l * 20}% rarer`, next: '-20% linters', base: 2, g: 1.6, max: 5 },
-    { id: 'insider', icon: '🕴️', name: 'Insider Trading', desc: l => `Hype gain +${l * 10}%`, next: '+10% hype gain', base: 10, g: 1.35 },
-    { id: 'debt', icon: '💳', name: 'Technical Debt', desc: l => `Agents ${(100 - Math.pow(.97, l) * 100).toFixed(1)}% cheaper`, next: '-3% agent cost', base: 5, g: 1.4, max: 25 },
-    { id: 'legacy', icon: '🏛️', name: 'Legacy Code', desc: l => `Bosses drop +${l * 50}% $`, next: '+50% boss $', base: 2, g: 1.3 },
+    { id: 'seriesA', icon: 'chart-line-up', name: 'Series A', desc: l => `Agent DPS +${l * 25}%`, next: '+25% agent DPS', base: 1, g: 1.2 },
+    { id: 'growth', icon: 'trend-up', name: 'Growth Hacker', desc: l => `Downtime $ +${l * 20}%`, next: '+20% $', base: 1, g: 1.2 },
+    { id: 'cron', icon: 'timer', name: 'Cron Job', desc: l => l ? `Auto-fires ${l} shot${l > 1 ? 's' : ''}/s (50% dmg)` : 'Auto-fires the cannon', next: '+1 auto-shot/s', base: 3, g: 1.6, max: 10 },
+    { id: 'hiring', icon: 'handshake', name: 'Hiring Manager', desc: l => l ? `Auto-hires agents every ${(8 / l).toFixed(1)}s` : 'Hires agents for you', next: 'faster auto-hire', base: 5, g: 1.8, max: 10 },
+    { id: 'deadline', icon: 'hourglass', name: 'Deadline Extension', desc: l => `Boss timer +${l * 3}s`, next: '+3s boss timer', base: 2, g: 1.5, max: 10 },
+    { id: 'bounty', icon: 'bug', name: 'Bug Bounty Hunter', desc: l => `Zero-days +${l * 15}% more often, buffs +${l * 10}% longer`, next: '+15% zero-days', base: 3, g: 1.5, max: 10 },
+    { id: 'severance', icon: 'briefcase', name: 'Golden Parachute', desc: l => l ? `Start each run at incident ${1 + l * 5}` : 'Skip early incidents after a pivot', next: '+5 starting incidents', base: 4, g: 1.7, max: 10 },
+    { id: 'remote', icon: 'island', name: 'Remote Work', desc: l => `Offline earnings ${25 + l * 15}%`, next: '+15% offline', base: 2, g: 1.6, max: 5 },
+    { id: 'linter', icon: 'speaker-slash', name: 'Disable the Linter', desc: l => l >= 5 ? 'Linter drones never spawn' : `Linter drones ${l * 20}% rarer`, next: '-20% linters', base: 2, g: 1.6, max: 5 },
+    { id: 'insider', icon: 'detective', name: 'Insider Trading', desc: l => `Hype gain +${l * 10}%`, next: '+10% hype gain', base: 10, g: 1.35 },
+    { id: 'debt', icon: 'credit-card', name: 'Technical Debt', desc: l => `Agents ${(100 - Math.pow(.97, l) * 100).toFixed(1)}% cheaper`, next: '-3% agent cost', base: 5, g: 1.4, max: 25 },
+    { id: 'legacy', icon: 'bank', name: 'Legacy Code', desc: l => `Bosses drop +${l * 50}% $`, next: '+50% boss $', base: 2, g: 1.3 },
   ];
   const boardCost = (b, l) => Math.ceil(b.base * Math.pow(b.g, l));
 
-  // ───────────── prestige 2: REWRITE IT IN RUST (Crabs 🦀) ─────────────
+  // ───────────── prestige 2: REWRITE IT IN RUST (Crabs) ─────────────
   const RUST_LEVEL = 120;
   const crabsFor = maxLvl => maxLvl < RUST_LEVEL ? 0 : Math.floor(Math.pow(2, (maxLvl - 110) / 10));
   const RUST = [
-    { id: 'safety', icon: '🛡️', name: 'Memory Safety', desc: l => `All damage x${Math.pow(3, l)}`, next: 'x3 all damage', base: 1, g: 2 },
-    { id: 'fearless', icon: '🧵', name: 'Fearless Concurrency', desc: l => `Hype gain x${Math.pow(2, l)}`, next: 'x2 hype gain', base: 1, g: 2 },
-    { id: 'cargo', icon: '📦', name: 'Cargo', desc: l => l ? 'Auto-buys cannon mods and calibre' : 'Auto-buy cannon mods & calibre', next: 'unlock auto-buying', base: 2, g: 1, max: 1 },
-    { id: 'clippy', icon: '📎', name: 'Clippy', desc: l => `Keep ${l * 10}% of Board levels on Rust reset`, next: '+10% Board kept', base: 1, g: 1.6, max: 10 },
-    { id: 'zerocost', icon: '🪶', name: 'Zero-Cost Abstractions', desc: l => `Agents x${Math.pow(2, l)} cheaper`, next: 'agents half price', base: 2, g: 2.2 },
-    { id: 'unsafe', icon: '☢️', name: 'unsafe {}', desc: l => `Crit damage x${Math.pow(2, l)}`, next: 'x2 crit damage', base: 1, g: 1.8 },
-    { id: 'blazing', icon: '⚡', name: 'Blazingly Fast', desc: l => `Shots +${l * 5}% of DPS`, next: '+5% DPS per shot', base: 3, g: 2 },
+    { id: 'safety', icon: 'shield-check', name: 'Memory Safety', desc: l => `All damage x${Math.pow(3, l)}`, next: 'x3 all damage', base: 1, g: 2 },
+    { id: 'fearless', icon: 'git-merge', name: 'Fearless Concurrency', desc: l => `Hype gain x${Math.pow(2, l)}`, next: 'x2 hype gain', base: 1, g: 2 },
+    { id: 'cargo', icon: 'package', name: 'Cargo', desc: l => l ? 'Auto-buys cannon mods and calibre' : 'Auto-buy cannon mods & calibre', next: 'unlock auto-buying', base: 2, g: 1, max: 1 },
+    { id: 'clippy', icon: 'paperclip', name: 'Clippy', desc: l => `Keep ${l * 10}% of Board levels on Rust reset`, next: '+10% Board kept', base: 1, g: 1.6, max: 10 },
+    { id: 'zerocost', icon: 'feather', name: 'Zero-Cost Abstractions', desc: l => `Agents x${Math.pow(2, l)} cheaper`, next: 'agents half price', base: 2, g: 2.2 },
+    { id: 'unsafe', icon: 'radioactive', name: 'unsafe {}', desc: l => `Crit damage x${Math.pow(2, l)}`, next: 'x2 crit damage', base: 1, g: 1.8 },
+    { id: 'blazing', icon: 'lightning', name: 'Blazingly Fast', desc: l => `Shots +${l * 5}% of DPS`, next: '+5% DPS per shot', base: 3, g: 2 },
   ];
   const rustCost = (r, l) => Math.ceil(r.base * Math.pow(r.g, l));
 
   // ───────────── postmortems (challenges, Antimatter Dimensions style) ─────────────
   const CHALLENGES = [
-    { id: 'freeze', icon: '🥶', name: 'Code Freeze', rule: 'Agents deal no damage. Only the cannon fires.', goal: 20, reward: 'Shots deal +10% of DPS, forever.' },
-    { id: 'friday', icon: '🍻', name: 'Friday 4:59 PM', rule: 'Boss timers are 10 seconds.', goal: 40, reward: 'Boss timer +10s and bosses drop x3 $.' },
-    { id: 'legacy4', icon: '🏚️', name: 'Legacy Only', rule: 'Only the first 4 agents can be hired.', goal: 35, reward: 'The first 4 agents are x100 stronger.' },
-    { id: 'notests', icon: '🧪', name: 'No Tests', rule: 'Milestones give no bonus.', goal: 40, reward: 'All agents x3.' },
-    { id: 'ratelimit', icon: '🚦', name: '429 Too Many Requests', rule: 'Cannon fires 4x slower. Agents deal 1/3 damage.', goal: 45, reward: 'Fire rate +50%.' },
-    { id: 'airgap', icon: '🔌', name: 'Air-Gapped', rule: 'No zero-days. Hype gives no bonus.', goal: 60, reward: 'Each hype gives +12% instead of +10%.' },
-    { id: 'monorepo', icon: '🗿', name: 'Monorepo', rule: 'Agent cost growth is 12% per hire instead of 7%.', goal: 60, reward: 'All agents x10.' },
-    { id: 'k8s', icon: '♻️', name: 'Self-Healing Infra', rule: 'Servers roll back to full HP after 3s without damage.', goal: 70, reward: 'All damage x5.' },
+    { id: 'freeze', icon: 'snowflake', name: 'Code Freeze', rule: 'Agents deal no damage. Only the cannon fires.', goal: 20, reward: 'Shots deal +10% of DPS, forever.' },
+    { id: 'friday', icon: 'beer-stein', name: 'Friday 4:59 PM', rule: 'Boss timers are 10 seconds.', goal: 40, reward: 'Boss timer +10s and bosses drop x3 $.' },
+    { id: 'legacy4', icon: 'warehouse', name: 'Legacy Only', rule: 'Only the first 4 agents can be hired.', goal: 35, reward: 'The first 4 agents are x100 stronger.' },
+    { id: 'notests', icon: 'flask', name: 'No Tests', rule: 'Milestones give no bonus.', goal: 40, reward: 'All agents x3.' },
+    { id: 'ratelimit', icon: 'traffic-signal', name: '429 Too Many Requests', rule: 'Cannon fires 4x slower. Agents deal 1/3 damage.', goal: 45, reward: 'Fire rate +50%.' },
+    { id: 'airgap', icon: 'plugs', name: 'Air-Gapped', rule: 'No zero-days. Hype gives no bonus.', goal: 60, reward: 'Each hype gives +12% instead of +10%.' },
+    { id: 'monorepo', icon: 'stack', name: 'Monorepo', rule: 'Agent cost growth is 12% per hire instead of 7%.', goal: 60, reward: 'All agents x10.' },
+    { id: 'k8s', icon: 'arrows-clockwise', name: 'Self-Healing Infra', rule: 'Servers roll back to full HP after 3s without damage.', goal: 70, reward: 'All damage x5.' },
   ];
   const CHALLENGE_PIVOTS = 3;
 

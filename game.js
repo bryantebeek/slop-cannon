@@ -80,7 +80,7 @@ function buyUpg(u, quiet) {
   if (S.upg[u.id]) return false;
   const c = E.upgCost(S, u); if (c > S.cash) { if (!quiet) sfx.deny(); return false; }
   S.cash -= c; S.upg[u.id] = 1; markDirty(true); if (!quiet) sfx.buy();
-  if (u.eff.weapon) { if (!quiet) S.weapon = u.eff.weapon; toast('🧨', `New cannon mode: ${E.WEAPONS[u.eff.weapon].name}`, `Press ${u.eff.weapon + 1} to switch. ${E.WEAPONS[u.eff.weapon].sub}.`); }
+  if (u.eff.weapon) { if (!quiet) S.weapon = u.eff.weapon; const w = E.WEAPONS[u.eff.weapon]; toast(w.icon, `New cannon mode: ${w.name}`, `Press ${u.eff.weapon + 1} to switch. ${w.sub}.`, w.col); }
   return true;
 }
 function buyCannon(n) {
@@ -109,8 +109,8 @@ function checkMilestones() {
   const now = new Set(E.milestones(S).map(u => u.id));
   if (msOn) {
     const fresh = [...now].filter(id => !msOn.has(id)).map(id => E.UPG[id]);
-    if (fresh.length === 1) { const u = fresh[0]; toast(u.icon, `Milestone: ${u.name}`, u.flav, 'ms'); sfx.ach(); }
-    else if (fresh.length > 1) { toast('🎯', `${fresh.length} milestones reached`, fresh.map(u => u.name).join(' · '), 'ms'); sfx.ach(); }
+    if (fresh.length === 1) { const u = fresh[0]; toast(u.icon, `Milestone: ${u.name}`, u.flav, '#ffffff'); sfx.ach(); }
+    else if (fresh.length > 1) { toast('target', `${fresh.length} milestones reached`, fresh.slice(0, 3).map(u => u.name).join(' · ') + (fresh.length > 3 ? ` · +${fresh.length - 3} more` : ''), '#ffffff'); sfx.ach(); }
   }
   msOn = now;
 }
@@ -124,7 +124,7 @@ function doPivot(intoChallenge = null) {
   E.newRun(S);
   if (S.challenge) { S.level = 1; S.maxLevel = 1; }
   resetRunRuntime(); markDirty(true); save(); sfx.pivot();
-  banner(intoChallenge ? `POSTMORTEM: ${E.CHALLENGES.find(c => c.id === intoChallenge).name.toUpperCase()}` : 'PIVOTED TO AI 🚀', intoChallenge ? E.CHALLENGES.find(c => c.id === intoChallenge).rule : `+${fmt(h)} hype · investors are thrilled`, '#c77dff');
+  banner(intoChallenge ? `POSTMORTEM: ${E.CHALLENGES.find(c => c.id === intoChallenge).name.toUpperCase()}` : 'PIVOTED TO AI', intoChallenge ? E.CHALLENGES.find(c => c.id === intoChallenge).rule : `+${fmt(h)} hype · investors are thrilled`, '#c77dff');
 }
 function doRust() {
   const c = E.crabsFor(S.eraMax); if (c < 1) return;
@@ -133,12 +133,12 @@ function doRust() {
   for (const id in S.board) S.board[id] = Math.floor(S.board[id] * keep);
   S.hype = 0; S.hypeClaimed = 0; S.eraEarned = 0; S.eraMax = 1; S.challenge = null;
   E.newRun(S); resetRunRuntime(); markDirty(true); save(); sfx.pivot();
-  banner('REWRITTEN IN RUST 🦀', `+${fmt(c)} crabs · blazingly fast · memory safe · still down`, '#ff8a3d');
+  banner('REWRITTEN IN RUST', `+${fmt(c)} crabs · blazingly fast · memory safe · still down`, '#ff8a3d');
 }
 function completeChallenge() {
   const c = E.CHALLENGES.find(c => c.id === S.challenge); if (!c) return;
   S.chDone[c.id] = 1; S.challenge = null; markDirty(true); sfx.clear();
-  modal(`${c.icon} Postmortem complete`, `<p><b>${c.name}</b> is now closed as <i>"won't fix"</i>.</p><p class="good">Permanent reward: ${c.reward}</p><p class="dim">Restrictions lifted. Keep going or pivot when you're ready.</p>`, [{ label: 'Blameless.', cls: 'primary' }]);
+  modal('Postmortem complete', `<p><b>${c.name}</b> is now closed as <i>"won't fix"</i>.</p><p class="good">Permanent reward: ${c.reward}</p><p class="dim">Restrictions lifted. Keep going or pivot when you're ready.</p>`, [{ label: 'Blameless.', icon: 'check-circle', cls: 'primary' }], { icon: c.icon, col: '#ff4d6d' });
 }
 
 // ───────────── levels ─────────────
@@ -334,9 +334,9 @@ function spawnGolden() {
   alert(0, `Zero-day disclosed in ${pick(PKGS)} — shoot the golden package!`); sfx.goldSpawn();
 }
 const GOLDEN = [
-  { w: 42, f() { addBuff('frenzy', '🔥 PROD IS ON FIRE', 'Agent DPS x7', 30, { dps: 7 }); return 'PROD IS ON FIRE · agents x7'; } },
+  { w: 42, f() { addBuff('frenzy', 'PROD IS ON FIRE', 'Agent DPS x7', 30, { dps: 7, icon: 'fire' }); return 'PROD IS ON FIRE · agents x7'; } },
   { w: 38, f() { const g = Math.min(S.cash * .15, incomePerSec() * 900) + 13; earn(g); return `LEAKED API KEY · +${money(g)}`; } },
-  { w: 12, f() { addBuff('caffeine', '☕ CAFFEINE IV', 'Shot damage x77', 13, { click: 77 }); return 'CAFFEINE IV · shots x77'; } },
+  { w: 12, f() { addBuff('caffeine', 'CAFFEINE IV', 'Shot damage x77', 13, { click: 77, icon: 'coffee' }); return 'CAFFEINE IV · shots x77'; } },
   { w: 8, f() {
     const boss = servers.find(s => s.type === 'boss' && !s.dead);
     if (boss) { damage(boss, boss.maxHp * .1, 0, 0, 0, 'cascade'); return 'HOTFIX · boss -10% HP'; }
@@ -420,7 +420,7 @@ function sim(dt) {
     } else p.vy -= p.g * dt;
     if (p.split && p.age >= p.split) {
       for (let j = 0; j < 8; j++) { const [dmg, crit] = rollCrit(p.dmg / (p.crit ? D.critMult : 1)); mkProj([p.x, p.y, p.z], [p.vx + rand(-7, 7), p.vy + rand(-2, 4), p.vz + rand(-5, 5)], { text: pick(PKGS), dmg, crit, g: 20, size: .6, col: p.col, spr: p.spr }); }
-      glyphs(p.x, p.y, p.z, '📦{}[]', 8, p.col, 6); part({ k: 'flash', x: p.x, y: p.y, z: p.z, life: .15, size: 3, spr: 'yel' });
+      glyphs(p.x, p.y, p.z, '{}[]()', 8, p.col, 6); part({ k: 'flash', x: p.x, y: p.y, z: p.z, life: .15, size: 3, spr: 'yel' });
       projs.splice(projs.indexOf(p), 1); continue;
     }
     const sp = Math.hypot(p.vx, p.vy, p.vz), n = Math.max(1, Math.ceil(sp * dt / .35)), hs = dt / n;
@@ -459,7 +459,7 @@ function checkAchievements() {
   for (const a of ACHIEVEMENTS) {
     if (S.ach[a.id]) continue;
     let ok = false; try { ok = a.test(S, G); } catch (e) { }
-    if (ok) { S.ach[a.id] = Date.now(); n++; toast(a.icon, `Trophy: ${a.name}`, `${a.desc} · +3% damage`, 'ach'); }
+    if (ok) { S.ach[a.id] = Date.now(); n++; toast(a.icon, `Trophy: ${a.name}`, `${a.desc} · +3% damage`, '#ffd23f'); }
   }
   if (n) { sfx.ach(); markDirty(true); }
 }
@@ -487,22 +487,33 @@ function render(dt) {
   }
 }
 
-// ───────────── UI: generic pieces ─────────────
+// ───────────── UI: icons & generic pieces ─────────────
+// Icons are Phosphor duotone glyphs; data objects carry the icon name (e.g. 'robot').
+const IC = (n, cls = '') => `<i class="ph-duotone ph-${n}${cls ? ' ' + cls : ''}"></i>`;
+const icon = n => h('i', { class: `ph-duotone ph-${n}` });
+const BADGE = (n, c, size = '') => `<span class="ib ${size}" style="--c:${c}">${IC(n)}</span>`;
+const badge = (n, c, size = '') => h('span', { class: `ib ${size}`, style: `--c:${c}` }, icon(n));
+const COL = { cash: '#ffd23f', hype: '#c77dff', crab: '#ff8a3d', trophy: '#ffd23f', ms: '#ffffff', cannon: '#ffd23f', company: '#7df9ff', post: '#ff4d6d', good: '#5dff9b', info: '#7df9ff', bad: '#ff4d6d', mute: '#9aa6c4' };
+const upgCol = u => u.kind === 'tier' ? E.AGENTS[u.agent].col : u.kind === 'syn' ? E.AGENTS[u.a].col : u.kind === 'global' ? COL.company : COL.cannon;
 const toastsEl = $('#toasts'), tipEl = $('#tooltip'), modalEl = $('#modal');
-function toast(icon, title, body, cls = '') {
-  const el = h('div', { class: 'toast ' + cls }, h('div', { class: 'ticon' }, icon), h('div', {}, h('b', {}, title), h('div', { class: 'dim' }, body)));
+function toast(ic, title, body, col = COL.good) {
+  const el = h('div', { class: 'toast', style: `--c:${col}` }, badge(ic, col, 'sm'), h('div', {}, h('b', {}, title), h('div', { class: 'd' }, body)), h('i', { class: 'life' }));
   toastsEl.prepend(el); while (toastsEl.children.length > 4) toastsEl.lastChild.remove();
   setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 400); }, 5200);
 }
 function banner(title, sub, col) {
-  const el = $('#banner'); el.innerHTML = ''; el.append(h('div', { class: 'btitle', 'data-t': title, style: `color:${col || '#fff'}` }, title), h('div', { class: 'bsub' }, sub));
+  const el = $('#banner'); el.innerHTML = ''; el.append(h('div', { class: 'btitle', style: `color:${col || '#fff'}` }, title), h('div', { class: 'bsub' }, sub));
   el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
 }
 const modalOpen = () => !modalEl.hidden;
-function modal(title, html, buttons) {
+// buttons: [{ label, icon?, cls?, onclick? }] — onclick returning false keeps the modal open.
+function modal(title, html, buttons, o = {}) {
+  const col = o.col || COL.hype;
   modalEl.innerHTML = '';
-  const card = h('div', { class: 'mcard' }, h('h2', {}, title), h('div', { class: 'mbody', html }),
-    h('div', { class: 'mbtns' }, ...(buttons || [{ label: 'OK', cls: 'primary' }]).map(b => h('button', { class: 'btn ' + (b.cls || ''), onclick: () => { if (b.onclick && b.onclick() === false) return; closeModal(); } }, b.label))));
+  const card = h('div', { class: 'mcard', style: `--c:${col}` },
+    h('div', { class: 'mhead' }, o.icon ? badge(o.icon, col, 'lg') : null, h('h2', {}, title)),
+    h('div', { class: 'mbody', html }),
+    h('div', { class: 'mbtns' }, ...(buttons || [{ label: 'OK', cls: 'primary' }]).map(b => h('button', { class: 'btn ' + (b.cls || ''), onclick: () => { if (b.onclick && b.onclick() === false) return; closeModal(); } }, b.icon ? icon(b.icon) : null, b.label))));
   modalEl.append(card); modalEl.hidden = false; firing = false;
 }
 function closeModal() { modalEl.hidden = true; }
@@ -515,68 +526,79 @@ document.addEventListener('mousemove', e => {
   const r = tipEl.getBoundingClientRect(), x = Math.min(e.clientX + 16, innerWidth - r.width - 8), y = Math.min(e.clientY + 16, innerHeight - r.height - 8);
   tipEl.style.transform = `translate(${Math.max(8, x)}px,${Math.max(8, y)}px)`;
 });
+const tipHead = (ic, col, name, sub) => `<div class="tth">${BADGE(ic, col, 'sm')}<div>${name}${sub ? `<small>${sub}</small>` : ''}</div></div>`;
 
-// ───────────── UI: top bar ─────────────
+// ───────────── UI: HUD ─────────────
 const ui = {
-  cash: $('#cash'), income: $('#income'), dpsl: $('#dpsline'), lvlStrip: $('#lvlStrip'), lvlInfo: $('#lvlInfo'), boss: $('#bossbar'), bossFill: $('#bossfill'), bossTxt: $('#bosstxt'),
-  auto: $('#autoBtn'), chips: $('#chips'), buffs: $('#buffs'), weapons: $('#weapons'), chBanner: $('#chBanner'),
+  cash: $('#cash'), income: $('#income'), pills: $('#pills'), lvlStrip: $('#lvlStrip'), lvlInfo: $('#lvlInfo'), boss: $('#bossbar'), bossFill: $('#bossfill'), bossTxt: $('#bosstxt'),
+  auto: $('#autoBtn'), chips: $('#chips'), buffs: $('#buffs'), weapons: $('#weapons'), chBanner: $('#chBanner'), mute: $('#muteBtn'),
 };
 $('#lvlPrev').onclick = () => setLevel(S.level - 1);
 $('#lvlNext').onclick = () => setLevel(S.level + 1);
 ui.auto.onclick = () => { S.auto = !S.auto; sfx.click(); };
+ui.mute.onclick = () => toggleMute();
+function toggleMute() { VOL.muted = !VOL.muted; G.muted = G.muted || VOL.muted; setVolumes(); toast(VOL.muted ? 'speaker-slash' : 'speaker-high', VOL.muted ? 'Muted' : 'Sound on', 'Press M to toggle.', COL.mute); }
 const lvlBoxes = [];
 for (let i = 0; i < 5; i++) { const b = h('button', { class: 'lvl', onclick: () => setLevel(+b.dataset.l) }); lvlBoxes.push(b); ui.lvlStrip.append(b); }
 const weaponBtns = E.WEAPONS.map((w, i) => {
-  const b = h('button', { class: 'wpn', style: `--c:${w.col}`, onclick: () => selectWeapon(i), tip: () => `<b style="color:${w.col}">${w.name}</b><br>${w.sub}<br><span class="dim">x${w.mult} per shot · ${(1 / w.cd).toFixed(1)} shots/s</span>` },
-    h('span', { class: 'k' }, i + 1), h('span', { class: 'n' }, w.name));
+  const b = h('button', { class: 'wpn glass', style: `--c:${w.col}`, onclick: () => selectWeapon(i), tip: () => tipHead(w.icon, w.col, w.name, `key ${i + 1}`) + `${w.sub}<br><span class="dim">x${w.mult} damage per shot · ${(1 / w.cd).toFixed(1)} shots/s</span>` },
+    badge(w.icon, w.col), h('span', {}, w.name), h('kbd', {}, i + 1));
   ui.weapons.append(b); return b;
 });
 function selectWeapon(i) { if (D.weapons[i] && S.weapon !== i) { S.weapon = i; sfx.click(); } }
 function updateTop() {
   setText(ui.cash, money(S.cash));
-  setText(ui.income, `+${money(incomePerSec())}/s idle`);
-  setText(ui.dpsl, `AGENT DPS ${fmt(D.dps * dpsBuff())} · SHOT ${fmt(shotDmg(E.WEAPONS[S.weapon].mult))}${D.cron ? ` · CRON ${D.cron}/s` : ''}`);
+  setHTML(ui.income, `${IC('trend-up')} +${money(incomePerSec())}/s idle`);
+  setHTML(ui.pills, `<span class="pill" style="--c:#7df9ff">${IC('lightning')} ${fmt(D.dps * dpsBuff())} DPS</span><span class="pill" style="--c:#ffd23f">${IC('crosshair')} ${fmt(shotDmg(E.WEAPONS[S.weapon].mult))}</span>` +
+    (D.cron ? `<span class="pill" style="--c:#c77dff">${IC('timer')} ${D.cron}/s</span>` : ''));
   const l = S.level, start = clamp(l - 2, 1, Math.max(1, S.maxLevel - 3));
   lvlBoxes.forEach((b, i) => {
-    const n = start + i; b.dataset.l = n; setText(b, n === E.FINAL ? '☁' : String(n));
+    const n = start + i; b.dataset.l = n; setHTML(b, n === E.FINAL ? IC('cloud') : String(n));
     b.className = 'lvl' + (n === l ? ' cur' : '') + (E.isBoss(n) ? ' boss' : '') + (n > S.maxLevel ? ' locked' : '') + (n === S.maxLevel && n !== l ? ' frontier' : '');
+    b.title = n === E.FINAL ? 'us-east-1' : E.isBoss(n) ? `Boss: ${E.bossName(n)}` : `Incident ${n}`;
   });
   const boss = E.isBoss(l), alive = servers.filter(s => !s.dead).length;
-  setText(ui.lvlInfo, boss ? `⚠ BOSS · ${E.bossName(l)}` : `INCIDENT ${l} · ${E.PER_LEVEL - alive}/${E.PER_LEVEL} servers down`);
+  setHTML(ui.lvlInfo, boss ? `${IC('skull')} BOSS · ${E.bossName(l)}` : `${IC('hard-drives')} INCIDENT ${l} · ${E.PER_LEVEL - alive}/${E.PER_LEVEL} DOWN`);
+  ui.lvlInfo.classList.toggle('boss', boss);
   ui.boss.hidden = !(boss && phase === 'fight');
   if (boss) { ui.bossFill.style.transform = `scaleX(${clamp(bossT / bossMax, 0, 1)})`; setText(ui.bossTxt, `${Math.max(0, bossT).toFixed(1)}s`); }
-  setText(ui.auto, S.auto ? 'AUTO ▶▶' : 'FARMING ⟳'); ui.auto.classList.toggle('off', !S.auto);
+  setHTML(ui.auto, S.auto ? `${IC('fast-forward')} AUTO` : `${IC('arrows-clockwise')} FARMING`); ui.auto.classList.toggle('off', !S.auto);
   let chips = '';
-  if (S.hype > 0 || S.pivots) chips += `<span class="chip hype" title="Hype">🚀 ${fmt(S.hype)} <i>+${fmt(S.hype * E.hypeEach(S) * 100)}%</i></span>`;
-  if (S.crabsEver > 0) chips += `<span class="chip crab">🦀 ${fmt(S.crabs)}</span>`;
-  const na = Object.keys(S.ach).length; if (na) chips += `<span class="chip ach">🏆 ${na} <i>+${na * 3}%</i></span>`;
+  if (S.hype > 0 || S.pivots) chips += `<span class="chip glass" title="Hype: +${(E.hypeEach(S) * 100).toFixed(0)}% damage each">${BADGE('rocket-launch', COL.hype)}${fmt(S.hype)} <em>+${fmt(S.hype * E.hypeEach(S) * 100)}%</em></span>`;
+  if (S.crabsEver > 0) chips += `<span class="chip glass" title="Crabs">${BADGE('shrimp', COL.crab)}${fmt(S.crabs)}</span>`;
+  const na = Object.keys(S.ach).length; if (na) chips += `<span class="chip glass" title="Trophies: +3% damage each">${BADGE('trophy', COL.trophy)}${na} <em>+${na * 3}%</em></span>`;
   setHTML(ui.chips, chips);
-  setHTML(ui.buffs, buffs.map(b => `<div class="buff"><b>${b.name}</b> ${b.desc} · ${Math.ceil(b.t)}s<i style="transform:scaleX(${b.t / b.max})"></i></div>`).join(''));
+  setHTML(ui.buffs, buffs.map(b => `<div class="buff">${BADGE(b.icon, COL.cash, 'sm')}<div><b>${b.name}</b>${b.desc} · ${Math.ceil(b.t)}s</div><i class="bar" style="transform:scaleX(${b.t / b.max})"></i></div>`).join(''));
   weaponBtns.forEach((b, i) => { b.hidden = !D.weapons[i]; b.classList.toggle('sel', S.weapon === i); });
   ui.weapons.hidden = D.weapons.filter(Boolean).length < 2;
+  setHTML(ui.mute, IC(VOL.muted ? 'speaker-slash' : 'speaker-high'));
   const ch = S.challenge && E.CHALLENGES.find(c => c.id === S.challenge);
   ui.chBanner.hidden = !ch;
-  if (ch) setHTML(ui.chBanner, `${ch.icon} POSTMORTEM: <b>${ch.name}</b> — ${ch.rule} Goal: clear incident ${ch.goal}. <button class="btn small" id="abandon">Abandon</button>`);
+  if (ch) setHTML(ui.chBanner, `${BADGE(ch.icon, COL.post, 'sm')}<div><b>POSTMORTEM: ${ch.name}</b><br><span class="dim">${ch.rule} Goal: clear incident ${ch.goal}.</span></div><button class="btn sm danger" id="abandon">${IC('sign-out')} Abandon</button>`);
 }
-ui.chBanner.addEventListener('click', e => { if (e.target.id === 'abandon') modal('Abandon postmortem?', '<p>This pivots you out of the postmortem without completing it.</p>', [{ label: 'Abandon', cls: 'danger', onclick: () => doPivot(null) }, { label: 'Keep going' }]); });
+ui.chBanner.addEventListener('click', e => {
+  if (e.target.closest('#abandon')) modal('Abandon postmortem?', '<p>This pivots you out of the postmortem without completing it. You still collect pending hype.</p>',
+    [{ label: 'Keep going' }, { label: 'Abandon', icon: 'sign-out', cls: 'danger', onclick: () => doPivot(null) }], { icon: 'warning', col: COL.post });
+});
 
-// ───────────── UI: panel tabs ─────────────
+// ───────────── UI: side panel ─────────────
 const TABS = [
-  { id: 'agents', icon: '🤖', name: 'Agents', show: () => true },
-  { id: 'upgrades', icon: '🎯', name: 'Milestones', show: () => true },
-  { id: 'cannon', icon: '🔫', name: 'Cannon', show: () => true },
-  { id: 'board', icon: '🚀', name: 'Pivot', show: () => S.pivots > 0 || S.allMax >= 15 || S.rusts > 0 },
-  { id: 'post', icon: '📝', name: 'Postmortems', show: () => S.pivots >= E.CHALLENGE_PIVOTS || S.rusts > 0 },
-  { id: 'rust', icon: '🦀', name: 'Rust', show: () => S.allMax >= 100 || S.rusts > 0 },
-  { id: 'trophies', icon: '🏆', name: 'Trophies', show: () => true },
-  { id: 'stats', icon: '📊', name: 'Stats', show: () => true },
-  { id: 'settings', icon: '⚙️', name: 'Settings', show: () => true },
+  { id: 'agents', icon: 'robot', col: '#5dff9b', name: 'Agents', show: () => true, sub: () => `${fmt(S.agents.reduce((a, b) => a + b, 0))} agents · ${fmt(D.dps * dpsBuff())} DPS` },
+  { id: 'upgrades', icon: 'target', col: '#ffffff', name: 'Milestones', short: 'Goals', show: () => true, sub: () => `${E.milestones(S).length} / ${E.UPGRADES.filter(u => u.kind !== 'cannon').length} active` },
+  { id: 'cannon', icon: 'crosshair', col: '#ffd23f', name: 'Cannon', show: () => true, sub: () => `Calibre ${S.cannon} · ${fmt(shotDmg(E.WEAPONS[S.weapon].mult))} per shot` },
+  { id: 'board', icon: 'rocket-launch', col: '#c77dff', name: 'Pivot to AI', short: 'Pivot', show: () => S.pivots > 0 || S.allMax >= 15 || S.rusts > 0, sub: () => `${fmt(S.hype)} hype · ${S.pivots} pivots` },
+  { id: 'post', icon: 'clipboard-text', col: '#ff4d6d', name: 'Postmortems', short: 'Postmort.', show: () => S.pivots >= E.CHALLENGE_PIVOTS || S.rusts > 0, sub: () => `${Object.keys(S.chDone).length} / ${E.CHALLENGES.length} complete` },
+  { id: 'rust', icon: 'gear-six', col: '#ff8a3d', name: 'Rewrite in Rust', short: 'Rust', show: () => S.allMax >= 100 || S.rusts > 0, sub: () => `${fmt(S.crabs)} crabs · ${S.rusts} rewrites` },
+  { id: 'trophies', icon: 'trophy', col: '#ffd23f', name: 'Trophies', show: () => true, sub: () => `${Object.keys(S.ach).length} / ${ACHIEVEMENTS.length} · +${Object.keys(S.ach).length * 3}% damage` },
+  { id: 'stats', icon: 'chart-bar', col: '#7df9ff', name: 'Stats', show: () => true, sub: () => `${fmtTime(S.stats.played)} played` },
+  { id: 'settings', icon: 'gear', col: '#9aa6c4', name: 'Settings', show: () => true, sub: () => 'Audio, display & saves' },
 ];
 let curTab = 'agents';
-const tabBar = $('#tabs'), tabBody = $('#tabBody'), tabBtns = {};
+const tabBody = $('#tabBody'), tabBtns = {}, pIcon = $('#picon');
 for (const t of TABS) {
-  tabBtns[t.id] = h('button', { class: 'tab', onclick: () => { curTab = t.id; S.seenUnlocks['tab_' + t.id] = 1; structDirty = true; sfx.click(); } }, h('span', { class: 'ti' }, t.icon), h('span', { class: 'tn' }, t.name), h('span', { class: 'new' }, 'NEW'), h('span', { class: 'cnt' }));
-  tabBar.append(tabBtns[t.id]);
+  tabBtns[t.id] = h('button', { class: 'tab', style: `--c:${t.col}`, title: t.name, onclick: () => { curTab = t.id; S.seenUnlocks['tab_' + t.id] = 1; structDirty = true; tabBody.scrollTop = 0; sfx.click(); } },
+    icon(t.icon), h('span', { class: 'tn' }, t.short || t.name), h('span', { class: 'new' }, 'NEW'), h('span', { class: 'cnt' }));
+  $('#railTabs').append(tabBtns[t.id]);
 }
 document.querySelectorAll('#buyAmt button').forEach(b => b.onclick = () => { buyMode = b.dataset.n === 'max' ? 'max' : +b.dataset.n; sfx.click(); updateBuyAmt(); });
 function updateBuyAmt() { document.querySelectorAll('#buyAmt button').forEach(b => b.classList.toggle('sel', String(buyMode) === b.dataset.n)); }
@@ -586,12 +608,14 @@ let tabUpdate = () => { }, tabKey = '';
 function tabsVisibility() {
   for (const t of TABS) {
     const vis = t.show(), b = tabBtns[t.id];
-    if (vis && b.hidden !== false) { b.hidden = false; if (!S.seenUnlocks['tab_' + t.id] && ['board', 'post', 'rust'].includes(t.id)) { b.classList.add('isnew'); toast(t.icon, `Unlocked: ${t.name}`, 'A new tab opened in the side panel.'); } }
+    if (vis && b.hidden !== false) { b.hidden = false; if (!S.seenUnlocks['tab_' + t.id] && ['board', 'post', 'rust'].includes(t.id)) { b.classList.add('isnew'); toast(t.icon, `Unlocked: ${t.name}`, 'A new tab opened in the side panel.', t.col); } }
     b.hidden = !vis;
     b.classList.toggle('sel', curTab === t.id);
-    if (t.id === 'cannon') { const n = E.UPGRADES.filter(u => u.kind === 'cannon' && modVisible(u) && E.upgCost(S, u) <= S.cash).length; setText(b.lastChild, n ? String(n) : ''); b.lastChild.hidden = !n; }
+    if (t.id === 'cannon') { const n = E.UPGRADES.filter(u => u.kind === 'cannon' && modVisible(u) && E.upgCost(S, u) <= S.cash).length; setText(b.lastChild, n ? String(n) : ''); b.lastChild.hidden = !n; } else b.lastChild.hidden = true;
     if (S.seenUnlocks['tab_' + t.id]) b.classList.remove('isnew');
   }
+  const t = TABS.find(t => t.id === curTab);
+  pIcon.style.setProperty('--c', t.col); setHTML(pIcon, IC(t.icon)); setText($('#pname'), t.name); setText($('#psub'), t.sub());
   $('#buyAmt').hidden = !(curTab === 'agents' || curTab === 'cannon');
 }
 function buildTab() {
@@ -608,229 +632,236 @@ function structKey() {
   if (curTab === 'trophies') return Object.keys(S.ach).length + '';
   return '';
 }
-const costBtn = (label, onclick) => { const b = h('button', { class: 'buy', onclick }, h('span', { class: 'bl' }, label), h('span', { class: 'bc' })); return b; };
+// A buy button: kind '' = cash (green), 'hype' (purple), 'rust' (orange).
+const costBtn = (label, onclick, kind = '') => h('button', { class: 'buy ' + kind, onclick }, h('span', { class: 'bl' }, label), h('span', { class: 'bc' }));
+function setBuy(btn, label, costHTML, ok) { setText(btn.firstChild, label); setHTML(btn.lastChild, costHTML); btn.classList.toggle('no', !ok); }
+// A list row: icon badge · name (+ right-aligned slot) · description · extra lines · action.
+function row({ col, ic, name, right, desc, extra = [], action, cls = '', tip }) {
+  return h('div', { class: 'row ' + cls, style: `--c:${col}`, tip }, badge(ic, col),
+    h('div', { class: 'rmain' }, h('div', { class: 'rname' }, h('span', { class: 'n' }, name), right || null), desc ? h('div', { class: 'rdesc' }, desc) : null, ...extra), action || null);
+}
+const stat = (ic, label, value, col) => `<div class="stat"${col ? ` style="--c:${col}"` : ''}><span>${IC(ic)}${label}</span><b>${value}</b></div>`;
+const hint = (ic, text) => h('div', { class: 'hint' }, icon(ic), h('span', {}, text));
 
 const BUILD = {
   agents() {
-    const rows = [];
-    const list = h('div', { class: 'list' });
-    let teaser = false;
-    {
-      const own = h('div', { class: 'aown' }), stat = h('div', { class: 'astat' });
+    const rows = [], list = h('div', { class: 'list' });
+    { // the cannon itself is the first "hire" (Clicker Heroes' click hero)
+      const own = h('span', { class: 'rcount' }), st = h('div', { class: 'rstat' });
       const btn = costBtn('CALIBRE', () => buyCannon(buyMode === 'max' ? Math.max(1, E.cannonMax(S, S.cash)) : buyMode));
-      list.append(h('div', { class: 'row agent', style: '--c:#ffd23f' }, h('div', { class: 'aicon' }, '🔫'),
-        h('div', { class: 'amain' }, h('div', { class: 'aname' }, 'Slop Cannon (you)', own), h('div', { class: 'adesc' }, 'Hold the mouse on prod to fire. Calibre adds base shot damage.'), stat), btn));
+      list.append(row({ col: COL.cannon, ic: 'crosshair', name: 'Slop Cannon (you)', right: own, desc: 'Hold the mouse on prod to fire. Calibre adds base damage.', extra: [st], action: btn, cls: 'accent' }));
       rows.push(() => {
         const n = buyMode === 'max' ? Math.max(1, E.cannonMax(S, S.cash)) : buyMode, c = E.cannonCost(S, n);
-        setText(own, 'Lv ' + S.cannon); setText(stat, `${fmt(shotDmg(E.WEAPONS[S.weapon].mult))} per shot · ${(D.rate / E.WEAPONS[S.weapon].cd).toFixed(1)} shots/s`);
-        setText(btn.firstChild, `+${n} CALIBRE`); setText(btn.lastChild, money(c)); btn.classList.toggle('no', c > S.cash);
+        setText(own, 'Lv ' + S.cannon);
+        setHTML(st, `${IC('crosshair')} ${fmt(shotDmg(E.WEAPONS[S.weapon].mult))} per shot <span class="sep">·</span> ${IC('gauge')} ${(D.rate / E.WEAPONS[S.weapon].cd).toFixed(1)}/s`);
+        setBuy(btn, `+${n} CALIBRE`, money(c), c <= S.cash);
       });
     }
+    let teaser = false;
     E.AGENTS.forEach((a, i) => {
       if (!agentVisible(i)) {
         if (teaser) return; teaser = true;
-        const el = h('div', { class: 'row agent locked' }, h('div', { class: 'aicon' }, '❔'), h('div', { class: 'amain' }, h('div', { class: 'aname' }, `??? — hire a ${E.AGENTS[i - 1].name} to reveal`.replace(/ a ([AEIOU])/, ' an $1')), h('div', { class: 'adesc dim' }, 'Cost: ' + money(a.cost))));
-        list.append(el); return;
+        list.append(row({ col: '#8a86a8', ic: 'lock-simple', name: '??? Classified agent', desc: `Hire ${/^[AEIOU]/.test(E.AGENTS[i - 1].name) ? 'an' : 'a'} ${E.AGENTS[i - 1].name} to reveal · ${money(a.cost)}`, cls: 'locked' }));
+        return;
       }
-      const owned = h('div', { class: 'aown' }), stat = h('div', { class: 'astat' }), bar = h('i'), next = h('div', { class: 'anext' });
+      const own = h('span', { class: 'rcount' }), st = h('div', { class: 'rstat' }), bar = h('i'), next = h('div', { class: 'rnext' });
       const btn = costBtn('HIRE', () => buyAgent(i, buyCount(i)));
-      const el = h('div', { class: 'row agent', style: `--c:${a.col}`, tip: () => agentTip(i) },
-        h('div', { class: 'aicon' }, a.icon),
-        h('div', { class: 'amain' }, h('div', { class: 'aname' }, a.name, owned), h('div', { class: 'adesc' }, a.desc), stat, h('div', { class: 'aprog' }, bar), next),
-        btn);
-      list.append(el);
+      list.append(row({ col: a.col, ic: a.icon, name: a.name, right: own, desc: a.desc, extra: [st, h('div', { class: 'prog' }, bar), next], action: btn, cls: 'accent', tip: () => agentTip(i) }));
       rows.push(() => {
-        const n = buyCount(i), c = E.agentCost(S, i, n), locked = agentLocked(i);
-        setText(owned, fmt(S.agents[i]));
-        const tot = D.dps || 1;
-        setText(stat, S.agents[i] ? `${fmt(D.agentDps[i] / S.agents[i])} DPS each · ${fmt(D.agentDps[i])} total (${(D.agentDps[i] / tot * 100).toFixed(1)}%)` : `${fmt(a.dps * D.agentMult[i] * D.dmg)} DPS each`);
+        const n = buyCount(i), c = E.agentCost(S, i, n), locked = agentLocked(i), tot = D.dps || 1;
+        setText(own, '×' + fmt(S.agents[i]));
+        setHTML(st, S.agents[i] ? `${IC('lightning')} ${fmt(D.agentDps[i] / S.agents[i])} each <span class="sep">·</span> ${fmt(D.agentDps[i])} total <span class="sep">·</span> ${D.agentDps[i] / tot < .001 ? '<0.1' : (D.agentDps[i] / tot * 100).toFixed(1)}%`
+          : `${IC('lightning')} ${fmt(a.dps * D.agentMult[i] * D.dmg)} DPS each`);
         const nt = E.TIER_AT.find(t => t > S.agents[i]), prev = [0, ...E.TIER_AT].filter(t => t <= S.agents[i]).pop();
         bar.style.transform = `scaleX(${nt ? (S.agents[i] - prev) / (nt - prev) : 1})`;
         const nu = E.UPGRADES.find(u => u.kind === 'tier' && u.agent === i && u.at === nt);
-        setHTML(next, `<span class="ready">x${fmt(D.agentMult[i])}</span> · ` + (nu ? `next: <b>${nu.name}</b> (x${nu.eff.mult}) at ${nt} · ${nt - S.agents[i]} to go` : 'all milestones reached'));
-        setText(btn.lastChild, locked ? 'LOCKED' : money(c)); setText(btn.firstChild, locked ? 'POSTMORTEM' : `HIRE ×${n}`);
-        btn.classList.toggle('no', locked || c > S.cash);
+        setHTML(next, `<span class="mult">${IC('target')} x${fmt(D.agentMult[i])}</span>` + (nu ? `${IC('arrow-right')} <b class="ready">${nu.name}</b> x${nu.eff.mult} <span class="sep">·</span> ${nt - S.agents[i]} to go` : `${IC('check-circle')} all milestones reached`));
+        setBuy(btn, locked ? 'LOCKED' : `HIRE ×${n}`, locked ? IC('lock-simple') : money(c), !locked && c <= S.cash);
       });
     });
-    tabBody.append(h('div', { class: 'hint' }, 'Agents fire slop at prod automatically. Every hire is 7% pricier. Owning 10, 25, 50, 100, 150, 200 and 300 of an agent multiplies its damage automatically.'), list);
+    tabBody.append(hint('info', 'Agents fire slop at prod on their own. Each hire costs 7% more. Owning 10 · 25 · 50 · 100 · 150 · 200 · 300 of an agent multiplies its damage automatically.'), list);
     return () => rows.forEach(f => f());
   },
   upgrades() {
     const all = E.UPGRADES.filter(u => u.kind !== 'cannon'), on = E.milestones(S);
-    const tile = (u, label) => h('div', { class: 'tile ms' + (E.reached(S, u) ? ' got' : ''), tip: () => upgTip(u) }, h('span', {}, u.icon), h('i', { class: 'tc' }, label));
-    if (S.challenge === 'notests') tabBody.append(h('div', { class: 'warn' }, '🧪 Postmortem "No Tests": milestones give no bonus this run.'));
-    tabBody.append(h('div', { class: 'card' }, h('div', { class: 'big' }, `${on.length} / ${all.length}`), h('div', { class: 'dim' }, 'Milestones switch on by themselves — no buying needed. Bright = active.')));
-    tabBody.append(h('div', { class: 'sechead' }, h('span', {}, 'Agent milestones'), h('span', { class: 'dim' }, 'at 10 · 25 · 50 · 100 · 150 · 200 · 300 owned')));
+    if (S.challenge === 'notests') tabBody.append(h('div', { class: 'notice' }, badge('flask', COL.post, 'sm'), 'Postmortem "No Tests": milestones give no bonus this run.'));
+    tabBody.append(h('div', { class: 'card summary' }, badge('target', COL.ms, 'lg'), h('div', {}, h('div', { class: 'big' }, `${on.length} / ${all.length}`), h('div', { class: 'dim' }, 'Milestones switch on by themselves — no buying needed. Bright = active.'))));
+    tabBody.append(h('div', { class: 'sechead' }, h('span', {}, 'Agent milestones'), h('span', {}, 'owned 10 · 25 · 50 · 100 · 150 · 200 · 300')));
     const list = h('div', { class: 'list' });
     E.AGENTS.forEach((a, i) => {
       if (!agentVisible(i)) return;
-      list.append(h('div', { class: 'mrow' }, h('div', { class: 'aicon', tip: () => agentTip(i) }, a.icon),
-        ...E.UPGRADES.filter(u => u.kind === 'tier' && u.agent === i).map(u => tile(u, `${u.at} · x${u.eff.mult}`))));
+      const b = badge(a.icon, a.col); b._tip = () => agentTip(i);
+      list.append(h('div', { class: 'mrow' }, b, ...E.UPGRADES.filter(u => u.kind === 'tier' && u.agent === i).map(u =>
+        h('div', { class: 'tile ms' + (E.reached(S, u) ? ' got' : ''), style: `--c:${a.col}`, tip: () => upgTip(u) }, h('b', { style: 'font:900 12px var(--disp)' }, `x${u.eff.mult}`), h('i', { class: 'tc' }, u.at)))));
     });
     tabBody.append(list);
-    tabBody.append(h('div', { class: 'sechead' }, h('span', {}, 'Synergies'), h('span', { class: 'dim' }, 'own enough of both agents')),
-      h('div', { class: 'grid' }, ...all.filter(u => u.kind === 'syn').map(u => tile(u, `${u.need[0]}+${u.need[1]}`))));
-    tabBody.append(h('div', { class: 'sechead' }, h('span', {}, 'Company milestones'), h('span', { class: 'dim' }, 'reach the incident this run')),
-      h('div', { class: 'grid' }, ...all.filter(u => u.kind === 'global').map(u => tile(u, `#${u.need}`))));
+    const tiles = (kind, label) => h('div', { class: 'grid' }, ...all.filter(u => u.kind === kind).map(u =>
+      h('div', { class: 'tile ms' + (E.reached(S, u) ? ' got' : ''), style: `--c:${upgCol(u)}`, tip: () => upgTip(u) }, icon(u.icon), h('i', { class: 'tc' }, label(u)))));
+    tabBody.append(h('div', { class: 'sechead' }, h('span', {}, 'Synergies'), h('span', {}, 'own enough of both agents')), tiles('syn', u => `${u.need[0]}+${u.need[1]}`));
+    tabBody.append(h('div', { class: 'sechead' }, h('span', {}, 'Company milestones'), h('span', {}, 'reach the incident this run')), tiles('global', u => `#${u.need}`));
   },
   cannon() {
-    const lvl = h('div', { class: 'big' }), info = h('div', { class: 'statgrid' });
+    const lvl = h('div', { class: 'big' }), sub = h('div', { class: 'sub' }), info = h('div', { class: 'statgrid' });
     const btn = costBtn('UPGRADE', () => buyCannon(buyMode === 'max' ? Math.max(1, E.cannonMax(S, S.cash)) : buyMode));
-    const card = h('div', { class: 'card' }, h('div', { class: 'cardhead' }, h('div', {}, h('div', { class: 'dim' }, 'CANNON CALIBRE'), lvl), btn), info);
+    const hero = h('div', { class: 'card hero', style: `--c:${COL.cannon}` }, h('div', { class: 'top' }, badge('crosshair', COL.cannon, 'xl'), h('div', { style: 'flex:1' }, lvl, sub), btn), h('div', { style: 'height:12px' }), info);
     const list = h('div', { class: 'list' }), rows = [];
     for (const u of E.UPGRADES.filter(u => u.kind === 'cannon')) {
       if (!S.upg[u.id] && !modVisible(u)) continue;
       const b = costBtn('BUY', () => buyUpg(u));
-      const r = h('div', { class: 'row upg' + (S.upg[u.id] ? ' done' : '') }, h('div', { class: 'aicon' }, u.icon), h('div', { class: 'amain' }, h('div', { class: 'aname' }, u.name), h('div', { class: 'adesc' }, u.flav)), S.upg[u.id] ? h('div', { class: 'check' }, '✓') : b);
-      list.append(r);
-      if (!S.upg[u.id]) rows.push(() => { const c = E.upgCost(S, u); setText(b.lastChild, money(c)); b.classList.toggle('no', c > S.cash); });
+      list.append(row({ col: COL.cannon, ic: u.icon, name: u.name, desc: u.flav, action: S.upg[u.id] ? h('div', { class: 'check' }, icon('check-circle')) : b, cls: S.upg[u.id] ? 'done' : '', tip: () => upgTip(u) }));
+      if (!S.upg[u.id]) rows.push(() => { const c = E.upgCost(S, u); setBuy(b, 'BUY', money(c), c <= S.cash); });
     }
-    tabBody.append(h('div', { class: 'hint' }, 'Hold the mouse on the battlefield to fire. Shots scale with calibre and a % of your agent DPS. Shoot golden 0-DAYs and linter drones!'), card, h('div', { class: 'sechead' }, h('span', {}, 'Cannon mods')), list);
+    tabBody.append(hint('crosshair', 'Hold the mouse on the battlefield to fire. Shots scale with calibre plus a % of your agent DPS. Shoot golden 0-DAYs and linter drones!'), hero, h('div', { class: 'sechead' }, h('span', {}, 'Cannon mods'), h('span', {}, 'the only upgrades you buy')), list);
     return () => {
-      const n = buyMode === 'max' ? Math.max(1, E.cannonMax(S, S.cash)) : buyMode, c = E.cannonCost(S, n);
-      setText(lvl, `Lv ${S.cannon}`); setText(btn.firstChild, `+${n} CALIBRE`); setText(btn.lastChild, money(c)); btn.classList.toggle('no', c > S.cash);
-      const WP = E.WEAPONS[S.weapon];
-      setHTML(info, [
-        ['Base damage', fmt(D.shotBase)], ['+ of agent DPS', (D.pct * 100).toFixed(0) + '%'], ['Mode', `${WP.name} x${WP.mult}`], ['Shot damage', fmt(shotDmg(WP.mult))],
-        ['Crit chance', (Math.min(1, D.crit) * 100).toFixed(0) + '%'], ['Crit damage', 'x' + fmt(D.critMult)], ['Fire rate', (D.rate / WP.cd).toFixed(1) + '/s'], ['Cron job', D.cron ? D.cron + ' shots/s' : '—'],
-      ].map(([k, v]) => `<div><span>${k}</span><b>${v}</b></div>`).join(''));
+      const n = buyMode === 'max' ? Math.max(1, E.cannonMax(S, S.cash)) : buyMode, c = E.cannonCost(S, n), WP = E.WEAPONS[S.weapon];
+      setHTML(lvl, `Lv ${S.cannon}<small>calibre</small>`); setText(sub, `${fmt(shotDmg(WP.mult))} damage per shot`);
+      setBuy(btn, `+${n} CALIBRE`, money(c), c <= S.cash);
+      setHTML(info, stat('sword', 'Base damage', fmt(D.shotBase)) + stat('percent', 'Of agent DPS', (D.pct * 100).toFixed(0) + '%') + stat(WP.icon, 'Mode', `${WP.name} x${WP.mult}`, WP.col) + stat('crosshair', 'Shot damage', fmt(shotDmg(WP.mult)), COL.cannon) +
+        stat('clover', 'Crit chance', (Math.min(1, D.crit) * 100).toFixed(0) + '%', '#5dff9b') + stat('fire', 'Crit damage', 'x' + fmt(D.critMult), '#ff8a3d') + stat('gauge', 'Fire rate', (D.rate / WP.cd).toFixed(1) + '/s') + stat('timer', 'Cron job', D.cron ? D.cron + ' shots/s' : '—', COL.hype));
       rows.forEach(f => f());
     };
   },
   board() {
-    const top = h('div', { class: 'card hypecard' }), pbtn = h('button', { class: 'btn big primary', onclick: confirmPivot }, 'PIVOT TO AI 🚀');
-    top.append(h('div', { class: 'hypebig' }), h('div', { class: 'hypeinfo' }), pbtn);
+    const big = h('div', { class: 'big' }), sub = h('div', { class: 'sub' }), info = h('div', { class: 'info' });
+    const pbtn = h('button', { class: 'btn big primary', onclick: confirmPivot }, icon('rocket-launch'), 'PIVOT TO AI');
+    const hero = h('div', { class: 'card hero', style: `--c:${COL.hype}` }, h('div', { class: 'top' }, badge('rocket-launch', COL.hype, 'xl'), h('div', {}, big, sub)), info, pbtn);
     const list = h('div', { class: 'list' }), rows = [];
     for (const b of E.BOARD) {
-      const lvl = h('span', { class: 'lv' }), desc = h('div', { class: 'adesc' }), btn = costBtn('HIRE', () => {
+      const lvl = h('span', { class: 'lv' }), desc = h('div', { class: 'rdesc' }), btn = costBtn('PROMOTE', () => {
         const l = E.lv(S.board, b.id), c = E.boardCost(b, l); if (b.max && l >= b.max) return; if (c > S.hype) return sfx.deny();
         S.hype -= c; S.board[b.id] = l + 1; markDirty(true); sfx.buy();
-      });
-      list.append(h('div', { class: 'row board' }, h('div', { class: 'aicon' }, b.icon), h('div', { class: 'amain' }, h('div', { class: 'aname' }, b.name, lvl), desc), btn));
+      }, 'hype');
+      list.append(row({ col: COL.hype, ic: b.icon, name: b.name, right: lvl, extra: [desc], action: btn }));
       rows.push(() => {
         const l = E.lv(S.board, b.id), c = E.boardCost(b, l), maxed = b.max && l >= b.max;
-        setText(lvl, `Lv ${l}${b.max ? '/' + b.max : ''}`); setText(desc, `${b.desc(l)}${maxed ? '' : ' · next: ' + b.next}`);
-        setText(btn.firstChild, maxed ? 'MAXED' : 'PROMOTE'); setText(btn.lastChild, maxed ? '—' : `🚀 ${fmt(c)}`); btn.classList.toggle('no', maxed || c > S.hype);
+        setText(lvl, `Lv ${l}${b.max ? ' / ' + b.max : ''}`); setHTML(desc, `${b.desc(l)}${maxed ? '' : ` <span class="dim">· next ${b.next}</span>`}`);
+        setBuy(btn, maxed ? 'MAXED' : 'PROMOTE', maxed ? IC('check') : `${IC('rocket-launch')} ${fmt(c)}`, !maxed && c <= S.hype);
       });
     }
-    tabBody.append(top, h('div', { class: 'sechead' }, h('span', {}, 'Board of Directors'), h('span', { class: 'dim' }, 'spending hype lowers its passive bonus')), list);
+    tabBody.append(hero, h('div', { class: 'sechead' }, h('span', {}, 'Board of Directors'), h('span', {}, 'spending hype lowers its passive bonus')), list);
     return () => {
-      const p = E.pendingHype(S), ok = canPivot();
-      setHTML(top.children[0], `🚀 ${fmt(S.hype)} <small>hype</small>`);
-      setHTML(top.children[1], `Each hype gives <b>+${(E.hypeEach(S) * 100).toFixed(0)}%</b> damage (now <b>+${fmt(S.hype * E.hypeEach(S) * 100)}%</b>).<br>` +
-        (S.maxLevel >= E.PIVOT_LEVEL ? `Pivoting now grants <b class="good">+${fmt(p)} hype</b> → <b>+${fmt((S.hype + p) * E.hypeEach(S) * 100)}%</b>.` : `Reach incident <b>${E.PIVOT_LEVEL}</b> this run to pivot (now ${S.maxLevel}). Pending: +${fmt(p)}.`) +
-        `<br><span class="dim">Hype = (downtime this era ÷ ${E.T.hypeDiv})^${E.T.hypeExp}. Earn more before pivoting for diminishing-but-real gains. Pivots: ${S.pivots}</span>`);
-      pbtn.disabled = !ok; rows.forEach(f => f());
+      const p = E.pendingHype(S);
+      setHTML(big, `${fmt(S.hype)}<small>hype</small>`); setText(sub, `+${fmt(S.hype * E.hypeEach(S) * 100)}% damage · +${(E.hypeEach(S) * 100).toFixed(0)}% each`);
+      setHTML(info, (S.maxLevel >= E.PIVOT_LEVEL ? `Pivoting now grants <b class="good">+${fmt(p)} hype</b>, raising your bonus to <b>+${fmt((S.hype + p) * E.hypeEach(S) * 100)}%</b>.` : `Reach incident <b>${E.PIVOT_LEVEL}</b> this run to pivot <span class="dim">(now ${S.maxLevel})</span>. Pending: <b>+${fmt(p)}</b>.`) +
+        `<br><span class="f">hype = (downtime this era ÷ ${E.T.hypeDiv})^${E.T.hypeExp} · pivots: ${S.pivots}</span>`);
+      pbtn.disabled = !canPivot(); rows.forEach(f => f());
     };
   },
   post() {
     const list = h('div', { class: 'list' });
     for (const c of E.CHALLENGES) {
       const done = S.chDone[c.id], act = S.challenge === c.id;
-      list.append(h('div', { class: 'row chal' + (done ? ' done' : '') + (act ? ' active' : '') }, h('div', { class: 'aicon' }, c.icon),
-        h('div', { class: 'amain' }, h('div', { class: 'aname' }, c.name, h('span', { class: 'lv' }, `goal: incident ${c.goal}`)), h('div', { class: 'adesc' }, c.rule), h('div', { class: 'adesc good' }, 'Reward: ' + c.reward)),
-        done ? h('div', { class: 'check' }, '✓') : act ? h('div', { class: 'check act' }, 'ACTIVE') : h('button', { class: 'btn', onclick: () => modal(`${c.icon} Start "${c.name}"?`, `<p>This <b>pivots</b> you (you still get pending hype) and restarts at incident 1 with this rule:</p><p class="warn">${c.rule}</p><p>Clear incident <b>${c.goal}</b> to win: <span class="good">${c.reward}</span></p>`, [{ label: 'Start postmortem', cls: 'primary', onclick: () => doPivot(c.id) }, { label: 'Cancel' }]) }, 'START')));
+      const start = h('button', { class: 'btn sm', onclick: () => modal(`Start "${c.name}"?`, `<p>This <b>pivots</b> you (you still collect pending hype) and restarts at incident 1 with this rule:</p><p class="warn">${c.rule}</p><p>Clear incident <b>${c.goal}</b> to win: <span class="good">${c.reward}</span></p>`, [{ label: 'Cancel' }, { label: 'Start postmortem', icon: 'play', cls: 'primary', onclick: () => doPivot(c.id) }], { icon: c.icon, col: COL.post }) }, icon('play'), 'Start');
+      list.append(row({ col: COL.post, ic: c.icon, name: c.name, right: h('span', { class: 'lv' }, `goal #${c.goal}`), desc: c.rule,
+        extra: [h('div', { class: 'rstat', html: `${IC('gift')} <span class="good">${c.reward}</span>` })],
+        action: done ? h('div', { class: 'check' }, icon('check-circle')) : act ? h('div', { class: 'check act' }, 'ACTIVE') : start, cls: done ? 'done' : act ? 'active' : '' }));
     }
-    tabBody.append(h('div', { class: 'hint' }, 'Postmortems are challenge runs with a nasty rule. Complete one for a permanent reward. Your Board and hype still apply.'), list);
+    tabBody.append(hint('clipboard-text', 'Challenge runs with a nasty rule. Complete one for a permanent reward. Your Board and hype still apply.'), list);
   },
   rust() {
-    const top = h('div', { class: 'card rustcard' }), rbtn = h('button', { class: 'btn big rust', onclick: confirmRust }, 'REWRITE IT IN RUST 🦀');
-    top.append(h('div', { class: 'hypebig' }), h('div', { class: 'hypeinfo' }), rbtn);
+    const big = h('div', { class: 'big' }), sub = h('div', { class: 'sub' }), info = h('div', { class: 'info' });
+    const rbtn = h('button', { class: 'btn big rust', onclick: confirmRust }, icon('gear-six'), 'REWRITE IT IN RUST');
+    const hero = h('div', { class: 'card hero', style: `--c:${COL.crab}` }, h('div', { class: 'top' }, badge('shrimp', COL.crab, 'xl'), h('div', {}, big, sub)), info, rbtn);
     const list = h('div', { class: 'list' }), rows = [];
     for (const r of E.RUST) {
-      const lvl = h('span', { class: 'lv' }), desc = h('div', { class: 'adesc' }), btn = costBtn('BUY', () => {
+      const lvl = h('span', { class: 'lv' }), desc = h('div', { class: 'rdesc' }), btn = costBtn('CRATE', () => {
         const l = E.lv(S.rust, r.id), c = E.rustCost(r, l); if (r.max && l >= r.max) return; if (c > S.crabs) return sfx.deny();
         S.crabs -= c; S.rust[r.id] = l + 1; markDirty(true); sfx.buy();
-      });
-      list.append(h('div', { class: 'row board' }, h('div', { class: 'aicon' }, r.icon), h('div', { class: 'amain' }, h('div', { class: 'aname' }, r.name, lvl), desc), btn));
+      }, 'rust');
+      list.append(row({ col: COL.crab, ic: r.icon, name: r.name, right: lvl, extra: [desc], action: btn }));
       rows.push(() => {
         const l = E.lv(S.rust, r.id), c = E.rustCost(r, l), maxed = r.max && l >= r.max;
-        setText(lvl, `Lv ${l}${r.max ? '/' + r.max : ''}`); setText(desc, `${r.desc(l)}${maxed ? '' : ' · next: ' + r.next}`);
-        setText(btn.firstChild, maxed ? 'MAXED' : 'CRATE'); setText(btn.lastChild, maxed ? '—' : `🦀 ${fmt(c)}`); btn.classList.toggle('no', maxed || c > S.crabs);
+        setText(lvl, `Lv ${l}${r.max ? ' / ' + r.max : ''}`); setHTML(desc, `${r.desc(l)}${maxed ? '' : ` <span class="dim">· next ${r.next}</span>`}`);
+        setBuy(btn, maxed ? 'MAXED' : 'CRATE', maxed ? IC('check') : `${IC('shrimp')} ${fmt(c)}`, !maxed && c <= S.crabs);
       });
     }
-    tabBody.append(top, h('div', { class: 'sechead' }, h('span', {}, 'The Borrow Checker')), list);
+    tabBody.append(hero, h('div', { class: 'sechead' }, h('span', {}, 'The Borrow Checker'), h('span', {}, 'permanent, survives every reset')), list);
     return () => {
       const p = E.crabsFor(S.eraMax);
-      setHTML(top.children[0], `🦀 ${fmt(S.crabs)} <small>crabs</small>`);
-      setHTML(top.children[1], (S.eraMax >= E.RUST_LEVEL ? `Rewriting now grants <b class="good">+${fmt(p)} crabs</b> (2^((best incident − 110) ÷ 10)).` : `Reach incident <b>${E.RUST_LEVEL}</b> to rewrite (best this era: ${S.eraMax}).`) +
-        `<br><span class="warn">Resets everything a pivot does, plus all hype and your Board.</span><br><span class="dim">Rewrites: ${S.rusts} · crabs earned: ${fmt(S.crabsEver)}</span>`);
+      setHTML(big, `${fmt(S.crabs)}<small>crabs</small>`); setText(sub, `${S.rusts} rewrites · ${fmt(S.crabsEver)} earned`);
+      setHTML(info, (S.eraMax >= E.RUST_LEVEL ? `Rewriting now grants <b class="good">+${fmt(p)} crabs</b>.` : `Reach incident <b>${E.RUST_LEVEL}</b> to rewrite <span class="dim">(best this era: ${S.eraMax})</span>.`) +
+        `<br><span class="warn">Resets everything a pivot does, plus all hype and your Board.</span><br><span class="f">crabs = 2^((best incident − 110) ÷ 10)</span>`);
       rbtn.disabled = p < 1; rows.forEach(f => f());
     };
   },
   trophies() {
     const n = Object.keys(S.ach).length;
-    const grid = h('div', { class: 'grid' }, ...ACHIEVEMENTS.map(a => {
-      const got = S.ach[a.id];
-      return h('div', { class: 'tile ach' + (got ? ' got' : ''), tip: () => got || !a.secret ? `<b>${a.icon} ${a.name}</b><br>${a.desc}${got ? '<br><span class="good">Unlocked ✓ · +3% damage</span>' : ''}` : '<b>??? Secret trophy</b><br>Keep breaking things.' }, h('span', {}, got || !a.secret ? a.icon : '❓'));
-    }));
-    tabBody.append(h('div', { class: 'card' }, h('div', { class: 'big' }, `${n} / ${ACHIEVEMENTS.length}`), h('div', { class: 'dim' }, `Each trophy: +3% damage (now +${n * 3}%)`)), grid);
+    tabBody.append(h('div', { class: 'card summary' }, badge('trophy', COL.trophy, 'lg'), h('div', {}, h('div', { class: 'big' }, `${n} / ${ACHIEVEMENTS.length}`), h('div', { class: 'dim' }, `Each trophy adds +3% damage · now +${n * 3}%`))),
+      h('div', { class: 'grid' }, ...ACHIEVEMENTS.map(a => {
+        const got = S.ach[a.id], show = got || !a.secret;
+        return h('div', { class: 'tile' + (got ? ' got' : ''), tip: () => show ? tipHead(a.icon, COL.trophy, a.name, got ? 'unlocked · +3% damage' : a.secret ? 'secret' : 'locked') + a.desc : tipHead('question', '#8a86a8', 'Secret trophy', 'locked') + 'Keep breaking things.' }, icon(show ? a.icon : 'question'));
+      })));
   },
   stats() {
-    const box = h('div', { class: 'statgrid wide' });
+    const box = h('div', { class: 'statgrid' });
     tabBody.append(box);
     return () => setHTML(box, [
-      ['Downtime this run', money(S.runEarned)], ['Downtime this era', money(S.eraEarned)], ['Downtime all time', money(S.totalEarned)],
-      ['Current incident', S.level], ['Best this run', S.maxLevel], ['Best ever', S.allMax],
-      ['Run time', fmtTime(S.runTime)], ['Time played', fmtTime(S.stats.played)], ['Pivots', S.pivots], ['Rewrites', S.rusts],
-      ['Servers down', fmt(S.stats.kills)], ['Bosses decommissioned', fmt(S.stats.bosses)], ['Shots fired', fmt(S.stats.shots)], ['Crits', fmt(S.stats.crits)],
-      ['Zero-days exploited', fmt(S.stats.golden)], ['Linters disabled', fmt(S.stats.drones)], ['Best combo', G.bestCombo], ['Earned offline', money(S.stats.offline)],
-      ['Damage multiplier', 'x' + fmt(D.dmg)], ['Agents owned', fmt(S.agents.reduce((a, b) => a + b, 0))],
-    ].map(([k, v]) => `<div><span>${k}</span><b>${v}</b></div>`).join(''));
+      ['coins', 'Downtime this run', money(S.runEarned), COL.cash], ['coins', 'This era', money(S.eraEarned), COL.cash], ['bank', 'All time', money(S.totalEarned), COL.cash], ['trend-up', 'Idle income', money(incomePerSec()) + '/s', COL.good],
+      ['hard-drives', 'Current incident', S.level], ['flag', 'Best this run', S.maxLevel], ['crown-simple', 'Best ever', S.allMax, COL.trophy], ['lightning', 'Damage mult', 'x' + fmt(D.dmg)],
+      ['timer', 'Run time', fmtTime(S.runTime)], ['clock', 'Time played', fmtTime(S.stats.played)], ['rocket-launch', 'Pivots', S.pivots, COL.hype], ['gear-six', 'Rewrites', S.rusts, COL.crab],
+      ['skull', 'Servers down', fmt(S.stats.kills), COL.bad], ['bank', 'Bosses', fmt(S.stats.bosses), COL.bad], ['crosshair', 'Shots fired', fmt(S.stats.shots), COL.cannon], ['clover', 'Crits', fmt(S.stats.crits), COL.good],
+      ['coin', 'Zero-days', fmt(S.stats.golden), COL.cash], ['speaker-slash', 'Linters down', fmt(S.stats.drones)], ['link-simple', 'Best combo', G.bestCombo, '#ff8a3d'], ['island', 'Earned offline', money(S.stats.offline), COL.good],
+      ['robot', 'Agents owned', fmt(S.agents.reduce((a, b) => a + b, 0)), COL.good], ['target', 'Milestones', E.milestones(S).length, COL.ms],
+    ].map(([ic, k, v, c]) => stat(ic, k, v, c)).join(''));
   },
   settings() {
     const st = S.settings;
-    const slider = (label, key, apply) => h('label', { class: 'set' }, h('span', {}, label), h('input', { type: 'range', min: 0, max: 1, step: .05, value: st[key], oninput: e => { st[key] = +e.target.value; applySettings(); } }));
-    const sel = (label, key, opts) => { const s = h('select', { onchange: e => { st[key] = isNaN(+e.target.value) ? e.target.value : +e.target.value; applySettings(); markDirty(true); } }, ...opts.map(([v, t]) => { const o = h('option', { value: v }, t); if (String(st[key]) === String(v)) o.selected = true; return o; })); return h('label', { class: 'set' }, h('span', {}, label), s); };
+    const slider = (ic, label, key) => h('label', { class: 'set' }, h('span', {}, icon(ic), label), h('input', { type: 'range', min: 0, max: 1, step: .05, value: st[key], oninput: e => { st[key] = +e.target.value; applySettings(); } }));
+    const sel = (ic, label, key, opts) => { const s = h('select', { onchange: e => { st[key] = isNaN(+e.target.value) ? e.target.value : +e.target.value; applySettings(); markDirty(true); } }, ...opts.map(([v, t]) => { const o = h('option', { value: v }, t); if (String(st[key]) === String(v)) o.selected = true; return o; })); return h('label', { class: 'set' }, h('span', {}, icon(ic), label), s); };
+    const keys = [['1 – 4', 'Cannon mode'], ['Space', 'Fire at the cursor'], ['← →', 'Previous / next incident'], ['F', 'Farm / auto-advance'], ['B', 'Cycle buy amount'], ['M', 'Mute']];
     tabBody.append(
+      h('div', { class: 'sechead' }, h('span', {}, 'Audio & display')),
       h('div', { class: 'card' },
-        slider('Sound effects', 'sfx'), slider('Music', 'music'),
-        sel('Number format', 'notation', [['suffix', '1.23M / 4.56Qa'], ['sci', '1.23e6 (scientific)']]),
-        sel('Particles', 'particles', [[1, 'High'], [.5, 'Low']]),
-        sel('Screen shake', 'shake', [[1, 'On'], [.3, 'Gentle'], [0, 'Off']])),
+        slider('speaker-high', 'Sound effects', 'sfx'), slider('music-notes', 'Music', 'music'),
+        sel('hash', 'Number format', 'notation', [['suffix', '1.23M · 4.56Qa'], ['sci', '1.23e6']]),
+        sel('sparkle', 'Particles', 'particles', [[1, 'High'], [.5, 'Low']]),
+        sel('vibrate', 'Screen shake', 'shake', [[1, 'On'], [.3, 'Gentle'], [0, 'Off']])),
+      h('div', { class: 'sechead' }, h('span', {}, 'Save data'), h('span', {}, 'autosaves every 15s')),
       h('div', { class: 'card btnrow' },
-        h('button', { class: 'btn', onclick: () => { save(); toast('💾', 'Saved', 'Your outage is safe in localStorage.'); } }, 'Save now'),
-        h('button', { class: 'btn', onclick: () => modal('Export save', `<textarea readonly class="savebox">${encodeSave()}</textarea><p class="dim">Copy this somewhere safe.</p>`) }, 'Export'),
-        h('button', { class: 'btn', onclick: () => modal('Import save', '<textarea class="savebox" id="imp" placeholder="Paste your save here"></textarea>', [{ label: 'Import', cls: 'primary', onclick: () => { try { S = decodeSave($('#imp').value); applySettings(); markDirty(true); resetRunRuntime(); save(); toast('💾', 'Imported', 'Welcome back to prod.'); } catch (e) { toast('⚠️', 'Import failed', 'That is not a valid save.'); return false; } } }, { label: 'Cancel' }]) }, 'Import'),
-        h('button', { class: 'btn danger', onclick: () => modal('Hard reset?', '<p class="warn">This deletes <b>everything</b>: hype, crabs, trophies. There is no backup. (This is the one time we test in prod.)</p>', [{ label: 'Delete everything', cls: 'danger', onclick: () => { localStorage.removeItem(SAVE_KEY); S = E.fresh(); applySettings(); markDirty(true); resetRunRuntime(); save(); } }, { label: 'Cancel' }]) }, 'Hard reset')),
-      h('div', { class: 'card dim small' }, h('div', { html: 'Keys: <b>1-4</b> cannon mode · <b>Space</b> fire · <b>←/→</b> incident · <b>F</b> farm/auto · <b>B</b> buy amount · <b>M</b> mute' }),
-        h('div', { html: 'Built in one HTML canvas, no libraries. No real servers were harmed. They were already like this. · <a href="https://github.com/bryantebeek/slop-cannon" target="_blank">source</a>' })));
+        h('button', { class: 'btn green', onclick: () => { save(); toast('floppy-disk', 'Saved', 'Your outage is safe in localStorage.'); } }, icon('floppy-disk'), 'Save now'),
+        h('button', { class: 'btn', onclick: () => modal('Export save', `<textarea readonly class="savebox">${encodeSave()}</textarea><p class="dim">Copy this somewhere safe.</p>`, null, { icon: 'export', col: COL.info }) }, icon('export'), 'Export'),
+        h('button', { class: 'btn', onclick: () => modal('Import save', '<textarea class="savebox" id="imp" placeholder="Paste your save here"></textarea>', [{ label: 'Cancel' }, { label: 'Import', icon: 'download-simple', cls: 'primary', onclick: () => { try { S = decodeSave($('#imp').value); applySettings(); markDirty(true); resetRunRuntime(); save(); toast('download-simple', 'Imported', 'Welcome back to prod.'); } catch (e) { toast('warning', 'Import failed', 'That is not a valid save.', COL.bad); return false; } } }], { icon: 'download-simple', col: COL.info }) }, icon('download-simple'), 'Import'),
+        h('button', { class: 'btn danger', onclick: () => modal('Hard reset?', '<p class="warn">This deletes <b>everything</b>: hype, crabs, trophies. There is no backup. (This is the one time we test in prod.)</p>', [{ label: 'Cancel' }, { label: 'Delete everything', icon: 'trash', cls: 'danger', onclick: () => { localStorage.removeItem(SAVE_KEY); S = E.fresh(); applySettings(); markDirty(true); resetRunRuntime(); save(); } }], { icon: 'trash', col: COL.bad }) }, icon('trash'), 'Hard reset')),
+      h('div', { class: 'sechead' }, h('span', {}, 'Controls')),
+      h('div', { class: 'card keys' }, ...keys.flatMap(([k, d]) => [h('kbd', {}, k), h('span', {}, d)])),
+      h('div', { class: 'hint', style: 'margin-top:14px' }, icon('github-logo'), h('span', { html: 'One HTML canvas, no frameworks. Icons by <a href="https://phosphoricons.com" target="_blank">Phosphor</a>. No real servers were harmed — they were already like this. <a href="https://github.com/bryantebeek/slop-cannon" target="_blank">Source</a>' })));
   },
 };
 function agentTip(i) {
   const a = E.AGENTS[i], ups = E.UPGRADES.filter(u => u.kind === 'tier' && u.agent === i);
-  return `<b>${a.icon} ${a.name}</b><br><span class="dim">${a.desc}</span><br>Multiplier: <span class="ready">x${fmt(D.agentMult[i])}</span><br>` + ups.map(u => {
+  return tipHead(a.icon, a.col, a.name, `${fmt(S.agents[i])} owned · x${fmt(D.agentMult[i])} multiplier`) + `<div class="dim">${a.desc}</div><div style="margin-top:8px">` + ups.map(u => {
     const got = E.reached(S, u);
-    return `<span class="${got ? 'ready' : 'dim'}">${got ? '✓' : '·'} ${u.at}: ${u.name} (x${u.eff.mult})</span>`;
-  }).join('<br>');
+    return `<div class="ttl ${got ? 'ready' : 'dim'}">${IC(got ? 'check-circle' : 'lock-simple')} ${u.at} · ${u.name} · x${u.eff.mult}</div>`;
+  }).join('') + '</div>';
 }
 function upgTip(u) {
+  const col = upgCol(u);
+  if (u.kind === 'cannon') return tipHead(u.icon, col, u.name, 'cannon mod') + `${u.flav}<br>${S.upg[u.id] ? `<span class="good">${IC('check-circle')} Owned</span>` : `<span class="${E.upgCost(S, u) > S.cash ? 'bad' : 'good'}">${IC('coins')} ${money(E.upgCost(S, u))}</span>`}`;
   const got = E.reached(S, u);
   const when = u.kind === 'tier' ? `own ${u.at} ${E.AGENTS[u.agent].name}s (${S.agents[u.agent]}/${u.at})`
     : u.kind === 'syn' ? `own ${u.need[0]} ${E.AGENTS[u.a].name}s and ${u.need[1]} ${E.AGENTS[u.b].name}s`
-      : u.kind === 'global' ? `reach incident ${u.need} this run (best: ${S.maxLevel})` : '';
-  if (u.kind === 'cannon') return `<b>${u.icon} ${u.name}</b><br>${u.flav}<br>${S.upg[u.id] ? '<span class="good">Owned ✓</span>' : `<span class="${E.upgCost(S, u) > S.cash ? 'bad' : 'good'}">${money(E.upgCost(S, u))}</span>`}`;
-  return `<b>${u.icon} ${u.name}</b><br>${u.flav}<br>${got ? '<span class="ready">✓ Active</span>' : `<span class="dim">Unlocks when you ${when}</span>`}`;
+      : `reach incident ${u.need} this run (best: ${S.maxLevel})`;
+  return tipHead(u.icon, col, u.name, 'milestone') + `${u.flav}<br>${got ? `<span class="ready">${IC('check-circle')} Active</span>` : `<span class="dim">${IC('lock-simple')} Unlocks when you ${when}</span>`}`;
 }
 function confirmPivot() {
   if (!canPivot()) return;
   const p = E.pendingHype(S);
-  modal('🚀 Pivot to AI?', `<p>The investors want a new narrative. You'll <b>lose</b>: downtime $, agents, upgrades, cannon calibre and incident progress.</p>
-    <p>You <b>keep</b>: hype, the Board, trophies, postmortems, crabs.</p>
+  modal('Pivot to AI?', `<p>The investors want a new narrative. You'll <b>lose</b>: downtime $, agents, cannon calibre and mods, and incident progress.</p>
+    <p>You <b>keep</b>: hype, the Board, trophies, postmortems and crabs.</p>
     <p class="good">You gain <b>+${fmt(p)} hype</b> → +${fmt((S.hype + p) * E.hypeEach(S) * 100)}% damage.${E.lv(S.board, 'severance') ? ` You'll restart at incident ${1 + 5 * E.lv(S.board, 'severance')}.` : ''}</p>
     <p class="dim">Root cause of the old company: ${pick(CAUSES)}.</p>`,
-    [{ label: `Pivot (+${fmt(p)} 🚀)`, cls: 'primary', onclick: () => doPivot(null) }, { label: 'Not yet' }]);
+    [{ label: 'Not yet' }, { label: `Pivot · +${fmt(p)} hype`, icon: 'rocket-launch', cls: 'primary', onclick: () => doPivot(null) }], { icon: 'rocket-launch', col: COL.hype });
 }
 function confirmRust() {
   const c = E.crabsFor(S.eraMax); if (c < 1) return;
-  modal('🦀 Rewrite it in Rust?', `<p>Everything goes: the run, <b>all hype</b> and <b>the Board</b>${E.lv(S.rust, 'clippy') ? ` (Clippy keeps ${E.lv(S.rust, 'clippy') * 10}% of Board levels)` : ''}. You keep trophies, postmortems and crabs.</p><p class="good">You gain <b>+${fmt(c)} crabs</b> to spend in the Borrow Checker.</p><p class="dim">Estimated rewrite time: 6 months. Actual: 4 years.</p>`,
-    [{ label: `Rewrite (+${fmt(c)} 🦀)`, cls: 'rust', onclick: doRust }, { label: 'Not yet' }]);
+  modal('Rewrite it in Rust?', `<p>Everything goes: the run, <b>all hype</b> and <b>the Board</b>${E.lv(S.rust, 'clippy') ? ` (Clippy keeps ${E.lv(S.rust, 'clippy') * 10}% of Board levels)` : ''}. You keep trophies, postmortems and crabs.</p><p class="good">You gain <b>+${fmt(c)} crabs</b> to spend in the Borrow Checker.</p><p class="dim">Estimated rewrite time: 6 months. Actual: 4 years.</p>`,
+    [{ label: 'Not yet' }, { label: `Rewrite · +${fmt(c)} crabs`, icon: 'gear-six', cls: 'rust', onclick: doRust }], { icon: 'gear-six', col: COL.crab });
 }
 function showEnding() {
-  modal('☁️ us-east-1 is DOWN', `<p>Half the internet is offline. Status pages everywhere still say <i>"All Systems Operational."</i></p>
+  modal('us-east-1 is DOWN', `<p>Half the internet is offline. Status pages everywhere still say <i>"All Systems Operational."</i></p>
     <p>Nobody can tell the difference.</p>
     <p class="dim">You took down ${fmt(S.stats.kills)} servers over ${fmtTime(S.stats.played)}, with ${S.pivots} pivots and ${S.rusts} rewrites. Root cause: you.</p>
-    <p class="good">Thanks for playing SLOP CANNON. The incidents keep going if you do — servers just get angrier.</p>`, [{ label: 'git push --force (continue)', cls: 'primary' }]);
+    <p class="good">Thanks for playing SLOP CANNON. The incidents keep going if you do — servers just get angrier.</p>`, [{ label: 'git push --force (continue)', icon: 'git-branch', cls: 'primary' }], { icon: 'cloud-slash', col: COL.info });
 }
 function updateUI() {
   updateTop(); tabsVisibility();
@@ -866,7 +897,7 @@ const KONAMI = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'Ar
 addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
   kIdx = e.code === KONAMI[kIdx] ? kIdx + 1 : e.code === KONAMI[0] ? 1 : 0;
-  if (kIdx === KONAMI.length) { G.konami = true; kIdx = 0; toast('🥪', 'Okay.', 'sudo make me a sandwich'); }
+  if (kIdx === KONAMI.length) { G.konami = true; kIdx = 0; toast('hamburger', 'Okay.', 'sudo make me a sandwich', '#ffd23f'); }
   if (e.code === 'Escape' && modalOpen()) return closeModal();
   if (modalOpen()) return;
   if (e.code === 'Space') { e.preventDefault(); initAudio(); if (!hoverCanvas) { aimX = W / 2; aimY = H * .45; hoverCanvas = true; } firing = true; }
@@ -875,7 +906,7 @@ addEventListener('keydown', e => {
   if (e.code === 'ArrowRight') setLevel(S.level + 1);
   if (e.code === 'KeyF') { S.auto = !S.auto; sfx.click(); }
   if (e.code === 'KeyB' && kIdx !== KONAMI.length - 1) { const m = [1, 10, 25, 100, 'max']; buyMode = m[(m.indexOf(buyMode) + 1) % m.length]; updateBuyAmt(); }
-  if (e.code === 'KeyM') { VOL.muted = !VOL.muted; G.muted = G.muted || VOL.muted; setVolumes(); toast(VOL.muted ? '🔕' : '🔔', VOL.muted ? 'Muted' : 'Sound on', 'Press M to toggle.'); }
+  if (e.code === 'KeyM') toggleMute();
 });
 addEventListener('keyup', e => { if (e.code === 'Space') firing = false; });
 addEventListener('blur', () => { firing = false; });
@@ -896,9 +927,9 @@ function applyOffline(first) {
   S.saved = Date.now();
   if (gain <= 0) return;
   earn(gain); S.stats.offline += gain;
-  modal('🏝️ While you were away', `<p>Away for <b>${fmtTime(secs)}</b>. Your agents kept shipping to prod.</p>
+  modal('While you were away', `<p>Away for <b>${fmtTime(secs)}</b>. Your agents kept shipping to prod.</p>
     <p class="good big">+${money(gain)}</p>
-    <p class="dim">Offline efficiency ${Math.round(D.offline * 100)}%${D.offline < 1 ? ' — hire <b>Remote Work</b> on the Board to raise it' : ''}. Pager alerts ignored: ${fmt(Math.floor(secs / 7))}.</p>`, [{ label: 'Back to breaking prod', cls: 'primary' }]);
+    <p class="dim">Offline efficiency ${Math.round(D.offline * 100)}%${D.offline < 1 ? ' — hire <b>Remote Work</b> on the Board to raise it' : ''}. Pager alerts ignored: ${fmt(Math.floor(secs / 7))}.</p>`, [{ label: 'Back to breaking prod', icon: 'play', cls: 'primary' }], { icon: 'island', col: '#5dff9b' });
 }
 
 // ───────────── boot ─────────────
@@ -907,7 +938,7 @@ if (hadSave) { $('#titleCta').textContent = '[ CLICK TO RESUME THE OUTAGE ]'; $(
 titleEl.addEventListener('click', () => {
   initAudio(); titleEl.classList.add('gone'); setTimeout(() => titleEl.remove(), 600);
   if (hadSave) applyOffline(true);
-  else later.push({ t: .5, f: () => toast('🔫', 'Hold the mouse to fire', 'Take down every server. Spend downtime $ on agents in the panel.') });
+  else later.push({ t: .5, f: () => toast('crosshair', 'Hold the mouse to fire', 'Take down every server. Spend downtime $ on agents in the panel.', '#ffd23f') });
 });
 startLevel();
 let last = performance.now(), perfT = 0, perfN = 0, uiT = 0;

@@ -4,7 +4,7 @@ An idle/incremental game in one HTML canvas. Hire AI agents to fire slop code at
 
 **▶ Play: https://bryantebeek.github.io/slop-cannon/**
 
-No build step, no libraries. Progress autosaves to localStorage and keeps earning while you're away.
+No build step, no frameworks. Icons are [Phosphor](https://phosphoricons.com) duotone (MIT), bundled in `vendor/`. Progress autosaves to localStorage and keeps earning while you're away.
 
 ## The loop
 

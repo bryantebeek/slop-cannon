@@ -380,7 +380,7 @@ function drawGolden() {
   ctx.fillStyle = 'rgba(80,40,0,.6)'; ctx.fillRect(-r * .12, -r * .8, r * .24, r * 1.6); ctx.fillRect(-r, -r * .1, r * 2, r * .2);
   ctx.restore();
   ctx.globalAlpha = a; ctx.font = `800 ${clamp(p.s * .45, 11, 18)}px ${MONO}`; ctx.textAlign = 'center';
-  ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(0,0,0,.7)'; ctx.strokeText('⚠ 0-DAY · SHOOT IT', p.x, p.y - r * 2.2); ctx.fillStyle = '#ffd23f'; ctx.fillText('⚠ 0-DAY · SHOOT IT', p.x, p.y - r * 2.2);
+  ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(0,0,0,.7)'; ctx.strokeText('!! 0-DAY · SHOOT IT !!', p.x, p.y - r * 2.2); ctx.fillStyle = '#ffd23f'; ctx.fillText('!! 0-DAY · SHOOT IT !!', p.x, p.y - r * 2.2);
   ctx.globalAlpha = 1;
 }
 function drawWorld() {
@@ -533,7 +533,7 @@ function drawCannon(info) {
   });
   monitor(.44, -.3, .78, -.5, 1.4, mx, my, oz, (x, y, w, h, fs) => {
     ctx.font = `800 ${fs}px ${MONO}`; ctx.fillStyle = 'rgba(232,230,255,.75)'; ctx.fillText('INCIDENT #' + info.level, x, y + fs * 1.2);
-    ctx.fillStyle = Math.sin(T * 6) > 0 ? '#ff4d6d' : '#7a2433'; ctx.fillText('BUILD: FAILING ✖', x, y + fs * 2.4);
+    ctx.fillStyle = Math.sin(T * 6) > 0 ? '#ff4d6d' : '#7a2433'; ctx.fillText('BUILD: FAILING (x)', x, y + fs * 2.4);
     ctx.font = `400 ${fs * .8}px ${MONO}`; ctx.fillStyle = 'rgba(232,230,255,.65)';
     ctx.fillText('AGENT DPS ' + fmt(info.dps), x, y + fs * 3.5); ctx.fillText('AGENTS ' + info.agents + ' · COV 3%', x, y + fs * 4.5);
     ctx.fillText('HEAT', x, y + fs * 5.6);
