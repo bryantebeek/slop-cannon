@@ -8,7 +8,7 @@
 <meta property="og:title" content="SLOP CANNON: Idle Ops">
 <meta property="og:description" content="Hire AI agents. Ship slop. Break prod. Pivot to AI. Rewrite it in Rust. Take down us-east-1.">
 <meta name="theme-color" content="#07020f">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><filter id='g' x='-50%' y='-50%' width='200%' height='200%'><feGaussianBlur stdDeviation='1.8' result='b'/><feMerge><feMergeNode in='b'/><feMergeNode in='b'/><feMergeNode in='SourceGraphic'/></feMerge></filter></defs><rect width='64' height='64' rx='12' fill='%230a0a12'/><g font-family='monospace' font-weight='bold' text-anchor='middle' filter='url(%23g)'><text x='32' y='29' font-size='30' fill='%235dff9b'>rm</text><text x='32' y='56' font-size='25' fill='%23ff4d6d'>-rf</text></g></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><radialGradient id='bg' cx='.5' cy='.35' r='.8'><stop offset='0' stop-color='%231d0b38'/><stop offset='1' stop-color='%2305010c'/></radialGradient><filter id='glow' x='-50%' y='-50%' width='200%' height='200%'><feGaussianBlur stdDeviation='2.2'/></filter><path id='a' d='M15 26V12M15 18Q15 12 21 12H24M29 26V12M29 17Q29 12 34 12Q39 12 39 17V26M39 17Q39 12 44 12Q49 12 49 17V26'/><path id='b' d='M14 45H22M28 52V38M28 44Q28 38 34 38H36M43 52V37Q43 32 48 32H51M38 39H49'/></defs><rect x='1' y='1' width='62' height='62' rx='14' fill='url(%23bg)' stroke='%23ff4dc8' stroke-opacity='.35' stroke-width='1.5'/><g fill='none' stroke-linecap='round' stroke-linejoin='round'><g stroke='%235dff9b'><use href='%23a' stroke-width='8' opacity='.55' filter='url(%23glow)'/><use href='%23a' stroke-width='4.2'/></g><g stroke='%23ff4d6d'><use href='%23b' stroke-width='8' opacity='.55' filter='url(%23glow)'/><use href='%23b' stroke-width='4.2'/></g><g stroke='%23fff' stroke-width='1.4' opacity='.85'><use href='%23a'/><use href='%23b'/></g></g></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Orbitron:wght@700;900&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -293,7 +293,16 @@ kbd{font:800 10px var(--mono);padding:1px 5px;border-radius:5px;border:1px solid
 #title .feats .ib{width:26px;height:26px;border-radius:999px;font-size:15px}
 #titleCta{margin-top:30px;font:900 clamp(14px,2vw,20px) var(--disp);color:var(--gold);animation:pulse 1.2s infinite}
 #titleSub{color:var(--dim);font:600 12px var(--mono);margin-top:6px}
-#title .foot{position:absolute;bottom:18px;color:var(--faint);font-size:11px;text-align:center;padding:0 12px}
+#title .foot{position:absolute;bottom:46px;color:var(--faint);font-size:11px;text-align:center;padding:0 12px}
+
+/* ── footer (sits above the title overlay too) ──────────── */
+#foot{position:relative;z-index:60;flex:none;display:flex;align-items:center;justify-content:center;gap:6px 16px;flex-wrap:wrap;padding:5px 12px;background:rgba(4,1,10,.92);border-top:1px solid var(--line);font:600 10.5px var(--mono);color:var(--faint)}
+#foot a{color:var(--dim);text-decoration:none;transition:.15s}
+#foot a:hover{color:var(--green);text-shadow:0 0 10px var(--green)}
+#foot .ph-duotone{vertical-align:-2px}
+#foot .subs{color:#ff8ad8}
+#foot .gh{display:inline-flex;align-items:center;gap:5px;padding:2px 10px;border-radius:999px;border:1px solid color-mix(in srgb,var(--green) 40%,transparent);background:rgba(93,255,155,.06);color:var(--green);box-shadow:0 0 12px rgba(93,255,155,.12)}
+#foot .gh:hover{background:rgba(93,255,155,.14);box-shadow:0 0 20px rgba(93,255,155,.35)}
 
 /* ── mobile ─────────────────────────────────────────────── */
 @media (max-width:900px){
@@ -312,6 +321,7 @@ kbd{font:800 10px var(--mono);padding:1px 5px;border-radius:5px;border:1px solid
   #chBanner,#buffs{top:150px}
   #toasts{bottom:auto;top:8px;right:8px}.toast{width:290px}
   #toasts .toast:nth-child(n+3){display:none}
+  #foot{gap:3px 10px;padding:5px 8px;font-size:9.5px;text-align:center}#foot .gh{padding:1px 8px}
   .wpn>span:not(.ib){display:none}
 }
 </style>
@@ -350,6 +360,11 @@ kbd{font:800 10px var(--mono);padding:1px 5px;border-radius:5px;border:1px solid
       <div id="tabBody"></div>
     </div>
   </aside>
+  <footer id="foot">
+    <span>Made with <i class="ph-duotone ph-coins" style="color:var(--gold)"></i> tokens by <a href="https://x.com/bryantebeek" target="_blank" rel="noopener"><i class="ph-duotone ph-x-logo"></i> @bryantebeek</a> while working on <a href="https://portfoliodividendtracker.com" target="_blank" rel="noopener">PortfolioDividendTracker.com</a></span>
+    <span class="subs">Subsidised by Dario, Sam, Elon and Mark</span>
+    <a class="gh" href="https://github.com/bryantebeek/slop-cannon" target="_blank" rel="noopener"><i class="ph-duotone ph-github-logo"></i> Open Source on GitHub</a>
+  </footer>
 </div>
 <div id="tooltip" hidden></div>
 <div id="modal" hidden></div>
