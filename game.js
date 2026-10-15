@@ -49,6 +49,7 @@ let buffs = [];
 const dpsBuff = () => buffs.reduce((m, b) => m * (b.dps || 1), 1);
 const shotBuff = () => buffs.reduce((m, b) => m * (b.click || 1), 1);
 const goldBuff = () => buffs.reduce((m, b) => m * (b.gold || 1), 1);
+const rateBuff = () => buffs.reduce((m, b) => m * (b.rate || 1), 1);
 const G = { zuck: 0, combo: 0, comboT: 0, bestCombo: 0, idleT: 0, idleKills: 0, konami: false, tickerClick: false, dropBoss: false, closeCall: false, muted: false, bossFail: false };
 
 function applySettings() {
@@ -233,7 +234,7 @@ function shotDmg(mult) { return E.shotDamage(D, dpsBuff()) * shotBuff() * mult; 
 function rollCrit(dmg) { const c = Math.random() < D.crit || buffs.some(b => b.allCrit); return [c ? dmg * D.critMult : dmg, c]; }
 function fireCannon() {
   const w = D.weapons[S.weapon] ? S.weapon : 0, WP = E.WEAPONS[w];
-  cool = WP.cd / D.rate;
+  cool = WP.cd / (D.rate * rateBuff());
   const o = [cam.x, cam.y, cam.z], d = screenRay(aimX, aimY), hit = raycast(o, d), m = muzzleWorld();
   const base = shotDmg(WP.mult), n0 = projs.length;
   if (w === 3) {
@@ -373,41 +374,72 @@ function spawnGolden(normal) {
 }
 // Regular zero-days: AI-dev X memes. w = weight out of 100; f() applies the effect and returns the subtitle.
 const GOLDEN = [
-  { w: 22, name: 'FEEL THE AGI', icon: 'brain', col: '#c77dff',
+  { w: 14, name: 'FEEL THE AGI', icon: 'brain', col: '#c77dff',
     f() { addBuff('agi', 'FEEL THE AGI', 'Agents x7', 30, { dps: 7, icon: 'brain', col: '#c77dff' }); return 'agents x7 for 30s'; } },
-  { w: 20, name: 'LEAKED API KEY', icon: 'key', col: '#ffd23f',
+  { w: 13, name: 'LEAKED API KEY', icon: 'key', col: '#ffd23f',
     f() { const g = Math.min(S.cash * .15, incomePerSec() * 900) + 13; earn(g); return `+${money(g)}`; } },
-  { w: 10, name: 'TIBO PRESSED THE RESET BUTTON', icon: 'arrows-counter-clockwise', col: '#10a37f',
+  { w: 8, name: 'TIBO PRESSED THE RESET BUTTON', icon: 'arrows-counter-clockwise', col: '#10a37f',
     f() {
       buffs = buffs.filter(b => !(b.dps < 1)); for (const b of buffs) b.t = b.max; // limits reset: debuffs gone, buffs refilled
       if (E.isBoss(S.level) && phase === 'fight') bossT = bossMax;
       addBuff('limits', 'LIMITS RESET', 'Agents x3', 30, { dps: 3, icon: 'arrows-counter-clockwise', col: '#10a37f' });
       return 'usage limits reset · buffs + boss timer refilled · agents x3';
     } },
-  { w: 10, name: "YOU'RE ABSOLUTELY RIGHT!", icon: 'thumbs-up', col: '#e8835a',
+  { w: 7, name: "YOU'RE ABSOLUTELY RIGHT!", icon: 'thumbs-up', col: '#e8835a',
     f() { addBuff('right', "YOU'RE ABSOLUTELY RIGHT!", 'Kills pay x3', 20, { gold: 3, icon: 'thumbs-up', col: '#e8835a' }); return 'every kill pays x3 for 20s · great point, by the way'; } },
-  { w: 10, name: 'MAKE NO MISTAKES', icon: 'gps-fix', col: '#7df9ff',
+  { w: 6, name: 'MAKE NO MISTAKES', icon: 'gps-fix', col: '#7df9ff',
     f() { addBuff('nomistakes', 'MAKE NO MISTAKES', 'Shots home in · x50', 15, { click: 50, homing: true, icon: 'gps-fix', col: '#7df9ff' }); return 'shots home in and hit x50 for 15s'; } },
-  { w: 8, name: '@GROK IS THIS TRUE?', icon: 'seal-question', col: '#cfd6e6',
+  { w: 5, name: '@GROK IS THIS TRUE?', icon: 'seal-question', col: '#cfd6e6',
     f() {
       const yes = Math.random() < .6, g = incomePerSec() * (yes ? 1800 : 60) + 13; earn(g);
       return yes ? `"Yes." +${money(g)}` : `Readers added context. +${money(g)}`;
     } },
-  { w: 8, name: "IT'S SO OVER", icon: 'trend-down', col: '#ff4d6d',
+  { w: 5, name: "IT'S SO OVER", icon: 'trend-down', col: '#ff4d6d',
     f() { addBuff('over', "IT'S SO OVER", 'Agents x0.25', 6, { dps: .25, icon: 'trend-down', col: '#ff4d6d', then: ['back', "WE'RE SO BACK", 'Agents x12', 20, { dps: 12, icon: 'trend-up', col: '#5dff9b' }] }); return 'agents x0.25… then WE\'RE SO BACK (x12)'; } },
-  { w: 7, name: 'COMPACTING CONVERSATION…', icon: 'arrows-in', col: '#ffb020',
+  { w: 5, name: 'COMPACTING CONVERSATION…', icon: 'arrows-in', col: '#ffb020',
     f() {
       for (const s of servers) if (!s.dead) { say(s.x, s.h + 1, s.z, 'COMPACTED', '#ffb020', 1, 1.2); damage(s, s.maxHp * (s.type === 'boss' ? .15 : .6), 0, 0, 0, 'cascade'); }
       return 'context compacted · every server -60% HP';
     } },
-  { w: 5, name: 'HOTFIX', icon: 'first-aid-kit', col: '#5dff9b',
+  { w: 3, name: 'HOTFIX', icon: 'first-aid-kit', col: '#5dff9b',
     f() {
       const boss = servers.find(s => s.type === 'boss' && !s.dead);
       if (boss) { damage(boss, boss.maxHp * .1, 0, 0, 0, 'cascade'); return 'boss -10% HP'; }
       for (const s of servers) if (!s.dead) damage(s, s.hp + 1, 0, 0, 0, 'cascade');
       return 'incident auto-resolved';
     } },
+  { w: 6, name: 'ULTRATHINK', icon: 'lightbulb-filament', col: '#ffd23f',
+    f() { addBuff('ultrathink', 'ULTRATHINK', 'Boss timer frozen · shots x10', 20, { click: 10, freeze: true, icon: 'lightbulb-filament', col: '#ffd23f' }); return 'boss timer frozen · shots x10 for 20s'; } },
+  { w: 6, name: 'OUR GPUS ARE MELTING', icon: 'thermometer-hot', col: '#ff8a3d',
+    f() { addBuff('melting', 'OUR GPUS ARE MELTING', 'Fire rate x3', 15, { rate: 3, icon: 'thermometer-hot', col: '#ff8a3d' }); return 'fire rate x3 for 15s · temporary limits incoming'; } },
+  { w: 5, name: 'FORGET THE CODE EVEN EXISTS', icon: 'headphones', col: '#c77dff',
+    f() { addBuff('vibes', 'FULLY GIVE IN TO THE VIBES', 'Hands-free homing vibes', 15, { vibeAuto: 4, icon: 'headphones', col: '#c77dff' }); return 'hands-free homing VIBE CODE barrage for 15s'; } },
+  { w: 5, name: '529 OVERLOADED_ERROR', icon: 'warning-octagon', col: '#ff4d6d',
+    f() { addBuff('overloaded', '529 OVERLOADED', 'Everything x3', 15, { dps: 3, click: 3, icon: 'warning-octagon', col: '#ff4d6d' }); return 'prod is overloaded too · everything deals x3 for 15s'; } },
+  { w: 5, name: '--dangerously-skip-permissions', icon: 'skull', col: '#ff4d6d',
+    f() { addBuff('yolo', 'YOLO MODE', 'Agents x15', 10, { dps: 15, icon: 'skull', col: '#ff4d6d' }); if (S.maxLevel >= 10 && !drones.length) spawnDrones(); return 'agents x15 for 10s · the linters noticed'; } },
+  { w: 4, name: 'RALPH WIGGUM LOOP', icon: 'repeat', col: '#ffd23f',
+    f() { ralphQ.push(...[0, 1, 2].map(() => pick(GOLDEN.filter(g => g.name !== 'RALPH WIGGUM LOOP')))); return '"I\'m helping!" · rolling 3 more zero-days'; } },
+  { w: 3, name: 'AGI ACHIEVED INTERNALLY', icon: 'sparkle', col: '#ffffff',
+    f() { const g = Math.min(S.cash * .3, incomePerSec() * 3600) + 13; earn(g); return `an hour of downtime, delivered · +${money(g)}`; } },
 ];
+// The Ralph loop replays zero-days one after another (survives incident changes, unlike `later`).
+let ralphQ = [], ralphT = 0, vibeT = 0;
+function ralphStep() {
+  const e = ralphQ.shift(), sub = e.f();
+  S.stats.memes = S.stats.memes || {}; S.stats.memes[e.name] = (S.stats.memes[e.name] || 0) + 1;
+  toast(e.icon, `RALPH LOOP · ${e.name}`, sub, e.col); alert(0, `Ralph loop: ${e.name} · ${sub}`); sfx.golden();
+}
+// FORGET THE CODE: one homing VIBE CODE volley at a random live server
+function fireVibes() {
+  const s = liveTarget(); if (!s) return;
+  const m = muzzleWorld(), WP = E.WEAPONS[3];
+  for (let i = 0; i < 3; i++) {
+    const v = camDir(rand(-1, 1) * .7, rand(.35, .8), .7), [dmg, crit] = rollCrit(shotDmg(WP.mult));
+    mkProj(m, [v[0] * 26, v[1] * 26, v[2] * 26], { text: pick(VIBES), dmg, crit, homing: s, g: 0, life: 5, size: .7, col: WP.col, spr: WP.spr, src: 'cron' });
+  }
+  recoil = Math.min(1.4, recoil + .3); flash = .7;
+}
 function collectGolden() {
   const g = golden; golden = null; if (!g) return;
   if (g.fr) {
@@ -467,12 +499,16 @@ function sim(dt) {
   // phase
   if (phase === 'clear') { phaseT -= dt; if (phaseT <= 0) startLevel(); }
   else if (E.isBoss(S.level) && servers.length && !servers[0].dead && servers[0].sp >= 1) {
-    bossT -= dt; if (bossT <= 0) bossEscaped();
+    if (!buffs.some(b => b.freeze)) bossT -= dt; if (bossT <= 0) bossEscaped();
   }
   // firing
   cool -= dt;
   if (firing && hoverCanvas && cool <= 0 && !modalOpen()) fireCannon();
   if (D.cron > 0 && phase === 'fight') { cronT -= dt; if (cronT <= 0) { cronT += 1 / D.cron; fireCron(); } }
+  const vb = buffs.find(b => b.vibeAuto);
+  if (vb && phase === 'fight') { vibeT -= dt; while (vibeT <= 0) { vibeT += 1 / vb.vibeAuto; fireVibes(); } }
+  if (buffs.some(b => b.rate)) heat = 1; // GPUs melting: the barrel glows red-hot
+  if (ralphQ.length) { ralphT -= dt; if (ralphT <= 0) { ralphT = .9; ralphStep(); } }
   const ap = buffs.find(b => b.autopilot);
   if (ap && phase === 'fight') { apT -= dt; while (apT <= 0) { apT += 1 / ap.autopilot; fireCron(1, '#cfd6e6'); } }
   if (phase === 'fight') for (let i = 0; i < E.AGENTS.length; i++) {
