@@ -98,7 +98,7 @@ canvas{display:block;width:100%;height:100%;cursor:none;touch-action:none}
 #ticker{position:absolute;left:0;right:0;bottom:0;height:32px;background:linear-gradient(90deg,rgba(255,77,109,.16),rgba(7,2,15,.92) 140px);border-top:1px solid rgba(255,77,109,.35);overflow:hidden;z-index:2;cursor:pointer}
 #tickerTag{position:absolute;left:0;top:0;bottom:0;z-index:1;display:flex;align-items:center;gap:6px;padding:0 12px;background:linear-gradient(90deg,#ff4d6d,#ff2e66);color:#1a0207;font:900 10px var(--disp);letter-spacing:1px;box-shadow:6px 0 18px rgba(0,0,0,.5)}
 #tickerTag i{font-size:15px}
-#tickerText{position:absolute;white-space:nowrap;line-height:32px;left:100%;color:#ffd6de;font:600 12px var(--mono)}
+#tickerText{position:absolute;top:0;bottom:0;left:100%;display:flex;align-items:center;white-space:nowrap;color:#ffd6de;font:600 12px var(--mono)}
 @keyframes tick{from{transform:translateX(0)}to{transform:translateX(calc(-100vw - 100%))}}
 #banner{position:absolute;left:0;right:0;top:33%;text-align:center;pointer-events:none;z-index:2;opacity:0}
 #banner.show{animation:banner 3.2s var(--ease) forwards}
