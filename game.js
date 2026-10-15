@@ -993,9 +993,16 @@ function updateUI() {
 
 // ───────────── news ticker ─────────────
 const tickerEl = $('#tickerText');
+// Shuffle bag: every eligible headline plays once before any repeat; freshly unlocked ones jump the queue.
+const newsSeen = new Set(); let newsKnown = null;
 function nextNews() {
   const pool = NEWS.filter(n => !n[1] || n[1](S));
-  setText(tickerEl, pick(pool)[0]);
+  const fresh = newsKnown ? pool.filter(n => !newsKnown.has(n) && !newsSeen.has(n)) : [];
+  newsKnown = new Set(pool);
+  let bag = pool.filter(n => !newsSeen.has(n)); if (!bag.length) { newsSeen.clear(); bag = pool; }
+  const n = fresh[0] || pick(bag); newsSeen.add(n);
+  const pts = Math.round(rand(80, 2400)), com = Math.round(pts * rand(.2, 1.1));
+  setHTML(tickerEl, `<span class="pts">▲ ${pts.toLocaleString('en-US')} · ${com} comments</span>${n[0].replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c])}`);
   tickerEl.style.animation = 'none'; void tickerEl.offsetWidth;
   const dur = (tickerEl.parentElement.clientWidth + tickerEl.scrollWidth) / 90;
   tickerEl.style.animation = `tick ${dur}s linear`;
