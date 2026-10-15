@@ -744,7 +744,7 @@ function buildTab() {
 function structKey() {
   if (curTab === 'agents') return S.agents.map((n, i) => agentVisible(i) ? 1 : 0).join('') + S.challenge;
   if (curTab === 'upgrades') return E.milestones(S).length + '|' + S.agents.map((n, i) => agentVisible(i) ? 1 : 0).join('') + S.challenge;
-  if (curTab === 'cannon') return E.UPGRADES.filter(u => u.kind === 'cannon' && (modVisible(u) || S.upg[u.id])).length + '';
+  if (curTab === 'cannon') return E.UPGRADES.filter(u => u.kind === 'cannon').map(u => S.upg[u.id] ? 2 : modVisible(u) ? 1 : 0).join('');
   if (curTab === 'board') return S.pivots + '' + S.rusts;
   if (curTab === 'post') return S.challenge + Object.keys(S.chDone).join();
   if (curTab === 'rust') return S.rusts + '';
@@ -823,7 +823,7 @@ const BUILD = {
   cannon() {
     const lvl = h('div', { class: 'big' }), sub = h('div', { class: 'sub' }), info = h('div', { class: 'statgrid' });
     const btn = costBtn('UPGRADE', () => buyCannon(buyMode === 'max' ? Math.max(1, E.cannonMax(S, S.cash)) : buyMode));
-    const hero = h('div', { class: 'card hero', style: `--c:${COL.cannon}` }, h('div', { class: 'top' }, badge('crosshair', COL.cannon, 'xl'), h('div', { style: 'flex:1' }, lvl, sub), btn), h('div', { style: 'height:12px' }), info);
+    const hero = h('div', { class: 'card hero', style: `--c:${COL.cannon}` }, h('div', { class: 'top' }, badge('crosshair', COL.cannon, 'xl'), h('div', { style: 'flex:1' }, lvl, sub)), btn, info);
     const list = h('div', { class: 'list' }), rows = [];
     for (const u of E.UPGRADES.filter(u => u.kind === 'cannon')) {
       if (!S.upg[u.id] && !modVisible(u)) continue;
