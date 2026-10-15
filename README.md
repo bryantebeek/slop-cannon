@@ -1,40 +1,71 @@
-# SLOP CANNON: Idle Ops 💥
+<p align="center">
+  <a href="https://bryantebeek.github.io/slop-cannon/"><img src="media/keyart.jpg" alt="SLOP CANNON: Idle Ops" width="100%"></a>
+</p>
 
-An idle/incremental game in one HTML canvas. Hire AI agents to fire slop code at production servers, pivot to AI, rewrite it in Rust, and take down **us-east-1**.
+<h3 align="center">
+  <a href="https://bryantebeek.github.io/slop-cannon/">▶ PLAY NOW — free, in your browser, no signup</a>
+</h3>
 
-**▶ Play: https://bryantebeek.github.io/slop-cannon/**
+<p align="center"><i>Production is a suggestion. You are the incident.</i></p>
 
-No build step, no frameworks. Icons are [Phosphor](https://phosphoricons.com) duotone (MIT), bundled in `vendor/`. Progress autosaves to localStorage and keeps earning while you're away.
+---
 
-## The loop
+You have a cannon. It fires AI-generated code. Production is right there.
 
-| Layer | What you do | Inspired by |
-|---|---|---|
-| **Cannon** | Hold the mouse on prod to fire. Calibre, crits, fire rate, and 4 modes (AI SLOP, NPM INSTALL, DROP TABLE, VIBE CODE) | Clicker Heroes' click hero |
-| **Agents** | 16 generators, from Intern to Simulation Admin, each firing its own slop lines. 7% cost growth | Clicker Heroes |
-| **Milestones** | 129 automatic multipliers: per-agent tiers at 10/25/50/100/150/200/300 owned, cross-agent synergies, and company upgrades at incident levels. No buying needed | AdVenture Capitalist, Cookie Clicker |
-| **Incidents** | 10 servers per incident; overkill chains between servers; every 5th is a timed legacy boss; farm or auto-advance | Clicker Heroes zones |
-| **Zero-days** | Golden packages fly by; shoot one for an AI-X-meme effect: FEEL THE AGI, LEAKED API KEY, TIBO PRESSED THE RESET BUTTON, YOU'RE ABSOLUTELY RIGHT!, MAKE NO MISTAKES, @GROK IS THIS TRUE?, IT'S SO OVER → WE'RE SO BACK, COMPACTING CONVERSATION…, HOTFIX, ULTRATHINK, OUR GPUS ARE MELTING, FORGET THE CODE EVEN EXISTS, 529 OVERLOADED_ERROR, --dangerously-skip-permissions, RALPH WIGGUM LOOP, AGI ACHIEVED INTERNALLY | Cookie Clicker golden cookies |
-| **Frontier drops** | Rare zero-days voiced (in parody) by the frontier-lab bosses: **Claude Mythos** (every shot crits + 2 bonus zero-days), **Hidden access to Bel** (agents x20, then rate limited), **ZUCK IT** (vacuums this incident and the next 4), **Full Self-Deploying** (hands-free autopilot at 30 shots/s) | |
-| **Linter drones** | Block your agents' shots until you shoot them down | |
-| **🚀 Pivot to AI** | Prestige layer 1: hype = (era earnings ÷ 40)^0.16, +10% damage each, or spend it on the Board of Directors (Cron Job auto-fire, Hiring Manager auto-buy, offline earnings…) | AdVenture Capitalist angels, Clicker Heroes ancients, Egg, Inc. exponent |
-| **📝 Postmortems** | 8 challenge runs with nasty rules and permanent rewards | Antimatter Dimensions challenges |
-| **🦀 Rewrite It In Rust** | Prestige layer 2 at incident 120: crabs for the Borrow Checker tree | Realm Grinder / AD multi-layer prestige |
-| **🏆 Trophies & news** | 78 trophies (+3% each, 9 secret) and a Hacker News ticker that reacts to your progress | Cookie Clicker |
+Hold the mouse and pour `// works on my machine` into a server rack until it catches fire. Every server you take down pays out. Spend it on an Intern who copy-pastes from Stack Overflow, then a Junior with ChatGPT, then a Vibe Coder who has never opened the diff, and keep going until a Paperclip Maximizer and a Dyson GPU Sphere are firing slop at prod while you get a coffee.
+
+Come back an hour later and the outage kept earning without you.
+
+<p align="center"><img src="media/gameplay.jpg" alt="A boss fight at incident 50: money popping off burning servers while a frontier drop flies past" width="100%"></p>
+
+## Why you won't stop playing
+
+**Numbers go up. Then they go up faster.** 16 AI agents, from *Intern* to *Simulation Admin*, and 129 milestones that multiply them automatically. Own 300 Interns and they stop being a joke.
+
+**Shoot the golden packages.** Zero-days fly across the sky. Hit one and anything can happen: **FEEL THE AGI** (agents x7), **YOU'RE ABSOLUTELY RIGHT!**, **ULTRATHINK**, **OUR GPUS ARE MELTING**, **--dangerously-skip-permissions**, **RALPH WIGGUM LOOP**, **AGI ACHIEVED INTERNALLY**, and more.
+
+**Frontier drops.** Rare packages from the big labs, all parody. **Claude Mythos** makes every shot crit. **ZUCK IT** vacuums up five incidents at once. **Full Self-Deploying** puts the cannon on autopilot at 30 shots a second.
+
+**Boss fights against legacy code.** Every fifth incident is a timed boss like *The DBA's Laptop*. Take it down before the timer runs out, or it rolls back and laughs at you.
+
+**Four ways to ship.** Switch cannon modes on the fly: **AI SLOP**, **NPM INSTALL** (splits into 8 dependencies mid-air), **DROP TABLE** (30x splash), and **VIBE CODE** (3 homing vibes that never miss, allegedly).
+
+**Pivot to AI.** Burn the company down for hype. Hype permanently boosts damage, or you can spend it on a Board of Directors that auto-fires, auto-hires and keeps earning while you sleep.
+
+**Rewrite it in Rust.** The second prestige layer. Earn crabs, spend them in the Borrow Checker. Estimated time: 6 months. Actual: 4 years.
+
+**Postmortems.** 8 challenge runs with nasty rules and permanent rewards.
+
+**78 trophies**, 9 of them secret. Plus a live Hacker News ticker with 118 headlines that react to how badly you're breaking things.
+
+**The goal:** reach incident 200 and take down **us-east-1**. Half the internet goes offline. The status pages still say *All Systems Operational*.
 
 ## Controls
 
 | Input | Action |
 |---|---|
 | Hold mouse / Space | Fire at the cursor |
-| 1-4 | Cannon mode |
+| 1–4 | Switch cannon mode |
 | ← / → | Previous / next incident |
-| F | Toggle farm / auto-advance |
+| F | Farm or auto-advance |
 | B | Cycle buy amount (x1 / x10 / x25 / x100 / MAX) |
 | M | Mute |
 
-## Balance
+Progress saves automatically and keeps earning while you're away.
 
-`econ.js` holds every formula and number, with no DOM. `node sim.js active [hours]` runs a greedy headless player and prints the pacing: first pivot at about 20 minutes, then runs of 15–25 minutes that each push 5–15 incidents further. You can override any knob with `SLOP_<knob>=value`. `node test.js` asserts that every multiplier source (158 checks) moves damage, gold, cost or hype by exactly its advertised amount.
+## Under the hood
 
-No real servers were harmed. They were already like this.
+One HTML page, a canvas, and plain JavaScript. No build step, no framework, no backend. Open `index.html` and it runs.
+
+- `econ.js` holds every formula and number, with no DOM, so the game balances headlessly.
+- `node sim.js active [hours]` runs a greedy bot player and prints the pacing: first pivot at about 20 minutes, then runs of 15–25 minutes that each push 5–15 incidents further. Override any knob with `SLOP_<knob>=value`.
+- `node test.js` checks that every multiplier source (159 checks) moves damage, gold, cost or hype by exactly what its tooltip promises.
+- Icons are [Phosphor](https://phosphoricons.com) duotone (MIT), bundled in `vendor/`.
+
+---
+
+<p align="center">
+  Made with tokens by <a href="https://x.com/bryantebeek">@bryantebeek</a> while working on <a href="https://portfoliodividendtracker.com">PortfolioDividendTracker.com</a>.<br>
+  Subsidized by Dario, Sam, Elon and Mark.<br><br>
+  <i>No real servers were harmed. They were already like this.</i>
+</p>
