@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Orbitron:wght@700;900&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="vendor/phosphor/duotone.css?v=202610150904">
+<link rel="stylesheet" href="vendor/phosphor/duotone.css?v=202610150911">
 <style>
 :root{
   --bg:#07020f;--panel:#0b0517;--panel2:#0f0820;--line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.16);
@@ -107,7 +107,7 @@ canvas{display:block;width:100%;height:100%;cursor:none;touch-action:none}
 @keyframes banner{0%{opacity:0;transform:scale(1.25)}8%{opacity:1;transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:translateY(-20px)}}
 @keyframes pulse{50%{opacity:.5}}
 @keyframes pop{from{transform:scale(.9);opacity:0}}
-@keyframes slidein{from{transform:translateX(-24px);opacity:0}}
+@keyframes slidein{from{transform:translateX(24px);opacity:0}}
 @keyframes shine{from{transform:translateX(-120%) skewX(-20deg)}to{transform:translateX(260%) skewX(-20deg)}}
 
 /* ── bottom dock ──────────────────────────────────────── */
@@ -254,13 +254,13 @@ kbd{font:800 10px var(--mono);padding:1px 5px;border-radius:5px;border:1px solid
 .keys{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center;font-size:12px;color:var(--dim)}
 
 /* ── overlays ───────────────────────────────────────────── */
-#toasts{position:absolute;left:12px;bottom:88px;display:flex;flex-direction:column-reverse;gap:8px;z-index:20;pointer-events:none}
+#toasts{position:absolute;right:12px;bottom:44px;display:flex;flex-direction:column-reverse;align-items:flex-end;gap:8px;z-index:20;pointer-events:none}
 .toast{--c:var(--green);position:relative;overflow:hidden;display:flex;gap:11px;align-items:center;width:340px;padding:10px 14px 12px 10px;border-radius:14px;background:linear-gradient(180deg,rgba(24,12,46,.97),rgba(12,5,26,.97));border:1px solid color-mix(in srgb,var(--c) 55%,transparent);box-shadow:0 14px 40px rgba(0,0,0,.55),0 0 24px color-mix(in srgb,var(--c) 14%,transparent);animation:slidein .35s var(--ease);transition:opacity .4s,transform .4s}
 .toast b{display:block;font:800 12.5px var(--ui)}
 .toast .d{color:var(--dim);font-size:11.5px;margin-top:1px}
 .toast .life{position:absolute;left:0;bottom:0;height:2px;width:100%;background:var(--c);transform-origin:left;animation:life 5.2s linear forwards}
 @keyframes life{to{transform:scaleX(0)}}
-.toast.out{opacity:0;transform:translateX(-24px)}
+.toast.out{opacity:0;transform:translateX(24px)}
 #tooltip{position:fixed;left:0;top:0;z-index:30;max-width:330px;padding:11px 13px;border-radius:12px;background:linear-gradient(180deg,rgba(24,12,46,.98),rgba(12,5,26,.98));border:1px solid var(--line2);box-shadow:0 16px 40px rgba(0,0,0,.6);font-size:12px;line-height:1.55;pointer-events:none}
 .tth{display:flex;align-items:center;gap:10px;margin-bottom:7px;font:800 13px var(--ui)}
 .tth small{display:block;font:600 10.5px var(--mono);color:var(--dim)}
@@ -309,7 +309,7 @@ kbd{font:800 10px var(--mono);padding:1px 5px;border-radius:5px;border:1px solid
   #levelCard{min-width:0;padding:5px 6px 7px}.lvl{width:30px;height:26px;font-size:10px}
   #chips{grid-column:1/-1;flex-direction:row;justify-self:start}
   #chBanner,#buffs{top:150px}
-  #toasts{bottom:auto;top:8px;left:8px}.toast{width:290px}
+  #toasts{bottom:auto;top:8px;right:8px}.toast{width:290px}
   #toasts .toast:nth-child(n+3){display:none}
   .wpn>span:not(.ib){display:none}
 }
@@ -367,9 +367,9 @@ kbd{font:800 10px var(--mono);padding:1px 5px;border-radius:5px;border:1px solid
   <div id="titleSub">Your progress saves automatically and keeps earning while you're away.</div>
   <div class="foot">No real servers were harmed. They were already like this.</div>
 </div>
-<script src="econ.js?v=202610150904"></script>
-<script src="content.js?v=202610150904"></script>
-<script src="scene.js?v=202610150904"></script>
-<script src="game.js?v=202610150904"></script>
+<script src="econ.js?v=202610150911"></script>
+<script src="content.js?v=202610150911"></script>
+<script src="scene.js?v=202610150911"></script>
+<script src="game.js?v=202610150911"></script>
 </body>
 </html>

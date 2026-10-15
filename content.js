@@ -165,6 +165,10 @@ const NEWS = [
   ['Insiders say Bel is amazing. Outsiders ask "what is Bel?"', S => ((S.stats.frontier || {}).bel || 0) >= 1],
   ['Meta open-sources your outage; 40,000 forks by lunch', S => ((S.stats.frontier || {}).zuck || 0) >= 1],
   ['Full Self-Deploying enters beta for the 11th consecutive year', S => ((S.stats.frontier || {}).musk || 0) >= 1],
+  ['Tibo resets the usage limits again; developers ship four years of slop by lunch', S => S.stats.golden >= 3],
+  ['"Make no mistakes" appended to 40 million prompts; mistakes unchanged', S => S.stats.golden >= 3],
+  ['@grok is this true? Grok: "Yes." Readers added context', S => S.stats.golden >= 5],
+  ['It\'s so over. We\'re so back. It\'s so over. (Repeat until AGI.)', S => S.stats.golden >= 5],
   ['Frontier labs agree on one thing: your prod was already down', S => Object.keys(S.stats.frontier || {}).length >= 2],
   ['us-east-1 is down. Half the internet is down. Nobody can tell the difference', S => S.allMax > 200],
 ];

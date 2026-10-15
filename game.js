@@ -48,6 +48,7 @@ function refresh() { if (dirty) { D = E.derive(S); dirty = false; checkMilestone
 let buffs = [];
 const dpsBuff = () => buffs.reduce((m, b) => m * (b.dps || 1), 1);
 const shotBuff = () => buffs.reduce((m, b) => m * (b.click || 1), 1);
+const goldBuff = () => buffs.reduce((m, b) => m * (b.gold || 1), 1);
 const G = { zuck: 0, combo: 0, comboT: 0, bestCombo: 0, idleT: 0, idleKills: 0, konami: false, tickerClick: false, dropBoss: false, closeCall: false, muted: false, bossFail: false };
 
 function applySettings() {
@@ -234,7 +235,7 @@ function fireCannon() {
   const w = D.weapons[S.weapon] ? S.weapon : 0, WP = E.WEAPONS[w];
   cool = WP.cd / D.rate;
   const o = [cam.x, cam.y, cam.z], d = screenRay(aimX, aimY), hit = raycast(o, d), m = muzzleWorld();
-  const base = shotDmg(WP.mult);
+  const base = shotDmg(WP.mult), n0 = projs.length;
   if (w === 3) {
     const tgt = hit.s || nearestToRay(o, d);
     for (let i = 0; i < 3; i++) {
@@ -248,6 +249,10 @@ function fireCannon() {
     if (w === 0) mkProj(m, v, { text: pick(SLOP), dmg, crit, g, col: WP.col, spr: WP.spr });
     else if (w === 1) mkProj(m, v, { text: 'npm install', dmg, crit, g, split: v[3] * .55, size: .9, col: WP.col, spr: WP.spr });
     else mkProj(m, v, { text: 'DROP TABLE prod;', dmg, crit, g, aoe: 10, size: 1.3, col: WP.col, spr: WP.spr, drop: true });
+  }
+  if (buffs.some(b => b.homing) && !hit.gold && !hit.dr) { // MAKE NO MISTAKES: this volley homes in on the aimed (or nearest) server
+    const tgt = hit.s || nearestToRay(o, d);
+    if (tgt) for (let k = n0; k < projs.length; k++) { projs[k].homing = tgt; projs[k].g = 0; }
   }
   S.stats.shots++; G.idleT = 0;
   recoil = Math.min(1.4, recoil + [.5, .8, 1.3, .7][w]); flash = 1; shake += [.04, .15, .5, .1][w] * QUALITY.shake; heat = Math.min(1, heat + [.05, .15, .35, .12][w]);
@@ -295,7 +300,7 @@ function kill(s, kind) {
   }
   shake += (boss ? 2 : .5) * QUALITY.shake; redFlash = boss ? .35 : .12; sfx.boom(boss ? 2 : .6);
   G.combo = G.comboT > 0 ? G.combo + 1 : 1; G.comboT = 2.5; comboPop = 1; G.bestCombo = Math.max(G.bestCombo, G.combo);
-  const l = S.level, gold = E.reward(l) * s.rmult * D.gold * (boss ? D.bossGold : 1) * (1 + .01 * Math.min(G.combo - 1, 50));
+  const l = S.level, gold = E.reward(l) * s.rmult * D.gold * goldBuff() * (boss ? D.bossGold : 1) * (1 + .01 * Math.min(G.combo - 1, 50));
   earn(gold); S.stats.kills++; if (G.idleT > 300) G.idleKills++;
   say(cx, s.h + 1.6, cz, '+' + money(gold), '#ffd23f', boss ? 2 : 1.1, 1.6, 1); coins(cx, s.h, cz, boss ? 30 : 6); sfx.coin();
   if (s.treasure) alert(0, `Public S3 bucket leaked — ${money(gold)} in "downtime"`);
@@ -366,16 +371,42 @@ function spawnGolden(normal) {
   if (fr) { alert(0, `Frontier drop: ${fr.name} (${fr.who}) — shoot it!`); sfx.goldSpawn(); later.push({ t: .25, f: sfx.goldSpawn }); }
   else { alert(0, `Zero-day disclosed in ${pick(PKGS)} — shoot the golden package!`); sfx.goldSpawn(); }
 }
+// Regular zero-days: AI-dev X memes. w = weight out of 100; f() applies the effect and returns the subtitle.
 const GOLDEN = [
-  { w: 42, f() { addBuff('frenzy', 'PROD IS ON FIRE', 'Agent DPS x7', 30, { dps: 7, icon: 'fire' }); return 'PROD IS ON FIRE · agents x7'; } },
-  { w: 38, f() { const g = Math.min(S.cash * .15, incomePerSec() * 900) + 13; earn(g); return `LEAKED API KEY · +${money(g)}`; } },
-  { w: 12, f() { addBuff('caffeine', 'CAFFEINE IV', 'Shot damage x77', 13, { click: 77, icon: 'coffee' }); return 'CAFFEINE IV · shots x77'; } },
-  { w: 8, f() {
-    const boss = servers.find(s => s.type === 'boss' && !s.dead);
-    if (boss) { damage(boss, boss.maxHp * .1, 0, 0, 0, 'cascade'); return 'HOTFIX · boss -10% HP'; }
-    for (const s of servers) if (!s.dead) damage(s, s.hp + 1, 0, 0, 0, 'cascade');
-    return 'HOTFIX · incident auto-resolved';
-  } },
+  { w: 22, name: 'FEEL THE AGI', icon: 'brain', col: '#c77dff',
+    f() { addBuff('agi', 'FEEL THE AGI', 'Agents x7', 30, { dps: 7, icon: 'brain', col: '#c77dff' }); return 'agents x7 for 30s'; } },
+  { w: 20, name: 'LEAKED API KEY', icon: 'key', col: '#ffd23f',
+    f() { const g = Math.min(S.cash * .15, incomePerSec() * 900) + 13; earn(g); return `+${money(g)}`; } },
+  { w: 10, name: 'TIBO PRESSED THE RESET BUTTON', icon: 'arrows-counter-clockwise', col: '#10a37f',
+    f() {
+      buffs = buffs.filter(b => !(b.dps < 1)); for (const b of buffs) b.t = b.max; // limits reset: debuffs gone, buffs refilled
+      if (E.isBoss(S.level) && phase === 'fight') bossT = bossMax;
+      addBuff('limits', 'LIMITS RESET', 'Agents x3', 30, { dps: 3, icon: 'arrows-counter-clockwise', col: '#10a37f' });
+      return 'usage limits reset · buffs + boss timer refilled · agents x3';
+    } },
+  { w: 10, name: "YOU'RE ABSOLUTELY RIGHT!", icon: 'thumbs-up', col: '#e8835a',
+    f() { addBuff('right', "YOU'RE ABSOLUTELY RIGHT!", 'Kills pay x3', 20, { gold: 3, icon: 'thumbs-up', col: '#e8835a' }); return 'every kill pays x3 for 20s · great point, by the way'; } },
+  { w: 10, name: 'MAKE NO MISTAKES', icon: 'gps-fix', col: '#7df9ff',
+    f() { addBuff('nomistakes', 'MAKE NO MISTAKES', 'Shots home in · x50', 15, { click: 50, homing: true, icon: 'gps-fix', col: '#7df9ff' }); return 'shots home in and hit x50 for 15s'; } },
+  { w: 8, name: '@GROK IS THIS TRUE?', icon: 'seal-question', col: '#cfd6e6',
+    f() {
+      const yes = Math.random() < .6, g = incomePerSec() * (yes ? 1800 : 60) + 13; earn(g);
+      return yes ? `"Yes." +${money(g)}` : `Readers added context. +${money(g)}`;
+    } },
+  { w: 8, name: "IT'S SO OVER", icon: 'trend-down', col: '#ff4d6d',
+    f() { addBuff('over', "IT'S SO OVER", 'Agents x0.25', 6, { dps: .25, icon: 'trend-down', col: '#ff4d6d', then: ['back', "WE'RE SO BACK", 'Agents x12', 20, { dps: 12, icon: 'trend-up', col: '#5dff9b' }] }); return 'agents x0.25… then WE\'RE SO BACK (x12)'; } },
+  { w: 7, name: 'COMPACTING CONVERSATION…', icon: 'arrows-in', col: '#ffb020',
+    f() {
+      for (const s of servers) if (!s.dead) { say(s.x, s.h + 1, s.z, 'COMPACTED', '#ffb020', 1, 1.2); damage(s, s.maxHp * (s.type === 'boss' ? .15 : .6), 0, 0, 0, 'cascade'); }
+      return 'context compacted · every server -60% HP';
+    } },
+  { w: 5, name: 'HOTFIX', icon: 'first-aid-kit', col: '#5dff9b',
+    f() {
+      const boss = servers.find(s => s.type === 'boss' && !s.dead);
+      if (boss) { damage(boss, boss.maxHp * .1, 0, 0, 0, 'cascade'); return 'boss -10% HP'; }
+      for (const s of servers) if (!s.dead) damage(s, s.hp + 1, 0, 0, 0, 'cascade');
+      return 'incident auto-resolved';
+    } },
 ];
 function collectGolden() {
   const g = golden; golden = null; if (!g) return;
@@ -390,9 +421,11 @@ function collectGolden() {
   }
   let r = Math.random() * 100, eff = GOLDEN[0];
   for (const o of GOLDEN) { if ((r -= o.w) < 0) { eff = o; break; } }
-  const msg = eff.f();
-  S.stats.golden++; sfx.golden(); explosion(g.x, g.y, g.z, false); coins(g.x, g.y, g.z, 30);
-  say(g.x, g.y + 2, g.z, msg, '#ffd23f', 2, 2.4, 1); alert(0, msg); hitMark = .3;
+  const sub = eff.f();
+  S.stats.golden++; S.stats.memes = S.stats.memes || {}; S.stats.memes[eff.name] = (S.stats.memes[eff.name] || 0) + 1;
+  sfx.golden(); explosion(g.x, g.y, g.z, false); coins(g.x, g.y, g.z, 30);
+  say(g.x, g.y + 2, g.z, eff.name, eff.col, 2, 2.4, 1); alert(0, `${eff.name} · ${sub}`); hitMark = .3;
+  toast(eff.icon, eff.name, sub, eff.col);
 }
 function addBuff(id, name, desc, secs, eff) {
   secs *= D.buffLen;
@@ -489,7 +522,7 @@ function sim(dt) {
   else if (D.golden > 0 && S.maxLevel >= 3) { goldenT -= dt * D.golden; if (goldenT <= 0) { goldenT = rand(90, 200); spawnGolden(); } }
   // buffs, combo, automation
   for (const b of buffs) b.t -= dt;
-  if (buffs.some(b => b.t <= 0)) { const done = buffs.filter(b => b.t <= 0); buffs = buffs.filter(b => b.t > 0); for (const b of done) if (b.then) addBuff(...b.then); markDirty(); }
+  if (buffs.some(b => b.t <= 0)) { const done = buffs.filter(b => b.t <= 0); buffs = buffs.filter(b => b.t > 0); for (const b of done) if (b.then) { addBuff(...b.then); const [, name, desc, , eff] = b.then; toast(eff.icon, name, desc, eff.col); banner(name, desc, eff.col); } markDirty(); }
   G.comboT -= dt; if (G.comboT <= 0) G.combo = 0;
   if (D.hiring) { hireT -= dt; if (hireT <= 0) { hireT = 8 / D.hiring; autoHire(); } }
   if (E.lv(S.rust, 'cargo')) { cargoT -= dt; if (cargoT <= 0) { cargoT = 1.5; autoBuyCannon(); } }
@@ -543,7 +576,7 @@ const upgCol = u => u.kind === 'tier' ? E.AGENTS[u.agent].col : u.kind === 'syn'
 const toastsEl = $('#toasts'), tipEl = $('#tooltip'), modalEl = $('#modal');
 function toast(ic, title, body, col = COL.good) {
   const el = h('div', { class: 'toast', style: `--c:${col}` }, badge(ic, col, 'sm'), h('div', {}, h('b', {}, title), h('div', { class: 'd' }, body)), h('i', { class: 'life' }));
-  toastsEl.prepend(el); while (toastsEl.children.length > 4) toastsEl.lastChild.remove();
+  toastsEl.prepend(el); while (toastsEl.children.length > 3) toastsEl.lastChild.remove();
   setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 400); }, 5200);
 }
 function banner(title, sub, col) {
