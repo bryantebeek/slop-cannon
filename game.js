@@ -43,7 +43,7 @@ const decodeSave = s => merge(E.fresh(), JSON.parse(decodeURIComponent(escape(at
 
 // ───────────── derived stats, buffs ─────────────
 let D = E.derive(S), dirty = true, structDirty = true;
-function markDirty(struct) { dirty = true; if (struct) structDirty = true; }
+function markDirty() { dirty = true; }
 function refresh() { if (dirty) { D = E.derive(S); dirty = false; checkMilestones(); } }
 let buffs = [];
 const dpsBuff = () => buffs.reduce((m, b) => m * (b.dps || 1), 1);
@@ -372,7 +372,7 @@ function hurtDrone(d, n = 1) {
 }
 
 // ───────────── simulation ─────────────
-function resetRunRuntime() { buffs = []; drones = []; golden = null; G.combo = 0; msOn = null; startLevel(); }
+function resetRunRuntime() { buffs = []; drones = []; golden = null; G.combo = 0; msOn = null; structDirty = true; startLevel(); }
 let hireT = 0, cargoT = 0, achT = 0, saveT = 0;
 function sim(dt) {
   refresh();
@@ -537,6 +537,10 @@ $('#lvlPrev').onclick = () => setLevel(S.level - 1);
 $('#lvlNext').onclick = () => setLevel(S.level + 1);
 ui.auto.onclick = () => { S.auto = !S.auto; sfx.click(); };
 ui.mute.onclick = () => toggleMute();
+const panelEl = $('#panel'), collapseBtn = $('#collapseBtn');
+function setCollapsed(c) { panelEl.classList.toggle('collapsed', c); collapseBtn.innerHTML = IC(c ? 'caret-up' : 'caret-down'); collapseBtn.title = c ? 'Expand panel' : 'Collapse panel'; }
+collapseBtn.onclick = () => { setCollapsed(!panelEl.classList.contains('collapsed')); sfx.click(); };
+setCollapsed(false);
 function toggleMute() { VOL.muted = !VOL.muted; G.muted = G.muted || VOL.muted; setVolumes(); toast(VOL.muted ? 'speaker-slash' : 'speaker-high', VOL.muted ? 'Muted' : 'Sound on', 'Press M to toggle.', COL.mute); }
 const lvlBoxes = [];
 for (let i = 0; i < 5; i++) { const b = h('button', { class: 'lvl', onclick: () => setLevel(+b.dataset.l) }); lvlBoxes.push(b); ui.lvlStrip.append(b); }
@@ -584,10 +588,10 @@ ui.chBanner.addEventListener('click', e => {
 // ───────────── UI: side panel ─────────────
 const TABS = [
   { id: 'agents', icon: 'robot', col: '#5dff9b', name: 'Agents', show: () => true, sub: () => `${fmt(S.agents.reduce((a, b) => a + b, 0))} agents · ${fmt(D.dps * dpsBuff())} DPS` },
-  { id: 'upgrades', icon: 'target', col: '#ffffff', name: 'Milestones', short: 'Goals', show: () => true, sub: () => `${E.milestones(S).length} / ${E.UPGRADES.filter(u => u.kind !== 'cannon').length} active` },
+  { id: 'upgrades', icon: 'target', col: '#ffffff', name: 'Milestones', show: () => true, sub: () => `${E.milestones(S).length} / ${E.UPGRADES.filter(u => u.kind !== 'cannon').length} active` },
   { id: 'cannon', icon: 'crosshair', col: '#ffd23f', name: 'Cannon', show: () => true, sub: () => `Calibre ${S.cannon} · ${fmt(shotDmg(E.WEAPONS[S.weapon].mult))} per shot` },
   { id: 'board', icon: 'rocket-launch', col: '#c77dff', name: 'Pivot to AI', short: 'Pivot', show: () => S.pivots > 0 || S.allMax >= 15 || S.rusts > 0, sub: () => `${fmt(S.hype)} hype · ${S.pivots} pivots` },
-  { id: 'post', icon: 'clipboard-text', col: '#ff4d6d', name: 'Postmortems', short: 'Postmort.', show: () => S.pivots >= E.CHALLENGE_PIVOTS || S.rusts > 0, sub: () => `${Object.keys(S.chDone).length} / ${E.CHALLENGES.length} complete` },
+  { id: 'post', icon: 'clipboard-text', col: '#ff4d6d', name: 'Postmortems', show: () => S.pivots >= E.CHALLENGE_PIVOTS || S.rusts > 0, sub: () => `${Object.keys(S.chDone).length} / ${E.CHALLENGES.length} complete` },
   { id: 'rust', icon: 'gear-six', col: '#ff8a3d', name: 'Rewrite in Rust', short: 'Rust', show: () => S.allMax >= 100 || S.rusts > 0, sub: () => `${fmt(S.crabs)} crabs · ${S.rusts} rewrites` },
   { id: 'trophies', icon: 'trophy', col: '#ffd23f', name: 'Trophies', show: () => true, sub: () => `${Object.keys(S.ach).length} / ${ACHIEVEMENTS.length} · +${Object.keys(S.ach).length * 3}% damage` },
   { id: 'stats', icon: 'chart-bar', col: '#7df9ff', name: 'Stats', show: () => true, sub: () => `${fmtTime(S.stats.played)} played` },
@@ -596,7 +600,7 @@ const TABS = [
 let curTab = 'agents';
 const tabBody = $('#tabBody'), tabBtns = {}, pIcon = $('#picon');
 for (const t of TABS) {
-  tabBtns[t.id] = h('button', { class: 'tab', style: `--c:${t.col}`, title: t.name, onclick: () => { curTab = t.id; S.seenUnlocks['tab_' + t.id] = 1; structDirty = true; tabBody.scrollTop = 0; sfx.click(); } },
+  tabBtns[t.id] = h('button', { class: 'tab', style: `--c:${t.col}`, title: t.name, onclick: () => { curTab = t.id; S.seenUnlocks['tab_' + t.id] = 1; structDirty = true; tabBody.scrollTop = 0; setCollapsed(false); sfx.click(); } },
     icon(t.icon), h('span', { class: 'tn' }, t.short || t.name), h('span', { class: 'new' }, 'NEW'), h('span', { class: 'cnt' }));
   $('#railTabs').append(tabBtns[t.id]);
 }
@@ -604,7 +608,7 @@ document.querySelectorAll('#buyAmt button').forEach(b => b.onclick = () => { buy
 function updateBuyAmt() { document.querySelectorAll('#buyAmt button').forEach(b => b.classList.toggle('sel', String(buyMode) === b.dataset.n)); }
 updateBuyAmt();
 
-let tabUpdate = () => { }, tabKey = '';
+let tabUpdate = () => { }, tabKey = '', builtTab = null;
 function tabsVisibility() {
   for (const t of TABS) {
     const vis = t.show(), b = tabBtns[t.id];
@@ -619,6 +623,7 @@ function tabsVisibility() {
   $('#buyAmt').hidden = !(curTab === 'agents' || curTab === 'cannon');
 }
 function buildTab() {
+  if (builtTab !== curTab) { builtTab = curTab; tabBody.classList.remove('enter'); void tabBody.offsetWidth; tabBody.classList.add('enter'); } // fade in on tab switch only
   tabBody.innerHTML = ''; structDirty = false;
   const t = BUILD[curTab](); tabUpdate = t || (() => { });
 }
@@ -687,7 +692,7 @@ const BUILD = {
     if (S.challenge === 'notests') tabBody.append(h('div', { class: 'notice' }, badge('flask', COL.post, 'sm'), 'Postmortem "No Tests": milestones give no bonus this run.'));
     tabBody.append(h('div', { class: 'card summary' }, badge('target', COL.ms, 'lg'), h('div', {}, h('div', { class: 'big' }, `${on.length} / ${all.length}`), h('div', { class: 'dim' }, 'Milestones switch on by themselves — no buying needed. Bright = active.'))));
     tabBody.append(h('div', { class: 'sechead' }, h('span', {}, 'Agent milestones'), h('span', {}, 'owned 10 · 25 · 50 · 100 · 150 · 200 · 300')));
-    const list = h('div', { class: 'list' });
+    const list = h('div', { class: 'list wide' });
     E.AGENTS.forEach((a, i) => {
       if (!agentVisible(i)) return;
       const b = badge(a.icon, a.col); b._tip = () => agentTip(i);
@@ -711,7 +716,8 @@ const BUILD = {
       list.append(row({ col: COL.cannon, ic: u.icon, name: u.name, desc: u.flav, action: S.upg[u.id] ? h('div', { class: 'check' }, icon('check-circle')) : b, cls: S.upg[u.id] ? 'done' : '', tip: () => upgTip(u) }));
       if (!S.upg[u.id]) rows.push(() => { const c = E.upgCost(S, u); setBuy(b, 'BUY', money(c), c <= S.cash); });
     }
-    tabBody.append(hint('crosshair', 'Hold the mouse on the battlefield to fire. Shots scale with calibre plus a % of your agent DPS. Shoot golden 0-DAYs and linter drones!'), hero, h('div', { class: 'sechead' }, h('span', {}, 'Cannon mods'), h('span', {}, 'the only upgrades you buy')), list);
+    tabBody.append(hint('crosshair', 'Hold the mouse on the battlefield to fire. Shots scale with calibre plus a % of your agent DPS. Shoot golden 0-DAYs and linter drones!'),
+      h('div', { class: 'split' }, hero, h('div', {}, h('div', { class: 'sechead' }, h('span', {}, 'Cannon mods'), h('span', {}, 'the only upgrades you buy')), list)));
     return () => {
       const n = buyMode === 'max' ? Math.max(1, E.cannonMax(S, S.cash)) : buyMode, c = E.cannonCost(S, n), WP = E.WEAPONS[S.weapon];
       setHTML(lvl, `Lv ${S.cannon}<small>calibre</small>`); setText(sub, `${fmt(shotDmg(WP.mult))} damage per shot`);
@@ -738,7 +744,7 @@ const BUILD = {
         setBuy(btn, maxed ? 'MAXED' : 'PROMOTE', maxed ? IC('check') : `${IC('rocket-launch')} ${fmt(c)}`, !maxed && c <= S.hype);
       });
     }
-    tabBody.append(hero, h('div', { class: 'sechead' }, h('span', {}, 'Board of Directors'), h('span', {}, 'spending hype lowers its passive bonus')), list);
+    tabBody.append(h('div', { class: 'split' }, hero, h('div', {}, h('div', { class: 'sechead' }, h('span', {}, 'Board of Directors'), h('span', {}, 'spending hype lowers its passive bonus')), list)));
     return () => {
       const p = E.pendingHype(S);
       setHTML(big, `${fmt(S.hype)}<small>hype</small>`); setText(sub, `+${fmt(S.hype * E.hypeEach(S) * 100)}% damage · +${(E.hypeEach(S) * 100).toFixed(0)}% each`);
@@ -775,7 +781,7 @@ const BUILD = {
         setBuy(btn, maxed ? 'MAXED' : 'CRATE', maxed ? IC('check') : `${IC('shrimp')} ${fmt(c)}`, !maxed && c <= S.crabs);
       });
     }
-    tabBody.append(hero, h('div', { class: 'sechead' }, h('span', {}, 'The Borrow Checker'), h('span', {}, 'permanent, survives every reset')), list);
+    tabBody.append(h('div', { class: 'split' }, hero, h('div', {}, h('div', { class: 'sechead' }, h('span', {}, 'The Borrow Checker'), h('span', {}, 'permanent, survives every reset')), list)));
     return () => {
       const p = E.crabsFor(S.eraMax);
       setHTML(big, `${fmt(S.crabs)}<small>crabs</small>`); setText(sub, `${S.rusts} rewrites · ${fmt(S.crabsEver)} earned`);
@@ -793,7 +799,7 @@ const BUILD = {
       })));
   },
   stats() {
-    const box = h('div', { class: 'statgrid' });
+    const box = h('div', { class: 'statgrid wide' });
     tabBody.append(box);
     return () => setHTML(box, [
       ['coins', 'Downtime this run', money(S.runEarned), COL.cash], ['coins', 'This era', money(S.eraEarned), COL.cash], ['bank', 'All time', money(S.totalEarned), COL.cash], ['trend-up', 'Idle income', money(incomePerSec()) + '/s', COL.good],
@@ -809,22 +815,22 @@ const BUILD = {
     const slider = (ic, label, key) => h('label', { class: 'set' }, h('span', {}, icon(ic), label), h('input', { type: 'range', min: 0, max: 1, step: .05, value: st[key], oninput: e => { st[key] = +e.target.value; applySettings(); } }));
     const sel = (ic, label, key, opts) => { const s = h('select', { onchange: e => { st[key] = isNaN(+e.target.value) ? e.target.value : +e.target.value; applySettings(); markDirty(true); } }, ...opts.map(([v, t]) => { const o = h('option', { value: v }, t); if (String(st[key]) === String(v)) o.selected = true; return o; })); return h('label', { class: 'set' }, h('span', {}, icon(ic), label), s); };
     const keys = [['1 – 4', 'Cannon mode'], ['Space', 'Fire at the cursor'], ['← →', 'Previous / next incident'], ['F', 'Farm / auto-advance'], ['B', 'Cycle buy amount'], ['M', 'Mute']];
-    tabBody.append(
+    tabBody.append(h('div', { class: 'cols' }, h('div', {},
       h('div', { class: 'sechead' }, h('span', {}, 'Audio & display')),
       h('div', { class: 'card' },
         slider('speaker-high', 'Sound effects', 'sfx'), slider('music-notes', 'Music', 'music'),
         sel('hash', 'Number format', 'notation', [['suffix', '1.23M · 4.56Qa'], ['sci', '1.23e6']]),
         sel('sparkle', 'Particles', 'particles', [[1, 'High'], [.5, 'Low']]),
-        sel('vibrate', 'Screen shake', 'shake', [[1, 'On'], [.3, 'Gentle'], [0, 'Off']])),
+        sel('vibrate', 'Screen shake', 'shake', [[1, 'On'], [.3, 'Gentle'], [0, 'Off']]))), h('div', {},
       h('div', { class: 'sechead' }, h('span', {}, 'Save data'), h('span', {}, 'autosaves every 15s')),
       h('div', { class: 'card btnrow' },
         h('button', { class: 'btn green', onclick: () => { save(); toast('floppy-disk', 'Saved', 'Your outage is safe in localStorage.'); } }, icon('floppy-disk'), 'Save now'),
         h('button', { class: 'btn', onclick: () => modal('Export save', `<textarea readonly class="savebox">${encodeSave()}</textarea><p class="dim">Copy this somewhere safe.</p>`, null, { icon: 'export', col: COL.info }) }, icon('export'), 'Export'),
         h('button', { class: 'btn', onclick: () => modal('Import save', '<textarea class="savebox" id="imp" placeholder="Paste your save here"></textarea>', [{ label: 'Cancel' }, { label: 'Import', icon: 'download-simple', cls: 'primary', onclick: () => { try { S = decodeSave($('#imp').value); applySettings(); markDirty(true); resetRunRuntime(); save(); toast('download-simple', 'Imported', 'Welcome back to prod.'); } catch (e) { toast('warning', 'Import failed', 'That is not a valid save.', COL.bad); return false; } } }], { icon: 'download-simple', col: COL.info }) }, icon('download-simple'), 'Import'),
-        h('button', { class: 'btn danger', onclick: () => modal('Hard reset?', '<p class="warn">This deletes <b>everything</b>: hype, crabs, trophies. There is no backup. (This is the one time we test in prod.)</p>', [{ label: 'Cancel' }, { label: 'Delete everything', icon: 'trash', cls: 'danger', onclick: () => { localStorage.removeItem(SAVE_KEY); S = E.fresh(); applySettings(); markDirty(true); resetRunRuntime(); save(); } }], { icon: 'trash', col: COL.bad }) }, icon('trash'), 'Hard reset')),
+        h('button', { class: 'btn danger', onclick: () => modal('Hard reset?', '<p class="warn">This deletes <b>everything</b>: hype, crabs, trophies. There is no backup. (This is the one time we test in prod.)</p>', [{ label: 'Cancel' }, { label: 'Delete everything', icon: 'trash', cls: 'danger', onclick: () => { localStorage.removeItem(SAVE_KEY); S = E.fresh(); applySettings(); markDirty(true); resetRunRuntime(); save(); } }], { icon: 'trash', col: COL.bad }) }, icon('trash'), 'Hard reset'))), h('div', {},
       h('div', { class: 'sechead' }, h('span', {}, 'Controls')),
       h('div', { class: 'card keys' }, ...keys.flatMap(([k, d]) => [h('kbd', {}, k), h('span', {}, d)])),
-      h('div', { class: 'hint', style: 'margin-top:14px' }, icon('github-logo'), h('span', { html: 'One HTML canvas, no frameworks. Icons by <a href="https://phosphoricons.com" target="_blank">Phosphor</a>. No real servers were harmed — they were already like this. <a href="https://github.com/bryantebeek/slop-cannon" target="_blank">Source</a>' })));
+      h('div', { class: 'hint', style: 'margin-top:14px' }, icon('github-logo'), h('span', { html: 'One HTML canvas, no frameworks. Icons by <a href="https://phosphoricons.com" target="_blank">Phosphor</a>. No real servers were harmed — they were already like this. <a href="https://github.com/bryantebeek/slop-cannon" target="_blank">Source</a>' })))));
   },
 };
 function agentTip(i) {
