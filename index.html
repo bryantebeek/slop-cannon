@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Orbitron:wght@700;900&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="vendor/phosphor/duotone.css?v=202610150855">
+<link rel="stylesheet" href="vendor/phosphor/duotone.css?v=202610150904">
 <style>
 :root{
   --bg:#07020f;--panel:#0b0517;--panel2:#0f0820;--line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.16);
@@ -86,9 +86,9 @@ canvas{display:block;width:100%;height:100%;cursor:none;touch-action:none}
 .chip em{font-style:normal;font-weight:600;color:var(--dim);font-size:11px}
 #chBanner{position:absolute;top:132px;left:50%;transform:translateX(-50%);z-index:2;display:flex;align-items:center;gap:10px;padding:8px 10px 8px 8px;border-radius:14px;background:linear-gradient(180deg,rgba(255,77,109,.2),rgba(80,8,24,.75));border:1px solid rgba(255,77,109,.55);font-size:12px;max-width:min(94%,680px);box-shadow:0 10px 30px rgba(0,0,0,.4)}
 #buffs{position:absolute;left:12px;top:132px;display:flex;flex-direction:column;gap:8px;z-index:2}
-.buff{position:relative;overflow:hidden;display:flex;align-items:center;gap:10px;padding:7px 12px 9px 7px;border-radius:12px;background:linear-gradient(180deg,rgba(255,210,63,.18),rgba(60,40,0,.6));border:1px solid rgba(255,210,63,.6);font-size:11px;color:#ffe9a0;box-shadow:0 0 24px rgba(255,210,63,.18)}
+.buff{--c:var(--gold);position:relative;overflow:hidden;display:flex;align-items:center;gap:10px;padding:7px 12px 9px 7px;border-radius:12px;background:linear-gradient(180deg,color-mix(in srgb,var(--c) 18%,transparent),rgba(20,10,30,.7));border:1px solid color-mix(in srgb,var(--c) 60%,transparent);font-size:11px;color:#f2eeff;box-shadow:0 0 24px color-mix(in srgb,var(--c) 18%,transparent)}
 .buff b{display:block;font:900 11px var(--disp);letter-spacing:.8px;color:#fff}
-.buff .bar{position:absolute;left:0;bottom:0;height:3px;width:100%;background:var(--gold);transform-origin:left;box-shadow:0 0 8px var(--gold)}
+.buff .bar{position:absolute;left:0;bottom:0;height:3px;width:100%;background:var(--c);transform-origin:left;box-shadow:0 0 8px var(--c)}
 #weapons{position:absolute;left:12px;bottom:46px;display:flex;gap:6px;z-index:2}
 .wpn{display:flex;gap:7px;align-items:center;padding:5px 11px 5px 5px;border-radius:12px;font:800 11px var(--mono);color:var(--dim);transition:.15s}
 .wpn .ib{width:28px;height:28px;border-radius:8px;font-size:16px}
@@ -103,7 +103,7 @@ canvas{display:block;width:100%;height:100%;cursor:none;touch-action:none}
 #banner{position:absolute;left:0;right:0;top:33%;text-align:center;pointer-events:none;z-index:2;opacity:0}
 #banner.show{animation:banner 3.2s var(--ease) forwards}
 .btitle{font:900 clamp(26px,5vw,54px)/1 var(--disp);letter-spacing:2px;text-shadow:3px 0 rgba(255,40,90,.7),-3px 1px rgba(40,200,255,.7),0 0 40px rgba(0,0,0,.6)}
-.bsub{margin-top:12px;font:700 15px var(--mono);color:var(--gold);text-shadow:0 2px 8px #000}
+.bsub{max-width:min(90%,780px);margin:12px auto 0;line-height:1.5;font:700 15px var(--mono);color:var(--gold);text-shadow:0 2px 8px #000}
 @keyframes banner{0%{opacity:0;transform:scale(1.25)}8%{opacity:1;transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:translateY(-20px)}}
 @keyframes pulse{50%{opacity:.5}}
 @keyframes pop{from{transform:scale(.9);opacity:0}}
@@ -361,15 +361,15 @@ kbd{font:800 10px var(--mono);padding:1px 5px;border-radius:5px;border:1px solid
     <span><span class="ib" style="--c:#5dff9b"><i class="ph-duotone ph-robot"></i></span>16 AI agents</span>
     <span><span class="ib" style="--c:#ffffff"><i class="ph-duotone ph-target"></i></span>129 milestones</span>
     <span><span class="ib" style="--c:#c77dff"><i class="ph-duotone ph-rocket-launch"></i></span>2 prestige layers</span>
-    <span><span class="ib" style="--c:#ffd23f"><i class="ph-duotone ph-trophy"></i></span>72 trophies</span>
+    <span><span class="ib" style="--c:#ffd23f"><i class="ph-duotone ph-trophy"></i></span>77 trophies</span>
   </div>
   <div id="titleCta">[ CLICK TO DEPLOY TO PROD ]</div>
   <div id="titleSub">Your progress saves automatically and keeps earning while you're away.</div>
   <div class="foot">No real servers were harmed. They were already like this.</div>
 </div>
-<script src="econ.js?v=202610150855"></script>
-<script src="content.js?v=202610150855"></script>
-<script src="scene.js?v=202610150855"></script>
-<script src="game.js?v=202610150855"></script>
+<script src="econ.js?v=202610150904"></script>
+<script src="content.js?v=202610150904"></script>
+<script src="scene.js?v=202610150904"></script>
+<script src="game.js?v=202610150904"></script>
 </body>
 </html>

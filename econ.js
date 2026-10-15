@@ -283,7 +283,7 @@ const ECON = (() => {
     const S = {
       v: 1, hype: 0, hypeClaimed: 0, eraEarned: 0, totalEarned: 0, board: {}, pivots: 0,
       crabs: 0, crabsEver: 0, rust: {}, rusts: 0, eraMax: 1, allMax: 1, challenge: null, chDone: {}, ach: {}, seenUnlocks: {},
-      stats: { shots: 0, kills: 0, bosses: 0, golden: 0, drones: 0, played: 0, crits: 0, offline: 0, start: Date.now() },
+      stats: { shots: 0, kills: 0, bosses: 0, golden: 0, drones: 0, played: 0, crits: 0, offline: 0, frontier: {}, start: Date.now() },
       settings: { sfx: .6, music: .3, notation: 'suffix', particles: 1, shake: 1 },
       saved: Date.now(),
     };

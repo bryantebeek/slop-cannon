@@ -15,11 +15,12 @@ No build step, no frameworks. Icons are [Phosphor](https://phosphoricons.com) du
 | **Milestones** | 129 automatic multipliers: per-agent tiers at 10/25/50/100/150/200/300 owned, cross-agent synergies, and company upgrades at incident levels. No buying needed | AdVenture Capitalist, Cookie Clicker |
 | **Incidents** | 10 servers per incident; overkill chains between servers; every 5th is a timed legacy boss; farm or auto-advance | Clicker Heroes zones |
 | **Zero-days** | Golden packages fly by: shoot them for frenzies, cash or hotfixes | Cookie Clicker golden cookies |
+| **Frontier drops** | Rare zero-days voiced (in parody) by the frontier-lab bosses: **Claude Mythos** (every shot crits + 2 bonus zero-days), **Hidden access to Bel** (agents x20, then rate limited), **ZUCK IT** (vacuums this incident and the next 4), **Full Self-Deploying** (hands-free autopilot at 30 shots/s) | |
 | **Linter drones** | Block your agents' shots until you shoot them down | |
 | **🚀 Pivot to AI** | Prestige layer 1: hype = (era earnings ÷ 40)^0.16, +10% damage each, or spend it on the Board of Directors (Cron Job auto-fire, Hiring Manager auto-buy, offline earnings…) | AdVenture Capitalist angels, Clicker Heroes ancients, Egg, Inc. exponent |
 | **📝 Postmortems** | 8 challenge runs with nasty rules and permanent rewards | Antimatter Dimensions challenges |
 | **🦀 Rewrite It In Rust** | Prestige layer 2 at incident 120: crabs for the Borrow Checker tree | Realm Grinder / AD multi-layer prestige |
-| **🏆 Trophies & news** | 72 trophies (+3% each, 9 secret) and a Hacker News ticker that reacts to your progress | Cookie Clicker |
+| **🏆 Trophies & news** | 77 trophies (+3% each, 9 secret) and a Hacker News ticker that reacts to your progress | Cookie Clicker |
 
 ## Controls
 

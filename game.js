@@ -48,7 +48,7 @@ function refresh() { if (dirty) { D = E.derive(S); dirty = false; checkMilestone
 let buffs = [];
 const dpsBuff = () => buffs.reduce((m, b) => m * (b.dps || 1), 1);
 const shotBuff = () => buffs.reduce((m, b) => m * (b.click || 1), 1);
-const G = { combo: 0, comboT: 0, bestCombo: 0, idleT: 0, idleKills: 0, konami: false, tickerClick: false, dropBoss: false, closeCall: false, muted: false, bossFail: false };
+const G = { zuck: 0, combo: 0, comboT: 0, bestCombo: 0, idleT: 0, idleKills: 0, konami: false, tickerClick: false, dropBoss: false, closeCall: false, muted: false, bossFail: false };
 
 function applySettings() {
   VOL.sfx = S.settings.sfx; VOL.music = S.settings.music; setVolumes();
@@ -170,6 +170,7 @@ function startLevel() {
     return;
   }
   musicIntensity = 0;
+  if (G.zuck > 0) later.push({ t: 1.1, f: () => { if (G.zuck > 0 && !E.isBoss(S.level)) { G.zuck--; zuck(servers.filter(s => !s.dead)); } } });
   const types = [], used = new Set();
   for (let i = 0; i < E.PER_LEVEL; i++) { const r = Math.random(); types.push(l < 3 ? (r < .5 ? 'pod' : 'api') : r < .3 ? 'pod' : r < .6 ? 'api' : r < .82 ? 'db' : 'lb'); }
   const msum = types.reduce((a, t) => a + TYPES[t].m, 0), norm = E.PER_LEVEL / msum, hp = E.hp(l);
@@ -228,7 +229,7 @@ function ballistic(from, to, speed, g) {
   return [dx / Tf, dy / Tf + .5 * g * Tf, dz / Tf, Tf];
 }
 function shotDmg(mult) { return E.shotDamage(D, dpsBuff()) * shotBuff() * mult; }
-function rollCrit(dmg) { const c = Math.random() < D.crit; return [c ? dmg * D.critMult : dmg, c]; }
+function rollCrit(dmg) { const c = Math.random() < D.crit || buffs.some(b => b.allCrit); return [c ? dmg * D.critMult : dmg, c]; }
 function fireCannon() {
   const w = D.weapons[S.weapon] ? S.weapon : 0, WP = E.WEAPONS[w];
   cool = WP.cd / D.rate;
@@ -253,10 +254,10 @@ function fireCannon() {
   glyphs(m[0], m[1], m[2], '{}();=>', 3, WP.col, 3);
   sfx.fire(w);
 }
-function fireCron() {
+function fireCron(mult = .5, col = '#7df9ff') {
   const s = liveTarget(); if (!s) return;
-  const m = muzzleWorld(), v = ballistic(m, [s.x, s.h * s.sp * .5, s.z - s.d / 2], 80, 12), [dmg, crit] = rollCrit(shotDmg(1) * .5);
-  mkProj(m, v, { text: pick(SLOP), dmg, crit, g: 12, col: '#7df9ff', spr: 'cyan', src: 'cron', size: .65 });
+  const m = muzzleWorld(), v = ballistic(m, [s.x, s.h * s.sp * .5, s.z - s.d / 2], 80, 12), [dmg, crit] = rollCrit(shotDmg(1) * mult);
+  mkProj(m, v, { text: pick(SLOP), dmg, crit, g: 12, col, spr: col === '#7df9ff' ? 'cyan' : null, src: 'cron', size: .65 });
   recoil = Math.min(1.4, recoil + .25); flash = .6;
 }
 function fireAgent(i) {
@@ -327,11 +328,43 @@ function impact(p, h) {
 }
 
 // ───────────── zero-days, linters ─────────────
-let goldenT = 40, droneT = 75;
-function spawnGolden() {
+let goldenT = 40, droneT = 75, goldenQueue = 0, queueT = 0, apT = 0;
+// Frontier drops: rare zero-day variants voiced (as parody) by the frontier-lab bosses.
+const FRONTIER = [
+  { id: 'mythos', name: 'CLAUDE MYTHOS', who: 'Dario Amodei', col: '#e8835a', icon: 'bug-beetle',
+    line: 'Mythos found a 17-year-old bug in your prod. Access is restricted to trusted partners. You have 20 seconds.',
+    f() { addBuff('mythos', 'CLAUDE MYTHOS', 'Every shot crits', 20, { allCrit: true, icon: 'bug-beetle', col: '#e8835a' }); goldenQueue += 2; return 'every shot crits · 2 more zero-days found'; } },
+  { id: 'bel', name: 'HIDDEN ACCESS TO BEL', who: 'Sam Altman', col: '#10a37f', icon: 'lock-key-open',
+    line: "Hidden access to Bel granted. It's amazing. Internal only. Please don't tell the board.",
+    f() { addBuff('bel', 'BEL (INTERNAL)', 'Agents x20', 15, { dps: 20, icon: 'lock-key-open', col: '#10a37f', then: ['ratelimit', 'RATE LIMITED', 'Agents x0.5 · Bel went back in the vault', 10, { dps: .5, icon: 'hourglass', col: '#ff4d6d' }] }); return 'agents x20 · then rate limited'; } },
+  { id: 'zuck', name: 'ZUCK IT', who: 'Mark Zuckerberg', col: '#4f8cff', icon: 'magnet',
+    line: "Move fast and break things? I'll just take all of them.",
+    f() {
+      const boss = servers.find(s => s.type === 'boss' && !s.dead);
+      if (boss) { zuck([boss], .25); return 'boss -25% HP'; }
+      G.zuck = 4; zuck(servers.filter(s => !s.dead)); return 'this incident + the next 4 vacuumed';
+    } },
+  { id: 'musk', name: 'FULL SELF-DEPLOYING', who: 'Elon Musk', col: '#cfd6e6', icon: 'car-profile',
+    line: 'Full Self-Deploying is here. (Arrives next year.)',
+    f() { addBuff('autopilot', 'FULL SELF-DEPLOYING', 'Autopilot · 30 shots/s', 15, { autopilot: 30, icon: 'car-profile', col: '#cfd6e6' }); return 'autopilot · 30 shots/s'; } },
+];
+// Vacuum servers into the cannon: beams to the muzzle, then they die (frac < 1 = chunk of a boss).
+function zuck(list, frac = 1) {
+  const m = muzzleWorld();
+  for (const s of list) {
+    beams.push({ a: [s.x, s.h * s.sp * .5, s.z], b: m, life: .5, max: .5, col: '79,140,255' });
+    sparks(s.x, s.h * .5, s.z, 16, 12, '#4f8cff');
+    say(s.x, s.h + 1, s.z, 'ZUCKED', '#4f8cff', 1.1, 1.2);
+    damage(s, frac < 1 ? s.maxHp * frac : s.hp + 1, 0, 0, 0, 'cascade');
+  }
+}
+function spawnGolden(normal) {
   const sd = Math.random() < .5 ? -1 : 1;
-  golden = { x: -sd * 38, y: rand(8, 14), z: rand(34, 56), vx: sd * rand(5, 6.5), life: 13, age: 0 };
-  alert(0, `Zero-day disclosed in ${pick(PKGS)} — shoot the golden package!`); sfx.goldSpawn();
+  const fr = !normal && S.maxLevel >= 8 && Math.random() < (1 / 6) * (1 + .1 * E.lv(S.board, 'bounty')) ? pick(FRONTIER) : null;
+  golden = { x: -sd * 38, y: rand(8, 14), z: rand(34, 56), vx: sd * rand(5, 6.5), life: 13, age: 0, fr,
+    glow: fr ? fr.col : '#ffc93c', label: fr ? `!! FRONTIER DROP · ${fr.name} !!` : '!! 0-DAY · SHOOT IT !!' };
+  if (fr) { alert(0, `Frontier drop: ${fr.name} (${fr.who}) — shoot it!`); sfx.goldSpawn(); later.push({ t: .25, f: sfx.goldSpawn }); }
+  else { alert(0, `Zero-day disclosed in ${pick(PKGS)} — shoot the golden package!`); sfx.goldSpawn(); }
 }
 const GOLDEN = [
   { w: 42, f() { addBuff('frenzy', 'PROD IS ON FIRE', 'Agent DPS x7', 30, { dps: 7, icon: 'fire' }); return 'PROD IS ON FIRE · agents x7'; } },
@@ -346,6 +379,15 @@ const GOLDEN = [
 ];
 function collectGolden() {
   const g = golden; golden = null; if (!g) return;
+  if (g.fr) {
+    const fr = g.fr, what = fr.f();
+    S.stats.frontier[fr.id] = (S.stats.frontier[fr.id] || 0) + 1; S.stats.golden++;
+    sfx.golden(); sfx.ach(); explosion(g.x, g.y, g.z, true); coins(g.x, g.y, g.z, 40); shake += .6 * QUALITY.shake; hitMark = .3;
+    banner(fr.name, `${fr.who}: "${fr.line}"`, fr.col);
+    toast(fr.icon, `${fr.name} · ${what}`, `${fr.who}: "${fr.line}"`, fr.col);
+    say(g.x, g.y + 2, g.z, fr.name, fr.col, 2, 2.4, 1); alert(0, `${fr.name} · ${what}`);
+    return;
+  }
   let r = Math.random() * 100, eff = GOLDEN[0];
   for (const o of GOLDEN) { if ((r -= o.w) < 0) { eff = o; break; } }
   const msg = eff.f();
@@ -398,6 +440,8 @@ function sim(dt) {
   cool -= dt;
   if (firing && hoverCanvas && cool <= 0 && !modalOpen()) fireCannon();
   if (D.cron > 0 && phase === 'fight') { cronT -= dt; if (cronT <= 0) { cronT += 1 / D.cron; fireCron(); } }
+  const ap = buffs.find(b => b.autopilot);
+  if (ap && phase === 'fight') { apT -= dt; while (apT <= 0) { apT += 1 / ap.autopilot; fireCron(1, '#cfd6e6'); } }
   if (phase === 'fight') for (let i = 0; i < E.AGENTS.length; i++) {
     if (!S.agents[i] || !(D.agentDps[i] > 0)) continue;
     agentT[i] -= dt; if (agentT[i] <= 0) { agentT[i] += AGENT_INT[i]; fireAgent(i); }
@@ -441,10 +485,11 @@ function sim(dt) {
   const lint = E.lv(S.board, 'linter');
   if (S.maxLevel >= 10 && lint < 5 && !drones.length) { droneT -= dt * (1 - .2 * lint); if (droneT <= 0) { droneT = rand(50, 110); spawnDrones(); } }
   if (golden) { golden.age += dt; golden.life -= dt; golden.x += golden.vx * dt; golden.y += Math.sin(golden.age * 2.2) * dt * 1.5; if (golden.life <= 0) golden = null; }
+  else if (goldenQueue > 0) { queueT -= dt; if (queueT <= 0) { queueT = 1.2; goldenQueue--; spawnGolden(true); } }
   else if (D.golden > 0 && S.maxLevel >= 3) { goldenT -= dt * D.golden; if (goldenT <= 0) { goldenT = rand(90, 200); spawnGolden(); } }
   // buffs, combo, automation
   for (const b of buffs) b.t -= dt;
-  if (buffs.some(b => b.t <= 0)) { buffs = buffs.filter(b => b.t > 0); markDirty(); }
+  if (buffs.some(b => b.t <= 0)) { const done = buffs.filter(b => b.t <= 0); buffs = buffs.filter(b => b.t > 0); for (const b of done) if (b.then) addBuff(...b.then); markDirty(); }
   G.comboT -= dt; if (G.comboT <= 0) G.combo = 0;
   if (D.hiring) { hireT -= dt; if (hireT <= 0) { hireT = 8 / D.hiring; autoHire(); } }
   if (E.lv(S.rust, 'cargo')) { cargoT -= dt; if (cargoT <= 0) { cargoT = 1.5; autoBuyCannon(); } }
@@ -572,7 +617,7 @@ function updateTop() {
   if (S.crabsEver > 0) chips += `<span class="chip glass" title="Crabs">${BADGE('shrimp', COL.crab)}${fmt(S.crabs)}</span>`;
   const na = Object.keys(S.ach).length; if (na) chips += `<span class="chip glass" title="Trophies: +3% damage each">${BADGE('trophy', COL.trophy)}${na} <em>+${na * 3}%</em></span>`;
   setHTML(ui.chips, chips);
-  setHTML(ui.buffs, buffs.map(b => `<div class="buff">${BADGE(b.icon, COL.cash, 'sm')}<div><b>${b.name}</b>${b.desc} · ${Math.ceil(b.t)}s</div><i class="bar" style="transform:scaleX(${b.t / b.max})"></i></div>`).join(''));
+  setHTML(ui.buffs, buffs.map(b => `<div class="buff" style="--c:${b.col || COL.cash}">${BADGE(b.icon, b.col || COL.cash, 'sm')}<div><b>${b.name}</b>${b.desc} · ${Math.ceil(b.t)}s</div><i class="bar" style="transform:scaleX(${b.t / b.max})"></i></div>`).join(''));
   weaponBtns.forEach((b, i) => { b.hidden = !D.weapons[i]; b.classList.toggle('sel', S.weapon === i); });
   ui.weapons.hidden = D.weapons.filter(Boolean).length < 2;
   setHTML(ui.mute, IC(VOL.muted ? 'speaker-slash' : 'speaker-high'));

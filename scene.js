@@ -370,17 +370,17 @@ function drawDrone(d) {
 }
 function drawGolden() {
   const g = golden, p = proj(g.x, g.y, g.z); if (!p) return;
-  const r = 1.1 * p.s, a = Math.min(1, g.life / 1.5, g.age / .4);
+  const r = (g.fr ? 1.7 : 1.1) * p.s, a = Math.min(1, g.life / 1.5, g.age / .4);
   ctx.globalCompositeOperation = 'lighter';
-  spr(SPR.gold, p.x, p.y, r * 7 * (1 + .1 * Math.sin(T * 8)), r * 7 * (1 + .1 * Math.sin(T * 8)), .8 * a);
+  spr(sprFor(g.glow), p.x, p.y, r * 7 * (1 + .1 * Math.sin(T * 8)), r * 7 * (1 + .1 * Math.sin(T * 8)), .8 * a);
   ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(Math.sin(T * 2) * .25);
   ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = a;
-  const gr = ctx.createLinearGradient(-r, -r, r, r); gr.addColorStop(0, '#fff3b0'); gr.addColorStop(.5, '#ffc93c'); gr.addColorStop(1, '#b8740d');
+  const gr = ctx.createLinearGradient(-r, -r, r, r); gr.addColorStop(0, '#ffffff'); gr.addColorStop(.45, g.glow); gr.addColorStop(1, 'rgba(20,10,30,.9)');
   ctx.fillStyle = gr; ctx.fillRect(-r, -r * .8, r * 2, r * 1.6);
   ctx.fillStyle = 'rgba(80,40,0,.6)'; ctx.fillRect(-r * .12, -r * .8, r * .24, r * 1.6); ctx.fillRect(-r, -r * .1, r * 2, r * .2);
   ctx.restore();
-  ctx.globalAlpha = a; ctx.font = `800 ${clamp(p.s * .45, 11, 18)}px ${MONO}`; ctx.textAlign = 'center';
-  ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(0,0,0,.7)'; ctx.strokeText('!! 0-DAY · SHOOT IT !!', p.x, p.y - r * 2.2); ctx.fillStyle = '#ffd23f'; ctx.fillText('!! 0-DAY · SHOOT IT !!', p.x, p.y - r * 2.2);
+  ctx.globalAlpha = a; ctx.font = `800 ${clamp(p.s * (g.fr ? .55 : .45), 11, g.fr ? 22 : 18)}px ${MONO}`; ctx.textAlign = 'center';
+  ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(0,0,0,.7)'; ctx.strokeText(g.label, p.x, p.y - r * 2.2); ctx.fillStyle = g.fr ? g.glow : '#ffd23f'; ctx.fillText(g.label, p.x, p.y - r * 2.2);
   ctx.globalAlpha = 1;
 }
 function drawWorld() {
