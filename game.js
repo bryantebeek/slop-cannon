@@ -669,9 +669,9 @@ const BUILD = {
         list.append(row({ col: '#8a86a8', ic: 'lock-simple', name: '??? Classified agent', desc: `Hire ${/^[AEIOU]/.test(E.AGENTS[i - 1].name) ? 'an' : 'a'} ${E.AGENTS[i - 1].name} to reveal · ${money(a.cost)}`, cls: 'locked' }));
         return;
       }
-      const own = h('span', { class: 'rcount' }), st = h('div', { class: 'rstat' }), bar = h('i'), next = h('div', { class: 'rnext' });
+      const own = h('span', { class: 'rcount' }), st = h('div', { class: 'rstat' }), bar = h('i'), mult = h('span', { class: 'mult', tip: () => agentTip(i) }), nextTxt = h('span', { class: 'rnext-t' }), next = h('div', { class: 'rnext' }, mult, nextTxt);
       const btn = costBtn('HIRE', () => buyAgent(i, buyCount(i)));
-      list.append(row({ col: a.col, ic: a.icon, name: a.name, right: own, desc: a.desc, extra: [st, h('div', { class: 'prog' }, bar), next], action: btn, cls: 'accent', tip: () => agentTip(i) }));
+      list.append(row({ col: a.col, ic: a.icon, name: a.name, right: own, desc: a.desc, extra: [st, h('div', { class: 'prog' }, bar), next], action: btn, cls: 'accent' }));
       rows.push(() => {
         const n = buyCount(i), c = E.agentCost(S, i, n), locked = agentLocked(i), tot = D.dps || 1;
         setText(own, '×' + fmt(S.agents[i]));
@@ -680,7 +680,8 @@ const BUILD = {
         const nt = E.TIER_AT.find(t => t > S.agents[i]), prev = [0, ...E.TIER_AT].filter(t => t <= S.agents[i]).pop();
         bar.style.transform = `scaleX(${nt ? (S.agents[i] - prev) / (nt - prev) : 1})`;
         const nu = E.UPGRADES.find(u => u.kind === 'tier' && u.agent === i && u.at === nt);
-        setHTML(next, `<span class="mult">${IC('target')} x${fmt(D.agentMult[i])}</span>` + (nu ? `${IC('arrow-right')} <b class="ready">${nu.name}</b> x${nu.eff.mult} <span class="sep">·</span> ${nt - S.agents[i]} to go` : `${IC('check-circle')} all milestones reached`));
+        setHTML(mult, `${IC('target')} x${fmt(D.agentMult[i])}`);
+        setHTML(nextTxt, (nu ? `${IC('arrow-right')} <b class="ready">${nu.name}</b> x${nu.eff.mult} <span class="sep">·</span> ${nt - S.agents[i]} to go` : `${IC('check-circle')} all milestones reached`));
         setBuy(btn, locked ? 'LOCKED' : `HIRE ×${n}`, locked ? IC('lock-simple') : money(c), !locked && c <= S.cash);
       });
     });
