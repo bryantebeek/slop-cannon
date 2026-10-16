@@ -1,0 +1,24 @@
+# SLOP CANNON: Idle Ops
+
+> A free idle/incremental browser game and programmer-humor parody. You fire AI-generated "slop" code at production servers, hire AI agents that break prod for you, pivot to AI for hype, rewrite it in Rust, and try to take down us-east-1. Plays instantly at https://slopcannonthegame.com/ with no signup, download or account.
+
+- Genre: idle game, incremental game, clicker game, parody
+- Platform: any modern web browser, desktop or mobile
+- Price: free, no ads, no in-app purchases
+- Made by Bryan te Beek ([@bryantebeek](https://x.com/bryantebeek)); first released 2026-10-14
+- Progress saves automatically in the browser and keeps earning while you're away
+- All servers, outages, companies and quotes in the game are fictional parody
+
+## Play
+
+- [Play SLOP CANNON](https://slopcannonthegame.com/): the game itself, a single page that runs in the browser
+
+## Docs
+
+- [Full game guide](https://slopcannonthegame.com/llms-full.txt): every agent, cannon mode, zero-day effect, boss, prestige layer and challenge run in one file
+- [README](https://github.com/bryantebeek/slop-cannon/blob/main/README.md): overview, controls and how the game is built
+
+## Optional
+
+- [Source code on GitHub](https://github.com/bryantebeek/slop-cannon): plain HTML, canvas and JavaScript with no build step
+- [Gameplay screenshot](https://slopcannonthegame.com/media/gameplay.jpg)

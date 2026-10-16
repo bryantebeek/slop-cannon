@@ -1,0 +1,183 @@
+# SLOP CANNON: Idle Ops — full game guide
+
+> A free idle/incremental browser game and programmer-humor parody. You fire AI-generated "slop" code at production servers, hire AI agents that break prod for you, pivot to AI for hype, rewrite it in Rust, and try to take down us-east-1. Plays instantly at https://slopcannonthegame.com/ with no signup, download or account.
+
+- Play: https://slopcannonthegame.com/
+- Source: https://github.com/bryantebeek/slop-cannon
+- Made by Bryan te Beek (@bryantebeek on X); first released 2026-10-14
+- Genre: idle game, incremental game, clicker game, parody
+- Platform: any modern web browser, desktop or mobile. Free, no ads, no in-app purchases.
+- All servers, outages, companies and quotes in the game are fictional parody. Frontier-lab names are used as satire.
+
+## The pitch
+
+You have a cannon. It fires AI-generated code. Production is right there.
+
+Hold the mouse and pour `// works on my machine` into a server rack until it catches fire. Every server you take down pays out. Spend the money on AI agents who break prod for you, from an Intern who copy-pastes from Stack Overflow all the way up to a Simulation Admin with sudo on reality. Close the tab and the outage keeps earning.
+
+The goal is to reach incident 200 and take down us-east-1. Half the internet goes offline. The status pages still say "All Systems Operational."
+
+## How a run works
+
+- The game is a sequence of incidents. Each incident has 10 servers to take down.
+- Every 5th incident is a boss: a single timed legacy system. Beat it before the timer runs out, or it rolls back.
+- Taking down servers pays downtime money ($). Chaining kills builds a CASCADING FAILURE combo that adds up to +50% $.
+- You can move back to earlier incidents to farm, or let the game auto-advance (F key).
+- Progress saves automatically in the browser. While you're away the game keeps earning for up to 24 hours.
+
+## Controls
+
+| Input | Action |
+|---|---|
+| Hold mouse / Space | Fire at the cursor |
+| 1–4 | Switch cannon mode |
+| ← / → | Previous / next incident |
+| F | Farm or auto-advance |
+| B | Cycle buy amount (x1 / x10 / x25 / x100 / MAX) |
+| M | Mute |
+
+On touch devices, hold your finger on the battlefield to fire.
+
+## AI agents
+
+Agents are the idle generators. They fire slop at prod on their own. Each hire costs 7% more than the last. Owning 10, 25, 50, 100, 150, 200 and 300 of an agent unlocks milestones that multiply its damage automatically.
+
+1. Intern: Copy-pastes from Stack Overflow. Unpaid. Unsupervised.
+2. Autocomplete: Presses Tab so you don't have to read.
+3. Junior + ChatGPT: Ships fast. Asks nothing. Understands less.
+4. Prompt Engineer: "You are a senior engineer. Do not make mistakes."
+5. Vibe Coder: Has never opened the diff. Has never needed to.
+6. Copilot Swarm: Forty autocompletes arguing in a trench coat.
+7. Autonomous Agent: Runs with --dangerously-skip-permissions. "I panicked."
+8. 10x Engineer: Ten agents in a hoodie. Refuses code review on principle.
+9. AI Consultancy: Bills by the token. Delivers a 400-slide deck.
+10. Hallucination Engine: Invents packages. Someone else publishes them.
+11. Self-Replicating Startup: Raises a seed round, forks itself, raises again.
+12. Paperclip Maximizer: Converts your infrastructure into paperclips. Efficiently.
+13. AGI (4 if-statements): Achieved general intelligence. It is mostly else-ifs.
+14. The Singularity: Improves itself. Mostly its own LinkedIn.
+15. Dyson GPU Sphere: Wraps the sun in H100s. Still CUDA out of memory.
+16. Simulation Admin: Has sudo on reality. Deploys straight to it.
+
+There are 129 milestones in total.
+
+## The cannon
+
+The Slop Cannon is the part you aim yourself. Upgrading its calibre raises base damage. Cannon mods add a share of your agent DPS to every shot, raise crit chance, or speed up the fire rate.
+
+### Cannon modes
+
+| Mode | Key | What it does |
+|---|---|---|
+| AI SLOP | 1 | Autocomplete spray. Fast, the default. |
+| NPM INSTALL | 2 | Splits into 8 dependencies mid-air and hits crowds. |
+| DROP TABLE | 3 | 30x damage with splash. The boss killer. |
+| VIBE CODE | 4 | 3 homing vibes that never miss (allegedly). |
+
+### Upgrades
+
+- Cannon mods: npm install, Mechanical Keyboard, Lucky Deploy (crits deal 10x), DROP TABLE, RGB Lighting, Overclocked Fan, VIBE CODE, Standing Desk, Production Hotfix, Blame Game ("It was the intern"), Gaming Chair, Liquid Cooling, Second Monitor, Vertical Third Monitor, Neuralink Keybinds.
+- Global upgrades: Kubernetes ("Nobody knows how it works, including it"), Bug Bounty Program, Microservices ("One outage became forty"), Edge Caching, Serverless ("There are still servers"), Put It On The Blockchain ("Immutable outages"), Add AI To Everything ("Including the toaster"), Quantum Slop, Infinite VC Money ("Burn rate: yes").
+- Synergies between agents: Pair Programming, Prompt Autocomplete, Mentorship (Vibes Only), Agentic Vibes, Hoodie Hive, Hallucinated Deliverables, Clip-Powered Growth, Sentient Datacenter.
+
+## Zero-days (golden packages)
+
+Golden packages fly across the sky. Shoot one and a random effect fires:
+
+- FEEL THE AGI: agents x7 for 30 seconds
+- LEAKED API KEY: a pile of instant cash
+- TIBO PRESSED THE RESET BUTTON: usage limits reset, buffs and boss timer refilled, agents x3
+- YOU'RE ABSOLUTELY RIGHT!: every kill pays x3 for 20 seconds
+- MAKE NO MISTAKES: shots home in and hit x50 for 15 seconds
+- @GROK IS THIS TRUE?: a big cash payout, or "Readers added context" and a small one
+- IT'S SO OVER: agents x0.25, then WE'RE SO BACK at x12
+- COMPACTING CONVERSATION…: every server loses 60% HP
+- HOTFIX: auto-resolves the incident, or takes 10% off a boss
+- ULTRATHINK: boss timer frozen and shots x10 for 20 seconds
+- OUR GPUS ARE MELTING: fire rate x3 for 15 seconds
+- FORGET THE CODE EVEN EXISTS: a hands-free homing VIBE CODE barrage
+- 529 OVERLOADED_ERROR: everything deals x3 for 15 seconds
+- --dangerously-skip-permissions: YOLO MODE, agents x15 for 10 seconds, and the linters notice
+- RALPH WIGGUM LOOP: "I'm helping!" Rolls 3 more zero-days
+- AGI ACHIEVED INTERNALLY: an hour of downtime money, delivered
+
+### Frontier drops
+
+Rare zero-day variants from parody versions of the big AI labs:
+
+- CLAUDE MYTHOS: every shot crits for 20 seconds, and 2 more zero-days are found
+- HIDDEN ACCESS TO BEL: agents x20, then rate limited
+- ZUCK IT: vacuums up this incident and the next 4, or takes 25% off a boss
+- FULL SELF-DEPLOYING: the cannon goes on autopilot at 30 shots per second
+
+### Linters
+
+Linter drones (ESLint, Prettier, SonarQube, Senior Dev, Clippy and friends) show up to block your shots. Shoot them down.
+
+## Bosses
+
+Every 5th incident is a timed boss fight against legacy infrastructure, including LEGACY MONOLITH, jenkins (DO NOT TOUCH), THE MAINFRAME, ORACLE LICENSE SERVER, COBOL PAYROLL, THE DBA'S LAPTOP and SAP ERP. The final boss at incident 200 is us-east-1.
+
+## Prestige layer 1: Pivot to AI
+
+From incident 25 you can pivot to AI: burn the company down and restart for hype. Each hype permanently adds +10% damage. Hype can also be spent on the Board of Directors:
+
+- Series A: agent DPS
+- Growth Hacker: more $
+- Cron Job: auto-shots every second
+- Hiring Manager: auto-hires agents
+- Deadline Extension: longer boss timers
+- Bug Bounty Hunter: more zero-days
+- Golden Parachute: start each run further in
+- Remote Work: more offline earnings
+- Disable the Linter: fewer linters
+- Insider Trading: more hype gain
+- Technical Debt: cheaper agents
+- Legacy Code: more boss $
+
+## Prestige layer 2: Rewrite it in Rust
+
+From incident 120 you can rewrite it in Rust. Estimated time: 6 months. Actual: 4 years. Rewrites earn crabs, spent in the Borrow Checker:
+
+- Memory Safety: x3 all damage
+- Fearless Concurrency: x2 hype gain
+- Cargo: unlocks auto-buying
+- Clippy: keep part of the Board after a rewrite
+- Zero-Cost Abstractions: agents half price
+- unsafe {}: x2 crit damage
+- Blazingly Fast: shots deal more of your DPS
+
+## Postmortems (challenge runs)
+
+8 challenge runs with nasty rules and permanent rewards:
+
+| Postmortem | Rule | Goal | Reward |
+|---|---|---|---|
+| Code Freeze | Agents deal no damage. Only the cannon fires. | Incident 20 | Shots deal +10% of DPS, forever. |
+| Friday 4:59 PM | Boss timers are 10 seconds. | Incident 40 | Boss timer +10s and bosses drop x3 $. |
+| Legacy Only | Only the first 4 agents can be hired. | Incident 35 | The first 4 agents are x100 stronger. |
+| No Tests | Milestones give no bonus. | Incident 40 | All agents x3. |
+| 429 Too Many Requests | Cannon fires 4x slower. Agents deal 1/3 damage. | Incident 45 | Fire rate +50%. |
+| Air-Gapped | No zero-days. Hype gives no bonus. | Incident 60 | Each hype gives +12% instead of +10%. |
+| Monorepo | Agent cost growth is 12% per hire instead of 7%. | Incident 60 | All agents x10. |
+| Self-Healing Infra | Servers roll back to full HP after 3s without damage. | Incident 70 | All damage x5. |
+
+## Trophies and extras
+
+- 78 trophies, 9 of them secret.
+- A live Hacker News ticker with 118 headlines that react to how badly you're breaking things.
+- Settings for sound, music, number notation, particles and screen shake.
+
+## FAQ
+
+**Is SLOP CANNON free?** Yes. It's free to play in the browser, with no ads, no purchases and no account.
+
+**Do I need to download anything?** No. Open https://slopcannonthegame.com/ and it runs. It works on desktop and mobile.
+
+**Does it keep progress?** Yes. Progress saves automatically in your browser, and the game keeps earning for up to 24 hours while you're away.
+
+**Is it an idle game or a clicker?** Both. You aim and fire the cannon yourself early on, and your AI agents take over as you hire them.
+
+**Are the outages real?** No. No real servers were harmed. They were already like this.
+
+**How is it built?** One HTML page, a canvas and plain JavaScript, with no build step, framework or backend. The economy is balanced with a headless bot player, and 159 automated checks verify that every multiplier does what its tooltip promises.
