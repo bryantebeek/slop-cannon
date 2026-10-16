@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>SLOP CANNON: Idle Ops — Free AI Idle Game in Your Browser</title>
 <meta name="description" content="Free browser idle game: hire AI agents to fire slop code at production servers. Break prod, pivot to AI, rewrite it in Rust and take down us-east-1. No signup.">
 <link rel="canonical" href="https://slopcannonthegame.com/">
@@ -12,6 +12,8 @@
 <meta name="apple-mobile-web-app-title" content="Slop Cannon">
 <meta name="theme-color" content="#07020f">
 <meta name="color-scheme" content="dark">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@bryantebeek">
@@ -32,9 +34,9 @@
 <meta property="og:image:alt" content="SLOP CANNON: Idle Ops. A cannon fires AI-generated code at burning server racks under a synthwave sunset.">
 <meta property="og:locale" content="en_US">
 
-<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="icon" href="favicon.ico" sizes="32x32">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="site.webmanifest">
 <script type="application/ld+json">
 {
@@ -108,7 +110,7 @@ b{font-weight:800}
 .ib.off{--c:#8a86a8;filter:grayscale(1);opacity:.45;box-shadow:none}
 
 /* ── layout ─────────────────────────────────────────────── */
-#app{display:flex;flex-direction:column;height:100vh;height:100dvh}
+#app{display:flex;flex-direction:column;height:100vh;height:100dvh;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
 #stage{position:relative;flex:1;min-width:0;min-height:0;overflow:hidden}
 canvas{display:block;width:100%;height:100%;cursor:none;touch-action:none}
 .glass{background:linear-gradient(180deg,rgba(20,10,40,.82),rgba(10,4,22,.78));border:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.06)}
@@ -453,5 +455,6 @@ kbd{font:800 10px var(--mono);padding:1px 5px;border-radius:5px;border:1px solid
 <script src="content.js?v=202610150959"></script>
 <script src="scene.js?v=202610150959"></script>
 <script src="game.js?v=202610150959"></script>
+<script>if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('/sw.js');</script>
 </body>
 </html>

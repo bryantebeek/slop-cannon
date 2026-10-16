@@ -1,16 +1,27 @@
 {
+  "id": "/",
   "name": "SLOP CANNON: Idle Ops",
   "short_name": "Slop Cannon",
-  "description": "Hire AI agents. Ship slop. Break prod. Take down us-east-1.",
+  "description": "Hire AI agents. Ship slop. Break prod. Pivot to AI. Rewrite it in Rust. Take down us-east-1. A free idle game that keeps earning while you're away.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#07020f",
   "theme_color": "#07020f",
+  "lang": "en",
+  "dir": "ltr",
   "categories": ["games", "entertainment"],
+  "launch_handler": { "client_mode": "navigate-existing" },
   "icons": [
-    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
-    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icons/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/maskable-1024.png", "sizes": "1024x1024", "type": "image/png", "purpose": "maskable" }
+  ],
+  "screenshots": [
+    { "src": "/media/screenshot-wide.jpg", "sizes": "1920x1080", "type": "image/jpeg", "form_factor": "wide", "label": "Agents firing AI slop at a burning server farm at incident 47" },
+    { "src": "/media/screenshot-narrow.jpg", "sizes": "1080x1920", "type": "image/jpeg", "form_factor": "narrow", "label": "Slop Cannon on a phone: the cannon up top, your AI agents below" }
   ]
 }
