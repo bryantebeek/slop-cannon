@@ -305,13 +305,14 @@ kbd{font:800 10px var(--mono);padding:1px 5px;border-radius:5px;border:1px solid
 
 /* ── mobile ─────────────────────────────────────────────── */
 @media (max-width:900px){
-  #panel{height:54dvh;flex-direction:column-reverse;border-top:1px solid rgba(255,77,200,.22)}
+  #panel{height:40dvh;flex-direction:column-reverse;border-top:1px solid rgba(255,77,200,.22)}
   #panel.collapsed{height:64px}
   #rail{padding:6px 8px;gap:2px;border-bottom:0;border-top:1px solid var(--line)}
   #logo,#railFoot{display:none}
   .tab{flex:1;min-width:54px;flex-direction:column;gap:3px;padding:7px 4px}.tab i{font-size:21px}.tab .tn{font-size:8.5px}
   .tab.sel::before{bottom:auto;top:-7px}
-  #phead{flex-wrap:wrap;gap:8px;padding:8px 12px}#buyAmt{width:100%}
+  #phead{gap:8px;padding:6px 10px}#ptitle .ib{display:none}#ptitle h1{font-size:14px}#psub{font-size:10px;overflow:hidden;text-overflow:ellipsis}
+  #buyAmt{width:auto;flex:0 1 190px;min-width:0}#buyAmt button{padding:4px 0;font-size:10px}.hint{display:none}
   .list,.list.wide,.split .list{grid-template-columns:1fr}.split{grid-template-columns:1fr}.split>.card{position:static}
   #hud{inset:6px 6px auto 6px;grid-template-columns:1fr auto;gap:6px}
   #cashCard{min-width:0;padding:7px 10px 7px 7px}#cashCard>.ib{display:none}#cash{font-size:19px}.pills{display:none}
@@ -360,7 +361,7 @@ kbd{font:800 10px var(--mono);padding:1px 5px;border-radius:5px;border:1px solid
     </div>
   </aside>
   <footer id="foot">
-    <span>Made with <i class="ph-duotone ph-coins" style="color:var(--gold)"></i> tokens by <a href="https://x.com/bryantebeek" target="_blank" rel="noopener">@bryantebeek</a></span>
+    <span>Made with tokens by <a href="https://x.com/bryantebeek" target="_blank" rel="noopener">@bryantebeek</a></span>
     <span class="subs">Subsidized by Dario, Sam, Elon and Mark</span>
     <a href="https://github.com/bryantebeek/slop-cannon" target="_blank" rel="noopener"><i class="ph-duotone ph-github-logo"></i> Open Slop on GitHub</a>
   </footer>
