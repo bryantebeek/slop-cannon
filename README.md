@@ -48,7 +48,7 @@ Come back an hour later and the outage kept earning without you.
 | 1–4 | Switch cannon mode |
 | ← / → | Previous / next incident |
 | F | Farm or auto-advance |
-| B | Cycle buy amount (x1 / x10 / x25 / x100 / MAX) |
+| B | Cycle buy amount (x1 / x10 / x25 / x50 / x100 / MAX) |
 | M | Mute |
 
 Progress saves automatically and keeps earning while you're away.

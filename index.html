@@ -470,7 +470,7 @@ kbd{font:800 10px var(--mono);padding:1px 5px;border-radius:5px;border:1px solid
     <div id="main">
       <header id="phead">
         <div id="ptitle"><span class="ib" id="picon"></span><div><h2 id="pname"></h2><div id="psub"></div></div></div>
-        <div id="buyAmt"><button data-n="1">x1</button><button data-n="10">x10</button><button data-n="25">x25</button><button data-n="100">x100</button><button data-n="max">MAX</button></div>
+        <div id="buyAmt"><button data-n="1">x1</button><button data-n="10">x10</button><button data-n="25">x25</button><button data-n="50">x50</button><button data-n="100">x100</button><button data-n="max">MAX</button></div>
       </header>
       <div id="tabBody"></div>
     </div>
@@ -498,11 +498,11 @@ kbd{font:800 10px var(--mono);padding:1px 5px;border-radius:5px;border:1px solid
   <div id="titleSub">Your progress saves automatically and keeps earning while you're away.</div>
   <div class="foot">No real servers were harmed. They were already like this.</div>
 </div>
-<script src="econ.js?v=202610161530"></script>
-<script src="content.js?v=202610161530"></script>
-<script src="scene.js?v=202610161530"></script>
-<script src="game.js?v=202610161530"></script>
-<script src="share.js?v=202610161530"></script>
+<script src="econ.js?v=202610161600"></script>
+<script src="content.js?v=202610161600"></script>
+<script src="scene.js?v=202610161600"></script>
+<script src="game.js?v=202610161600"></script>
+<script src="share.js?v=202610161600"></script>
 <script>if ('serviceWorker' in navigator && location.protocol === 'https:') addEventListener('load', () =>
   Promise.all([navigator.serviceWorker.register('/sw.js').then(() => navigator.serviceWorker.ready), document.fonts.ready])
     .then(([r]) => r.active.postMessage(['/', ...performance.getEntriesByType('resource').map(e => e.name).filter(u => u.startsWith('http'))])));</script>

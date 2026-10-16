@@ -1075,7 +1075,7 @@ addEventListener('keydown', e => {
   if (e.code === 'ArrowLeft') setLevel(S.level - 1);
   if (e.code === 'ArrowRight') setLevel(S.level + 1);
   if (e.code === 'KeyF') { S.auto = !S.auto; sfx.click(); }
-  if (e.code === 'KeyB' && kIdx !== KONAMI.length - 1) { const m = [1, 10, 25, 100, 'max']; buyMode = m[(m.indexOf(buyMode) + 1) % m.length]; updateBuyAmt(); }
+  if (e.code === 'KeyB' && kIdx !== KONAMI.length - 1) { const m = [1, 10, 25, 50, 100, 'max']; buyMode = m[(m.indexOf(buyMode) + 1) % m.length]; updateBuyAmt(); }
   if (e.code === 'KeyM') toggleMute();
 });
 addEventListener('keyup', e => { if (e.code === 'Space') firing = false; });

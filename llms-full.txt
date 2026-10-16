@@ -33,7 +33,7 @@ The goal is to reach incident 200 and take down us-east-1. Half the internet goe
 | 1–4 | Switch cannon mode |
 | ← / → | Previous / next incident |
 | F | Farm or auto-advance |
-| B | Cycle buy amount (x1 / x10 / x25 / x100 / MAX) |
+| B | Cycle buy amount (x1 / x10 / x25 / x50 / x100 / MAX) |
 | M | Mute |
 
 On touch devices, hold your finger on the battlefield to fire.
