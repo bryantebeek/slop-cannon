@@ -424,7 +424,8 @@ kbd{font:800 10px var(--mono);padding:1px 5px;border-radius:5px;border:1px solid
   #panel.collapsed{height:64px}
   #rail{padding:6px 8px;gap:2px;border-bottom:0;border-top:1px solid var(--line)}
   #logo,#railFoot{display:none}
-  .tab{flex:1;min-width:54px;flex-direction:column;gap:3px;padding:7px 4px}.tab i{font-size:21px}.tab .tn{font-size:8.5px}
+  .tab{flex:1;min-width:40px;justify-content:center;padding:8px 4px}.tab i{font-size:21px}.tab .tn{display:none}
+  #ticker{height:16px}#tickerTag{gap:4px;padding:0 7px;font-size:7px;letter-spacing:.5px}#tickerTag i{font-size:10px}#tickerText{font-size:9px}#tickerText .pts{font-size:8.5px;margin-right:8px}
   .tab.sel::before{bottom:auto;top:-7px}
   #phead{gap:8px;padding:6px 10px}#ptitle .ib{display:none}#ptitle h2{font-size:14px}#psub{font-size:10px;overflow:hidden;text-overflow:ellipsis}
   #buyAmt{width:auto;flex:0 1 190px;min-width:0}#buyAmt button{padding:4px 0;font-size:10px}.hint{display:none}
@@ -499,11 +500,11 @@ kbd{font:800 10px var(--mono);padding:1px 5px;border-radius:5px;border:1px solid
   <div id="titleSub">Your progress saves automatically and keeps earning while you're away.</div>
   <div class="foot">No real servers were harmed. They were already like this.</div>
 </div>
-<script src="econ.js?v=202610162000"></script>
-<script src="content.js?v=202610162000"></script>
-<script src="scene.js?v=202610162000"></script>
-<script src="game.js?v=202610162000"></script>
-<script src="share.js?v=202610162000"></script>
+<script src="econ.js?v=202610162030"></script>
+<script src="content.js?v=202610162030"></script>
+<script src="scene.js?v=202610162030"></script>
+<script src="game.js?v=202610162030"></script>
+<script src="share.js?v=202610162030"></script>
 <script>if ('serviceWorker' in navigator && location.protocol === 'https:') addEventListener('load', () =>
   Promise.all([navigator.serviceWorker.register('/sw.js').then(() => navigator.serviceWorker.ready), document.fonts.ready])
     .then(([r]) => r.active.postMessage(['/', ...performance.getEntriesByType('resource').map(e => e.name).filter(u => u.startsWith('http'))])));</script>
