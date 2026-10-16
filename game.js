@@ -1062,9 +1062,22 @@ cv.addEventListener('mouseleave', () => { hoverCanvas = false; firing = false; }
 cv.addEventListener('mousedown', e => { if (e.button !== 0) return; initAudio(); aimFrom(e); hoverCanvas = true; firing = true; });
 addEventListener('mouseup', e => { if (e.button === 0) firing = false; });
 cv.addEventListener('contextmenu', e => e.preventDefault());
-cv.addEventListener('touchstart', e => { e.preventDefault(); initAudio(); aimFrom(e.touches[0]); hoverCanvas = true; firing = true; }, { passive: false });
-cv.addEventListener('touchmove', e => { e.preventDefault(); aimFrom(e.touches[0]); }, { passive: false });
-cv.addEventListener('touchend', e => { if (!e.touches.length) { firing = false; hoverCanvas = false; } });
+// Touch aims like a trackpad: drag anywhere to move the crosshair, so your thumb never covers what you shoot.
+// Tapping a golden 0-DAY or drone directly still jumps the crosshair onto it.
+let touchX = 0, touchY = 0;
+const AIM_SPEED = 1.5;
+function touchFrom(t) { const r = cv.getBoundingClientRect(); touchX = t.clientX - r.left; touchY = t.clientY - r.top; }
+cv.addEventListener('touchstart', e => {
+  e.preventDefault(); initAudio(); touchFrom(e.touches[0]);
+  const tap = raycast([cam.x, cam.y, cam.z], screenRay(touchX, touchY));
+  if (!hoverCanvas || tap.gold || tap.dr) { aimX = hoverCanvas ? touchX : W / 2; aimY = hoverCanvas ? touchY : H * .45; }
+  hoverCanvas = true; firing = true;
+}, { passive: false });
+cv.addEventListener('touchmove', e => {
+  e.preventDefault(); const px = touchX, py = touchY; touchFrom(e.touches[0]);
+  aimX = clamp(aimX + (touchX - px) * AIM_SPEED, 0, W); aimY = clamp(aimY + (touchY - py) * AIM_SPEED, 0, H);
+}, { passive: false });
+for (const ev of ['touchend', 'touchcancel']) cv.addEventListener(ev, e => { if (e.touches.length) touchFrom(e.touches[0]); else firing = false; });
 const KONAMI = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA']; let kIdx = 0;
 addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
@@ -1110,7 +1123,7 @@ if (hadSave) { $('#titleCta').textContent = '[ CLICK TO RESUME THE OUTAGE ]'; $(
 titleEl.addEventListener('click', () => {
   initAudio(); titleEl.classList.add('gone'); setTimeout(() => titleEl.remove(), 600);
   if (hadSave) applyOffline(true);
-  else later.push({ t: .5, f: () => toast('crosshair', 'Hold the mouse to fire', 'Take down every server. Spend downtime $ on agents in the panel.', '#ffd23f') });
+  else later.push({ t: .5, f: () => toast('crosshair', matchMedia('(pointer: coarse)').matches ? 'Drag anywhere to aim, hold to fire' : 'Hold the mouse to fire', 'Take down every server. Spend downtime $ on agents in the panel.', '#ffd23f') });
 });
 startLevel();
 let last = performance.now(), perfT = 0, perfN = 0, uiT = 0;
