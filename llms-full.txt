@@ -91,7 +91,7 @@ Golden packages fly across the sky. Shoot one and a random effect fires:
 - MAKE NO MISTAKES: shots home in and hit x50 for 15 seconds
 - @GROK IS THIS TRUE?: a big cash payout, or "Readers added context" and a small one
 - IT'S SO OVER: agents x0.25, then WE'RE SO BACK at x12
-- COMPACTING CONVERSATION…: every server loses 60% HP
+- COMPACTING CONVERSATION…: every server takes damage equal to 60% of its max HP (15% for a boss)
 - HOTFIX: auto-resolves the incident, or takes 10% off a boss
 - ULTRATHINK: boss timer frozen and shots x10 for 20 seconds
 - OUR GPUS ARE MELTING: fire rate x3 for 15 seconds
@@ -99,7 +99,7 @@ Golden packages fly across the sky. Shoot one and a random effect fires:
 - 529 OVERLOADED_ERROR: everything deals x3 for 15 seconds
 - --dangerously-skip-permissions: YOLO MODE, agents x15 for 10 seconds, and the linters notice
 - RALPH WIGGUM LOOP: "I'm helping!" Rolls 3 more zero-days
-- AGI ACHIEVED INTERNALLY: an hour of downtime money, delivered
+- AGI ACHIEVED INTERNALLY: a cash payout of up to an hour of income (capped at 30% of the cash you hold)
 
 ### Frontier drops
 
@@ -120,7 +120,7 @@ Every 5th incident is a timed boss fight against legacy infrastructure, includin
 
 ## Prestige layer 1: Pivot to AI
 
-From incident 25 you can pivot to AI: burn the company down and restart for hype. Each hype permanently adds +10% damage. Hype can also be spent on the Board of Directors:
+From incident 25 you can pivot to AI: burn the company down and restart for hype. Each unspent hype adds +10% damage (+12% after the Air-Gapped postmortem). Hype can also be spent on the Board of Directors, which trades that bonus for upgrades that survive pivots:
 
 - Series A: agent DPS
 - Growth Hacker: more $
