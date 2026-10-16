@@ -135,7 +135,7 @@ const ECON = (() => {
     { name: 'AI SLOP', icon: 'code', sub: 'autocomplete spray', cd: .14, mult: 1, col: '#5dff9b', spr: 'green' },
     { name: 'NPM INSTALL', icon: 'package', sub: '8 deps · hits crowds', cd: .9, mult: 1.1, col: '#ffd23f', spr: 'yel' },
     { name: 'DROP TABLE', icon: 'bomb', sub: '30x · splash · boss killer', cd: 2.4, mult: 30, col: '#ff4d6d', spr: 'red' },
-    { name: 'VIBE CODE', icon: 'target', sub: '3 homing vibes', cd: 1.2, mult: 2.2, col: '#c77dff', spr: 'vio' },
+    { name: 'VIBE CODE', icon: 'target', sub: '3 homing vibes', cd: 1.2, mult: 5, col: '#c77dff', spr: 'vio' },
   ];
 
   // ───────────── levels ("incidents") ─────────────
@@ -170,6 +170,8 @@ const ECON = (() => {
       : u.kind === 'global' ? S.maxLevel >= u.need : !!S.upg[u.id];
   const active = (S, u) => u.kind === 'cannon' ? !!S.upg[u.id] : S.challenge !== 'notests' && reached(S, u);
   const milestones = S => UPGRADES.filter(u => u.kind !== 'cannon' && active(S, u));
+  // Calibre adds flat damage (early game) plus a sliver of agent DPS, so it never goes dead late.
+  const CAL_PCT = 1e-4;
   const cannonCost = (S, n = 1) => { const b = 10 * Math.pow(1.09, S.cannon); return b * (Math.pow(1.09, n) - 1) / .09; };
   const cannonMax = (S, cash) => Math.max(0, Math.floor(Math.log(cash * .09 / (10 * Math.pow(1.09, S.cannon)) + 1) / Math.log(1.09)));
 
@@ -251,7 +253,7 @@ const ECON = (() => {
     if (dn.notests) global *= 3;
     if (dn.freeze) pct += .1;
     if (dn.ratelimit) rate *= 1.5;
-    pct += .05 * lv(S.rust, 'blazing');
+    pct += .05 * lv(S.rust, 'blazing') + S.cannon * CAL_PCT;
     critMult *= Math.pow(2, lv(S.rust, 'unsafe'));
 
     const ach = 1 + .03 * Object.keys(S.ach).length;
@@ -292,7 +294,7 @@ const ECON = (() => {
   }
   return {
     T, AGENTS, UPGRADES, UPG, TIER_AT, WEAPONS, BOARD, RUST, CHALLENGES, CHALLENGE_PIVOTS, PER_LEVEL, BOSS_EVERY, FINAL, PIVOT_LEVEL, RUST_LEVEL,
-    isBoss, hp, reward, bossName, agentCost, maxAfford, upgCost, cannonCost, cannonMax, boardCost, rustCost, crabsFor,
+    isBoss, hp, reward, bossName, agentCost, maxAfford, upgCost, CAL_PCT, cannonCost, cannonMax, boardCost, rustCost, crabsFor,
     hypeTotal, pendingHype, hypeEach, lv, derive, shotDamage, reached, active, milestones, newRun, fresh,
   };
 })();

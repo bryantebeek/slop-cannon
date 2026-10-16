@@ -770,7 +770,7 @@ const BUILD = {
     { // the cannon itself is the first "hire" (Clicker Heroes' click hero)
       const own = h('span', { class: 'rcount' }), st = h('div', { class: 'rstat' });
       const btn = costBtn('CALIBRE', () => buyCannon(buyMode === 'max' ? Math.max(1, E.cannonMax(S, S.cash)) : buyMode));
-      list.append(row({ col: COL.cannon, ic: 'crosshair', name: 'Slop Cannon (you)', right: own, desc: 'Hold the mouse on prod to fire. Calibre adds base damage.', extra: [st], action: btn, cls: 'accent' }));
+      list.append(row({ col: COL.cannon, ic: 'crosshair', name: 'Slop Cannon (you)', right: own, desc: 'Hold the mouse on prod to fire. Each calibre adds base damage and +0.01% of agent DPS per shot.', extra: [st], action: btn, cls: 'accent' }));
       rows.push(() => {
         const n = buyMode === 'max' ? Math.max(1, E.cannonMax(S, S.cash)) : buyMode, c = E.cannonCost(S, n);
         setText(own, 'Lv ' + S.cannon);
@@ -833,13 +833,13 @@ const BUILD = {
       list.append(row({ col: COL.cannon, ic: u.icon, name: u.name, desc: u.flav, action: S.upg[u.id] ? h('div', { class: 'check' }, icon('check-circle')) : b, cls: S.upg[u.id] ? 'done' : '', tip: () => upgTip(u) }));
       if (!S.upg[u.id]) rows.push(() => { const c = E.upgCost(S, u); setBuy(b, 'BUY', money(c), c <= S.cash); });
     }
-    tabBody.append(hint('crosshair', 'Hold the mouse on the battlefield to fire. Shots scale with calibre plus a % of your agent DPS. Shoot golden 0-DAYs and linter drones!'),
+    tabBody.append(hint('crosshair', 'Hold the mouse on the battlefield to fire. Shots deal base damage plus a % of your agent DPS; calibre and mods raise both. Shoot golden 0-DAYs and linter drones!'),
       h('div', { class: 'split' }, hero, h('div', {}, h('div', { class: 'sechead' }, h('span', {}, 'Cannon mods'), h('span', {}, 'the only upgrades you buy')), list)));
     return () => {
       const n = buyMode === 'max' ? Math.max(1, E.cannonMax(S, S.cash)) : buyMode, c = E.cannonCost(S, n), WP = E.WEAPONS[S.weapon];
       setHTML(lvl, `Lv ${S.cannon}<small>calibre</small>`); setText(sub, `${fmt(shotDmg(WP.mult))} damage per shot`);
       setBuy(btn, `+${n} CALIBRE`, money(c), c <= S.cash);
-      setHTML(info, stat('sword', 'Base damage', fmt(D.shotBase)) + stat('percent', 'Of agent DPS', (D.pct * 100).toFixed(0) + '%') + stat(WP.icon, 'Mode', `${WP.name} x${WP.mult}`, WP.col) + stat('crosshair', 'Shot damage', fmt(shotDmg(WP.mult)), COL.cannon) +
+      setHTML(info, stat('sword', 'Base damage', fmt(D.shotBase)) + stat('percent', 'Of agent DPS', +(D.pct * 100).toFixed(2) + '%') + stat(WP.icon, 'Mode', `${WP.name} x${WP.mult}`, WP.col) + stat('crosshair', 'Shot damage', fmt(shotDmg(WP.mult)), COL.cannon) +
         stat('clover', 'Crit chance', (Math.min(1, D.crit) * 100).toFixed(0) + '%', '#5dff9b') + stat('fire', 'Crit damage', 'x' + fmt(D.critMult), '#ff8a3d') + stat('gauge', 'Fire rate', (D.rate / WP.cd).toFixed(1) + '/s') + stat('timer', 'Cron job', D.cron ? D.cron + ' shots/s' : '—', COL.hype));
       rows.forEach(f => f());
     };

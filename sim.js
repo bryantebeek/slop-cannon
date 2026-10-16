@@ -9,7 +9,7 @@ let t = 0, log = [], nextMark = [10, 25, 40, 60, 80, 100, 120, 140, 160, 180, 20
 
 function eff(S) {
   const D = E.derive(S);
-  const shots = active ? 6 * D.rate : D.cron * .5;
+  const shots = active || !S.agents[0] ? 6 * D.rate : D.cron * .5; // the idle player clicks only until the first hire
   const crit = 1 + Math.min(1, D.crit) * (D.critMult - 1);
   return D.dps + shots * E.shotDamage(D) * crit;
 }
@@ -32,6 +32,17 @@ function earn(S, x) { S.cash += x; S.runEarned += x; S.eraEarned += x; S.totalEa
 function pivot(S) {
   const h = E.pendingHype(S); S.hype += h; S.hypeClaimed += h; S.pivots++;
   E.newRun(S);
+  // run the easiest open postmortem we've comfortably outgrown (the game restarts those at incident 1)
+  const ch = S.pivots >= E.CHALLENGE_PIVOTS && E.CHALLENGES.filter(c => !S.chDone[c.id] && c.goal < S.eraMax * .7).sort((a, b) => a.goal - b.goal)[0];
+  if (ch) { S.challenge = ch.id; S.level = S.maxLevel = 1; log.push(`    postmortem ${ch.name}`); }
+}
+function rust(S) {
+  const c = E.crabsFor(S.eraMax); S.crabs += c; S.crabsEver += c; S.rusts++;
+  S.hype = S.hypeClaimed = S.eraEarned = 0; S.eraMax = 1; S.challenge = null; E.newRun(S);
+  for (;;) { // spend crabs on the cheaper of damage and hype gain
+    const r = ['safety', 'fearless'].map(id => E.RUST.find(r => r.id === id)).map(r => ({ r, c: E.rustCost(r, E.lv(S.rust, r.id)) })).sort((a, b) => a.c - b.c)[0];
+    if (r.c > S.crabs) break; S.crabs -= r.c; S.rust[r.r.id] = E.lv(S.rust, r.r.id) + 1;
+  }
 }
 let stuckFor = 0, runStart = 0;
 const HOURS = +(process.argv[3] || 40);
@@ -50,9 +61,16 @@ while (t < 3600 * HOURS && S.maxLevel <= E.FINAL) {
     t += tt; earn(S, E.PER_LEVEL * E.reward(l) * g); S.level++;
     if (tt > 90) stuckFor += tt; else stuckFor = 0;
   }
-  S.maxLevel = Math.max(S.maxLevel, S.level - 1);
+  S.maxLevel = Math.max(S.maxLevel, S.level - 1); S.eraMax = Math.max(S.eraMax, S.maxLevel);
+  const ch = S.challenge && E.CHALLENGES.find(c => c.id === S.challenge);
+  if (ch && S.maxLevel > ch.goal) { S.chDone[ch.id] = 1; S.challenge = null; log.push(`    done ${ch.name} at ${(t / 60).toFixed(1)} min`); }
   while (nextMark.length && S.maxLevel >= nextMark[0]) { log.push(`lvl ${nextMark[0]} @ ${(t / 60).toFixed(1)} min (pivots ${S.pivots}, hype ${S.hype})`); nextMark.shift(); }
-  const ph = E.pendingHype(S);
+  const ph = E.pendingHype(S), crabs = E.crabsFor(S.eraMax);
+  if (stuckFor > 120 && crabs >= Math.max(2, S.crabsEver)) {
+    log.push(`  RUST #${S.rusts + 1} at ${(t / 60).toFixed(1)} min, era best ${S.eraMax}, +${crabs} crabs`);
+    rust(S); stuckFor = 0; runStart = t; continue;
+  }
+  if (ch && stuckFor > 600) { log.push(`    gave up on ${ch.name}`); pivot(S); stuckFor = 0; runStart = t; continue; }
   if (S.maxLevel >= PIV && stuckFor > 120 && ph > Math.max(3, S.hype * (+process.env.pr || .5))) {
     if (!firstPivot) firstPivot = t;
     log.push(`  pivot #${S.pivots + 1} at ${(t / 60).toFixed(1)} min, reached ${S.maxLevel}, run ${((t - runStart) / 60).toFixed(1)} min, +${ph} hype`);

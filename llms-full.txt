@@ -63,7 +63,7 @@ There are 129 milestones in total.
 
 ## The cannon
 
-The Slop Cannon is the part you aim yourself. Upgrading its calibre raises base damage. Cannon mods add a share of your agent DPS to every shot, raise crit chance, or speed up the fire rate.
+The Slop Cannon is the part you aim yourself. Upgrading its calibre raises base damage and adds 0.01% of your agent DPS to every shot per level. Cannon mods add a share of your agent DPS to every shot, raise crit chance, or speed up the fire rate.
 
 ### Cannon modes
 
@@ -72,7 +72,7 @@ The Slop Cannon is the part you aim yourself. Upgrading its calibre raises base 
 | AI SLOP | 1 | Autocomplete spray. Fast, the default. |
 | NPM INSTALL | 2 | Splits into 8 dependencies mid-air and hits crowds. |
 | DROP TABLE | 3 | 30x damage with splash. The boss killer. |
-| VIBE CODE | 4 | 3 homing vibes that never miss (allegedly). |
+| VIBE CODE | 4 | 3 homing vibes at 5x each that never miss (allegedly). |
 
 ### Upgrades
 

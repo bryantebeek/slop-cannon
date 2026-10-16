@@ -22,10 +22,11 @@ for (const u of E.UPGRADES.filter(u => u.eff.global)) check(`company ${u.id} at 
 for (const u of E.UPGRADES.filter(u => u.eff.gold)) check(`company gold ${u.id}`, atLevel('gold', u), u.eff.gold);
 { const S = base(); S.agents[0] = 300; S.challenge = 'notests'; check('No Tests: milestones off', E.derive(S).agentMult[0], 1); }
 for (const u of E.UPGRADES.filter(u => u.eff.rate)) check(`rate ${u.id}`, ratio('rate', S => { S.upg[u.id] = 1; }), u.eff.rate);
-{ const S = base(), ups = E.UPGRADES.filter(u => u.eff.pct); ups.forEach(u => S.upg[u.id] = 1); check('shot %-of-DPS upgrades add up', E.derive(S).pct, ups.reduce((a, u) => a + u.eff.pct, 0)); }
+{ const S = base(), ups = E.UPGRADES.filter(u => u.eff.pct); ups.forEach(u => S.upg[u.id] = 1); check('shot %-of-DPS upgrades add up', E.derive(S).pct, ups.reduce((a, u) => a + u.eff.pct, S.cannon * E.CAL_PCT)); }
+check('each calibre adds 0.01% of DPS', ratio('dps', S => { S.cannon += 100; }, D => D.pct * D.dps) / ratio('dps', () => {}, D => D.pct * D.dps), 1 + 100 / 10); // base has 10 calibre, no mods
 
 // shots really include the %-of-DPS part
-{ const S = base(); S.upg.c_kb = 1; const D = E.derive(S); check('shot = base + 1% dps', E.shotDamage(D), D.shotBase + .01 * D.dps); check('shot with x7 frenzy', E.shotDamage(D, 7), D.shotBase + .07 * D.dps); }
+{ const S = base(); S.upg.c_kb = 1; const D = E.derive(S), p = .01 + S.cannon * E.CAL_PCT; check('shot = base + 1% dps + calibre', E.shotDamage(D), D.shotBase + p * D.dps); check('shot with x7 frenzy', E.shotDamage(D, 7), D.shotBase + 7 * p * D.dps); }
 
 // prestige & meta sources apply to agents AND the cannon
 const both = (name, mut, want) => { check(`${name} (agents)`, ratio('dps', mut), want); check(`${name} (cannon)`, ratio('shotBase', mut), want); };
