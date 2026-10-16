@@ -118,6 +118,8 @@ function checkMilestones() {
 }
 
 // ───────────── prestige ─────────────
+// How much harder you hit after pivoting: hype's bonus is additive, so show it as the real multiplier.
+const pivotX = p => 'x' + ((1 + (S.hype + p) * E.hypeEach(S)) / (1 + S.hype * E.hypeEach(S))).toFixed(2);
 function canPivot() { return S.maxLevel >= E.PIVOT_LEVEL && E.pendingHype(S) >= 1; }
 function doPivot(intoChallenge = null) {
   const h = E.pendingHype(S);
@@ -865,7 +867,7 @@ const BUILD = {
     return () => {
       const p = E.pendingHype(S);
       setHTML(big, `${fmt(S.hype)}<small>hype</small>`); setText(sub, `+${fmt(S.hype * E.hypeEach(S) * 100)}% damage · +${(E.hypeEach(S) * 100).toFixed(0)}% each`);
-      setHTML(info, (S.maxLevel >= E.PIVOT_LEVEL ? `Pivoting now grants <b class="good">+${fmt(p)} hype</b>, raising your bonus to <b>+${fmt((S.hype + p) * E.hypeEach(S) * 100)}%</b>.` : `Reach incident <b>${E.PIVOT_LEVEL}</b> this run to pivot <span class="dim">(now ${S.maxLevel})</span>. Pending: <b>+${fmt(p)}</b>.`) +
+      setHTML(info, (S.maxLevel >= E.PIVOT_LEVEL ? `Pivoting now grants <b class="good">+${fmt(p)} hype</b>, <b>${pivotX(p)} damage</b> (bonus +${fmt((S.hype + p) * E.hypeEach(S) * 100)}%).` : `Reach incident <b>${E.PIVOT_LEVEL}</b> this run to pivot <span class="dim">(now ${S.maxLevel})</span>. Pending: <b>+${fmt(p)}</b>.`) +
         `<br><span class="f">hype = (downtime this era ÷ ${E.T.hypeDiv})^${E.T.hypeExp} · pivots: ${S.pivots}</span>`);
       pbtn.disabled = !canPivot(); rows.forEach(f => f());
     };
@@ -1011,7 +1013,7 @@ function confirmPivot() {
   const p = E.pendingHype(S);
   modal('Pivot to AI?', `<p>The investors want a new narrative. You'll <b>lose</b>: downtime $, agents, cannon calibre and mods, and incident progress.</p>
     <p>You <b>keep</b>: hype, the Board, trophies, postmortems and crabs.</p>
-    <p class="good">You gain <b>+${fmt(p)} hype</b> → +${fmt((S.hype + p) * E.hypeEach(S) * 100)}% damage.${E.lv(S.board, 'severance') ? ` You'll restart at incident ${1 + 5 * E.lv(S.board, 'severance')}.` : ''}</p>
+    <p class="good">You gain <b>+${fmt(p)} hype</b> → <b>${pivotX(p)} damage</b> (+${fmt((S.hype + p) * E.hypeEach(S) * 100)}% total).${E.lv(S.board, 'severance') ? ` You'll restart at incident ${1 + 5 * E.lv(S.board, 'severance')}.` : ''}</p>
     <p class="dim">Root cause of the old company: ${pick(CAUSES)}.</p>`,
     [{ label: 'Not yet' }, { label: 'Share postmortem', icon: 'share-network', onclick: () => { sharePostmortem('pivot', confirmPivot); return false; } }, { label: `Pivot · +${fmt(p)} hype`, icon: 'rocket-launch', cls: 'primary', onclick: () => doPivot(null) }], { icon: 'rocket-launch', col: COL.hype });
 }

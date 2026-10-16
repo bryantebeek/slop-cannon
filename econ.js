@@ -189,7 +189,7 @@ const ECON = (() => {
   const BOARD = [
     { id: 'seriesA', icon: 'chart-line-up', name: 'Series A', desc: l => `Agent DPS +${l * 25}%`, next: '+25% agent DPS', base: 1, g: 1.2 },
     { id: 'growth', icon: 'trend-up', name: 'Growth Hacker', desc: l => `Downtime $ +${l * 20}%`, next: '+20% $', base: 1, g: 1.2 },
-    { id: 'cron', icon: 'timer', name: 'Cron Job', desc: l => l ? `Auto-fires ${l} shot${l > 1 ? 's' : ''}/s (50% dmg)` : 'Auto-fires the cannon', next: '+1 auto-shot/s', base: 3, g: 1.6, max: 10 },
+    { id: 'cron', icon: 'timer', name: 'Cron Job', desc: l => l ? `Auto-fires ${l} shot${l > 1 ? 's' : ''}/s (50% dmg), even while AFK or offline` : 'Auto-fires the cannon while you\'re AFK', next: '+1 auto-shot/s (for idlers)', base: 3, g: 1.6, max: 10 },
     { id: 'hiring', icon: 'handshake', name: 'Hiring Manager', desc: l => l ? `Auto-hires agents every ${(8 / l).toFixed(1)}s` : 'Hires agents for you', next: 'faster auto-hire', base: 5, g: 1.8, max: 10 },
     { id: 'deadline', icon: 'hourglass', name: 'Deadline Extension', desc: l => `Boss timer +${l * 3}s`, next: '+3s boss timer', base: 2, g: 1.5, max: 10 },
     { id: 'bounty', icon: 'bug', name: 'Bug Bounty Hunter', desc: l => `Zero-days +${l * 15}% more often, buffs +${l * 10}% longer`, next: '+15% zero-days', base: 3, g: 1.5, max: 10 },
