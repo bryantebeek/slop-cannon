@@ -194,7 +194,7 @@ const NEWS = [
   ['10x engineer turns out to be 10 agents in a hoodie', S => S.agents[7] >= 1],
   ['Consultancy bills $2M for a slide titled "Synergy"', S => S.agents[8] >= 1],
   ['Hallucinated npm package hits 1M weekly downloads; nobody can say who wrote it, including it', S => S.agents[9] >= 1],
-  ['Self-replicating startup raises a Series A from itself at a $10B valuation', S => S.agents[10] >= 1],
+  ['GPT wrapper startup raises a Series A from itself at a $10B valuation', S => S.agents[10] >= 1],
   ['Paperclip demand up 40,000%; analysts baffled', S => S.agents[11] >= 1],
   ['AGI achieved. Source code leak reveals four if-statements', S => S.agents[12] >= 1],
   ['The Singularity achieves recursive self-improvement; improves its LinkedIn headline 40,000 times', S => S.agents[13] >= 1],

@@ -42,7 +42,7 @@ check('Legacy Code x2', ratio('bossGold', S => { S.board.legacy = 2; }), 2);
 check('Friday reward', ratio('bossGold', S => { S.chDone.friday = 1; }), 3);
 check('Bug Bounty x2 zero-days', ratio('golden', S => { S.board.bounty = 2; }), 1.3);
 check('unsafe {} x2 crit', ratio('critMult', S => { S.rust.unsafe = 2; }), 4);
-check('Blame Game crit', ratio('critMult', S => { S.upg.c_blame = 1; }), 2);
+check('Blame the Model crit', ratio('critMult', S => { S.upg.c_blame = 1; }), 2);
 check('Legacy Only reward', ratio(null, S => { S.chDone.legacy4 = 1; }, D => D.agentDps[0]), 100);
 check('Monorepo reward', ratio('dps', S => { S.chDone.monorepo = 1; }), 10);
 check('Code Freeze: agents off', ratio('dps', S => { S.challenge = 'freeze'; }) + 1, 1);

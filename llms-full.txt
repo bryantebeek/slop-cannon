@@ -52,7 +52,7 @@ Agents are the idle generators. They fire slop at prod on their own. Each hire c
 8. 10x Engineer: Ten agents in a hoodie. Refuses code review on principle.
 9. AI Consultancy: Bills by the token. Delivers a 400-slide deck.
 10. Hallucination Engine: Invents packages. Someone else publishes them.
-11. Self-Replicating Startup: Raises a seed round, forks itself, raises again.
+11. GPT Wrapper Startup: One system prompt and a $40M seed round. Forks itself every demo day.
 12. Paperclip Maximizer: Converts your infrastructure into paperclips. Efficiently.
 13. AGI (4 if-statements): Achieved general intelligence. It is mostly else-ifs.
 14. The Singularity: Improves itself. Mostly its own LinkedIn.
@@ -76,7 +76,7 @@ The Slop Cannon is the part you aim yourself. Upgrading its calibre raises base 
 
 ### Upgrades
 
-- Cannon mods: npm install, Mechanical Keyboard, Lucky Deploy (crits deal 10x), DROP TABLE, RGB Lighting, Overclocked Fan, VIBE CODE, Standing Desk, Production Hotfix, Blame Game ("It was the intern"), Gaming Chair, Liquid Cooling, Second Monitor, Vertical Third Monitor, Neuralink Keybinds.
+- Cannon mods: npm install, Mechanical Keyboard, Temperature 2.0 (crits deal 10x), DROP TABLE, RGB Lighting, Speculative Decoding, VIBE CODE, Standing Desk, Production Hotfix, Blame the Model ("The AI wrote that part"), Gaming Chair, Liquid Cooling, Second Monitor, Vertical Third Monitor, Neuralink Keybinds.
 - Global upgrades: Kubernetes ("Nobody knows how it works, including it"), Bug Bounty Program, Microservices ("One outage became forty"), Edge Caching, Serverless ("There are still servers"), Put It On The Blockchain ("Immutable outages"), Add AI To Everything ("Including the toaster"), Quantum Slop, Infinite VC Money ("Burn rate: yes").
 - Synergies between agents: Pair Programming, Prompt Autocomplete, Mentorship (Vibes Only), Agentic Vibes, Hoodie Hive, Hallucinated Deliverables, Clip-Powered Growth, Sentient Datacenter.
 
