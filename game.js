@@ -205,6 +205,7 @@ function levelClear() {
   if (boss) { sfx.clear(); banner(l === E.FINAL ? 'us-east-1 IS DOWN' : 'LEGACY SYSTEM DECOMMISSIONED', l === E.FINAL ? 'half the internet is offline' : `incident ${l} resolved`, '#5dff9b'); }
   else sfx.level();
   if (S.challenge) { const c = E.CHALLENGES.find(c => c.id === S.challenge); if (c && S.maxLevel > c.goal) completeChallenge(); }
+  if (boss && l < E.FINAL && !S.seenUnlocks.shareNudge) { S.seenUnlocks.shareNudge = 1; later.push({ t: 2.5, f: () => toast('share-network', 'Postmortem filed', 'Share the incident report from the Stats tab.', COL.info) }); }
   if (l === E.FINAL && !S.seenUnlocks.ending) { S.seenUnlocks.ending = 1; later.push({ t: 2.5, f: showEnding }); }
   markDirty(true);
 }
@@ -300,7 +301,7 @@ function kill(s, kind) {
     S.stats.bosses++; if (kind === 'drop') G.dropBoss = true; if (bossT < 1) G.closeCall = true;
   }
   shake += (boss ? 2 : .5) * QUALITY.shake; redFlash = boss ? .35 : .12; sfx.boom(boss ? 2 : .6);
-  G.combo = G.comboT > 0 ? G.combo + 1 : 1; G.comboT = 2.5; comboPop = 1; G.bestCombo = Math.max(G.bestCombo, G.combo);
+  G.combo = G.comboT > 0 ? G.combo + 1 : 1; G.comboT = 2.5; comboPop = 1; G.bestCombo = Math.max(G.bestCombo, G.combo); S.stats.combo = Math.max(S.stats.combo, G.combo);
   const l = S.level, gold = E.reward(l) * s.rmult * D.gold * goldBuff() * (boss ? D.bossGold : 1) * (1 + .01 * Math.min(G.combo - 1, 50));
   earn(gold); S.stats.kills++; if (G.idleT > 300) G.idleKills++;
   say(cx, s.h + 1.6, cz, '+' + money(gold), '#ffd23f', boss ? 2 : 1.1, 1.6, 1); coins(cx, s.h, cz, boss ? 30 : 6); sfx.coin();
@@ -915,13 +916,13 @@ const BUILD = {
   },
   stats() {
     const box = h('div', { class: 'statgrid wide' });
-    tabBody.append(box);
+    tabBody.append(h('button', { class: 'btn primary', style: 'margin-bottom:12px', onclick: () => sharePostmortem('stats') }, icon('share-network'), 'Share postmortem'), box);
     return () => setHTML(box, [
       ['coins', 'Downtime this run', money(S.runEarned), COL.cash], ['coins', 'This era', money(S.eraEarned), COL.cash], ['bank', 'All time', money(S.totalEarned), COL.cash], ['trend-up', 'Idle income', money(incomePerSec()) + '/s', COL.good],
       ['hard-drives', 'Current incident', S.level], ['flag', 'Best this run', S.maxLevel], ['crown-simple', 'Best ever', S.allMax, COL.trophy], ['lightning', 'Damage mult', 'x' + fmt(D.dmg)],
       ['timer', 'Run time', fmtTime(S.runTime)], ['clock', 'Time played', fmtTime(S.stats.played)], ['rocket-launch', 'Pivots', S.pivots, COL.hype], ['gear-six', 'Rewrites', S.rusts, COL.crab],
       ['skull', 'Servers down', fmt(S.stats.kills), COL.bad], ['bank', 'Bosses', fmt(S.stats.bosses), COL.bad], ['crosshair', 'Shots fired', fmt(S.stats.shots), COL.cannon], ['clover', 'Crits', fmt(S.stats.crits), COL.good],
-      ['coin', 'Zero-days', fmt(S.stats.golden), COL.cash], ['speaker-slash', 'Linters down', fmt(S.stats.drones)], ['link-simple', 'Best combo', G.bestCombo, '#ff8a3d'], ['island', 'Earned offline', money(S.stats.offline), COL.good],
+      ['coin', 'Zero-days', fmt(S.stats.golden), COL.cash], ['speaker-slash', 'Linters down', fmt(S.stats.drones)], ['link-simple', 'Best combo', fmt(S.stats.combo), '#ff8a3d'], ['island', 'Earned offline', money(S.stats.offline), COL.good],
       ['robot', 'Agents owned', fmt(S.agents.reduce((a, b) => a + b, 0)), COL.good], ['target', 'Milestones', E.milestones(S).length, COL.ms],
     ].map(([ic, k, v, c]) => stat(ic, k, v, c)).join(''));
   },
@@ -971,7 +972,7 @@ function confirmPivot() {
     <p>You <b>keep</b>: hype, the Board, trophies, postmortems and crabs.</p>
     <p class="good">You gain <b>+${fmt(p)} hype</b> → +${fmt((S.hype + p) * E.hypeEach(S) * 100)}% damage.${E.lv(S.board, 'severance') ? ` You'll restart at incident ${1 + 5 * E.lv(S.board, 'severance')}.` : ''}</p>
     <p class="dim">Root cause of the old company: ${pick(CAUSES)}.</p>`,
-    [{ label: 'Not yet' }, { label: `Pivot · +${fmt(p)} hype`, icon: 'rocket-launch', cls: 'primary', onclick: () => doPivot(null) }], { icon: 'rocket-launch', col: COL.hype });
+    [{ label: 'Not yet' }, { label: 'Share postmortem', icon: 'share-network', onclick: () => { sharePostmortem('pivot', confirmPivot); return false; } }, { label: `Pivot · +${fmt(p)} hype`, icon: 'rocket-launch', cls: 'primary', onclick: () => doPivot(null) }], { icon: 'rocket-launch', col: COL.hype });
 }
 function confirmRust() {
   const c = E.crabsFor(S.eraMax); if (c < 1) return;
@@ -982,7 +983,7 @@ function showEnding() {
   modal('us-east-1 is DOWN', `<p>Half the internet is offline. Status pages everywhere still say <i>"All Systems Operational."</i></p>
     <p>Nobody can tell the difference.</p>
     <p class="dim">You took down ${fmt(S.stats.kills)} servers over ${fmtTime(S.stats.played)}, with ${S.pivots} pivots and ${S.rusts} rewrites. Root cause: you.</p>
-    <p class="good">Thanks for playing SLOP CANNON. The incidents keep going if you do — servers just get angrier.</p>`, [{ label: 'git push --force (continue)', icon: 'git-branch', cls: 'primary' }], { icon: 'cloud-slash', col: COL.info });
+    <p class="good">Thanks for playing SLOP CANNON. The incidents keep going if you do — servers just get angrier.</p>`, [{ label: 'Share postmortem', icon: 'share-network', onclick: () => { sharePostmortem('finale'); return false; } }, { label: 'git push --force (continue)', icon: 'git-branch', cls: 'primary' }], { icon: 'cloud-slash', col: COL.info });
 }
 function updateUI() {
   updateTop(); tabsVisibility();

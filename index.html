@@ -341,7 +341,8 @@ kbd{font:800 10px var(--mono);padding:1px 5px;border-radius:5px;border:1px solid
 .mhead h2{margin:0;font:900 19px/1.2 var(--disp);letter-spacing:.5px}
 .mbody p{margin:9px 0;line-height:1.6}
 .mbody .big{font:900 30px var(--disp)}
-.mbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+.mbtns{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;margin-top:18px}
+.pmimg{display:block;width:100%;border-radius:12px;border:1px solid var(--line2);box-shadow:0 12px 40px rgba(0,0,0,.5)}
 .savebox{width:100%;height:120px;background:#06020d;color:var(--green);border:1px solid var(--line2);border-radius:10px;font:11px var(--mono);padding:10px;resize:none;user-select:text}
 @keyframes fade{from{opacity:0}}
 
@@ -451,10 +452,11 @@ kbd{font:800 10px var(--mono);padding:1px 5px;border-radius:5px;border:1px solid
   <div id="titleSub">Your progress saves automatically and keeps earning while you're away.</div>
   <div class="foot">No real servers were harmed. They were already like this.</div>
 </div>
-<script src="econ.js?v=202610150959"></script>
-<script src="content.js?v=202610150959"></script>
-<script src="scene.js?v=202610150959"></script>
-<script src="game.js?v=202610150959"></script>
+<script src="econ.js?v=202610161400"></script>
+<script src="content.js?v=202610161400"></script>
+<script src="scene.js?v=202610161400"></script>
+<script src="game.js?v=202610161400"></script>
+<script src="share.js?v=202610161400"></script>
 <script>if ('serviceWorker' in navigator && location.protocol === 'https:') addEventListener('load', () =>
   Promise.all([navigator.serviceWorker.register('/sw.js').then(() => navigator.serviceWorker.ready), document.fonts.ready])
     .then(([r]) => r.active.postMessage(['/', ...performance.getEntriesByType('resource').map(e => e.name).filter(u => u.startsWith('http'))])));</script>
