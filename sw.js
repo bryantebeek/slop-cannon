@@ -1,5 +1,8 @@
 // Offline support: network-first for everything, so online players always get the latest deploy
 // and the last-seen version still loads with no connection.
+// Never rename: network-first already refreshes entries, and a rename would wipe offline play
+// mid-update (the new worker deletes the old cache before the page re-posts its resources).
+// ponytail: superseded ?v= script entries pile up (~4 small files per deploy); prune if it ever matters.
 const CACHE = 'slop-cannon-v2';
 // One page, one key: /?utm_source=slack and / must not cache separate (and diverging) copies.
 const keyOf = req => req.mode === 'navigate' ? '/' : req;

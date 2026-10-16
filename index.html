@@ -455,6 +455,8 @@ kbd{font:800 10px var(--mono);padding:1px 5px;border-radius:5px;border:1px solid
 <script src="content.js?v=202610150959"></script>
 <script src="scene.js?v=202610150959"></script>
 <script src="game.js?v=202610150959"></script>
-<script>if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('/sw.js').then(() => navigator.serviceWorker.ready).then(r => r.active.postMessage(['/', ...performance.getEntriesByType('resource').map(e => e.name).filter(u => u.startsWith('http'))]));</script>
+<script>if ('serviceWorker' in navigator && location.protocol === 'https:') addEventListener('load', () =>
+  Promise.all([navigator.serviceWorker.register('/sw.js').then(() => navigator.serviceWorker.ready), document.fonts.ready])
+    .then(([r]) => r.active.postMessage(['/', ...performance.getEntriesByType('resource').map(e => e.name).filter(u => u.startsWith('http'))])));</script>
 </body>
 </html>
