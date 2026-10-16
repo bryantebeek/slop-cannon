@@ -77,7 +77,7 @@ function resize() {
   const r = cv.parentElement.getBoundingClientRect();
   DPR = Math.min(window.devicePixelRatio || 1, maxDPR); W = Math.max(1, r.width); H = Math.max(1, r.height);
   cv.width = W * DPR | 0; cv.height = H * DPR | 0;
-  F = Math.min(H * .5 / Math.tan(.5), W * .5 / Math.tan(.75));
+  F = Math.min(H * .5 / Math.tan(.5), W * .5 / Math.tan(.62)); // .62 rad half-FOV just fits the spawn wedge (|x| ≤ .62z, ~.56 rad) plus pod sway; wider only zooms phones out
   VIG = mk(W, H, x => {
     const g = x.createRadialGradient(W / 2, H / 2, Math.min(W, H) * .35, W / 2, H / 2, Math.max(W, H) * .75);
     g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.72)'); x.fillStyle = g; x.fillRect(0, 0, W, H);
