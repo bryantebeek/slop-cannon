@@ -65,7 +65,7 @@ One HTML page, a canvas, and plain JavaScript. No build step, no framework, no b
 ---
 
 <p align="center">
-  Made with tokens by <a href="https://x.com/bryantebeek">@bryantebeek</a> while working on <a href="https://portfoliodividendtracker.com">PortfolioDividendTracker.com</a>.<br>
+  Made with tokens by <a href="https://x.com/bryantebeek">@bryantebeek</a>.<br>
   Subsidized by Dario, Sam, Elon and Mark.<br><br>
   <i>No real servers were harmed. They were already like this.</i>
 </p>
