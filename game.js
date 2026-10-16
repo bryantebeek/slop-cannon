@@ -50,7 +50,7 @@ const dpsBuff = () => buffs.reduce((m, b) => m * (b.dps || 1), 1);
 const shotBuff = () => buffs.reduce((m, b) => m * (b.click || 1), 1);
 const goldBuff = () => buffs.reduce((m, b) => m * (b.gold || 1), 1);
 const rateBuff = () => buffs.reduce((m, b) => m * (b.rate || 1), 1);
-const G = { zuck: 0, combo: 0, comboT: 0, bestCombo: 0, idleT: 0, idleKills: 0, konami: false, tickerClick: false, dropBoss: false, closeCall: false, muted: false, bossFail: false };
+const G = { rate: [], rateT: 0, rateLast: null, zuck: 0, combo: 0, comboT: 0, bestCombo: 0, idleT: 0, idleKills: 0, konami: false, tickerClick: false, dropBoss: false, closeCall: false, muted: false, bossFail: false };
 
 function applySettings() {
   VOL.sfx = S.settings.sfx; VOL.music = S.settings.music; setVolumes();
@@ -485,6 +485,7 @@ let hireT = 0, cargoT = 0, achT = 0, saveT = 0;
 function sim(dt) {
   refresh();
   S.stats.played += dt; S.runTime += dt; G.idleT += dt;
+  if ((G.rateT += dt) >= 1) { G.rateT -= 1; const e = S.totalEarned - S.stats.offline; if (G.rateLast !== null) G.rate.push(Math.max(0, e - G.rateLast)); G.rateLast = e; if (G.rate.length > 61) G.rate.shift(); }
   // spawn-in animation & server behaviour
   for (const s of servers) {
     if (s.dead) { s.deadT += dt; continue; }
@@ -915,16 +916,56 @@ const BUILD = {
       })));
   },
   stats() {
-    const box = h('div', { class: 'statgrid wide' });
-    tabBody.append(h('button', { class: 'btn primary', style: 'margin-bottom:12px', onclick: () => sharePostmortem('stats') }, icon('share-network'), 'Share postmortem'), box);
-    return () => setHTML(box, [
-      ['coins', 'Downtime this run', money(S.runEarned), COL.cash], ['coins', 'This era', money(S.eraEarned), COL.cash], ['bank', 'All time', money(S.totalEarned), COL.cash], ['trend-up', 'Idle income', money(incomePerSec()) + '/s', COL.good],
-      ['hard-drives', 'Current incident', S.level], ['flag', 'Best this run', S.maxLevel], ['crown-simple', 'Best ever', S.allMax, COL.trophy], ['lightning', 'Damage mult', 'x' + fmt(D.dmg)],
-      ['timer', 'Run time', fmtTime(S.runTime)], ['clock', 'Time played', fmtTime(S.stats.played)], ['rocket-launch', 'Pivots', S.pivots, COL.hype], ['gear-six', 'Rewrites', S.rusts, COL.crab],
-      ['skull', 'Servers down', fmt(S.stats.kills), COL.bad], ['bank', 'Bosses', fmt(S.stats.bosses), COL.bad], ['crosshair', 'Shots fired', fmt(S.stats.shots), COL.cannon], ['clover', 'Crits', fmt(S.stats.crits), COL.good],
-      ['coin', 'Zero-days', fmt(S.stats.golden), COL.cash], ['speaker-slash', 'Linters down', fmt(S.stats.drones)], ['link-simple', 'Best combo', fmt(S.stats.combo), '#ff8a3d'], ['island', 'Earned offline', money(S.stats.offline), COL.good],
-      ['robot', 'Agents owned', fmt(S.agents.reduce((a, b) => a + b, 0)), COL.good], ['target', 'Milestones', E.milestones(S).length, COL.ms],
-    ].map(([ic, k, v, c]) => stat(ic, k, v, c)).join(''));
+    // An observability console for prod: every number here is real, the status page is not.
+    const big = h('div', { class: 'big' }), sub = h('div', { class: 'sub' }), info = h('div', { class: 'info' });
+    const hero = h('div', { class: 'card hero pm' }, h('div', { class: 'top' }, badge('clipboard-text', COL.bad, 'xl'), h('div', {}, big, sub)),
+      h('div', { class: 'ok' }, h('i', { class: 'dot' }), 'All Systems Operational'), info,
+      h('button', { class: 'btn big primary', onclick: () => sharePostmortem('stats') }, icon('share-network'), 'SHARE POSTMORTEM'),
+      h('div', { class: 'f' }, '1200×630 report card for X, Slack and the group chat'));
+    const panel = (ic, col, title) => { const note = h('small'), body = h('div'); return [h('div', { class: 'card dash', style: `--c:${col}` }, h('h3', {}, h('span', {}, icon(ic), title), note), body), note, body]; };
+    const [chart, chartNote, chartBody] = panel('chart-line-up', COL.cash, 'Downtime / sec'), [road, roadNote, roadBody] = panel('flag-checkered', COL.good, 'Road to us-east-1');
+    const [blame, blameNote, blameBody] = panel('magnifying-glass', COL.bad, 'Root cause analysis'), kpis = h('div', { class: 'kgroups' });
+    tabBody.append(h('div', { class: 'split' }, hero, h('div', {}, h('div', { class: 'dashrow' }, chart, road), blame, kpis)));
+    const pct = (a, b) => b ? (a / b * 100 < .1 && a ? '<0.1' : (a / b * 100).toFixed(1)) + '%' : '—';
+    const kpi = (ic, k, v, s) => `<div class="k"><span>${IC(ic)}${k}</span><b>${v}</b><small>${s}</small></div>`;
+    const group = (ic, col, title, ...ks) => `<div class="card kg" style="--c:${col}"><h3><span>${IC(ic)}${title}</span></h3><div class="kgrid">${ks.join('')}</div></div>`;
+    return () => {
+      const d = postmortemData('stats'), st = S.stats, mins = Math.max(st.played / 60, 1), agents = S.agents.reduce((a, b) => a + b, 0);
+      setHTML(big, `${money(S.totalEarned)}<small>downtime</small>`);
+      setText(sub, `all time · since ${new Date(st.start).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`);
+      setHTML(info, `Headline: <b>incident #${d.lvl}</b>, ${d.name} <b class="bad">DOWN</b>.<br>Root cause: <b>${d.cause}</b>.`);
+      // live chart: real $ earned per second over the last minute
+      const r = G.rate, n = r.length, top = Math.max(...r, 1), avg = n ? r.reduce((a, b) => a + b, 0) / n : 0;
+      setHTML(chartNote, n ? `last ${n}s · peak ${money(top)}/s` : 'collecting…');
+      setHTML(chartBody, `<div class="kv">${money(avg)}<small>/s avg</small></div><div class="kvs">${IC('island')} idle floor ${money(incomePerSec())}/s</div>` +
+        `<svg viewBox="0 0 305 60" preserveAspectRatio="none"><defs><linearGradient id="dg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe680"/><stop offset="1" stop-color="#ffd23f" stop-opacity=".25"/></linearGradient></defs>` +
+        `<path d="M0 .5H305M0 30H305" class="gl"/><path d="M0 ${(60 - avg / top * 60).toFixed(1)}H305" class="avg"/>` +
+        r.map((v, i) => `<rect x="${(61 - n + i) * 5}" y="${(60 - v / top * 60).toFixed(1)}" width="4" height="${Math.max(v / top * 60, .8).toFixed(1)}" rx="1"/>`).join('') + '</svg>');
+      // progress track with the unlocks that matter
+      const at = l => Math.min(l / E.FINAL, 1) * 100, best = S.allMax - 1, run = S.maxLevel - 1;
+      setHTML(roadNote, best >= E.FINAL ? 'DOWN · servers just get angrier' : `${Math.round(best / E.FINAL * 100)}% there`);
+      setHTML(roadBody, `<div class="kv">#${fmt(best)}<small>best incident</small></div><div class="kvs">${IC('flag')} this run #${fmt(run)} · now at #${S.level}</div><div class="track"><i class="fill" style="width:${at(best)}%"></i><i class="run" style="left:${at(run)}%"></i>` +
+        [[E.PIVOT_LEVEL, 'rocket-launch', 'Pivot', COL.hype], [E.RUST_LEVEL, 'gear-six', 'Rust', COL.crab], [E.FINAL, 'cloud-slash', 'us-east-1', COL.info]].map(([l, ic, t, c]) =>
+          `<span class="mk${best >= l ? ' got' : ''}" style="left:${at(l)}%;--c:${c}">${IC(ic)}<b>${t}</b></span>`).join('') + '</div>');
+      // who to blame, by share of agent DPS
+      const share = E.AGENTS.map((a, i) => [a, D.agentDps[i]]).filter(x => x[1] > 0).sort((p, q) => q[1] - p[1]);
+      setHTML(blameNote, `${plural(agents, 'agent')} · ${fmt(D.dps)} DPS`);
+      setHTML(blameBody, share.length ? `<div class="stack">${share.map(([a, v]) => `<i style="flex:${v / D.dps};--c:${a.col}"></i>`).join('')}</div><div class="legend">` +
+        share.slice(0, 5).map(([a, v]) => `<span style="--c:${a.col}">${IC(a.icon)}${a.name}<b>${pct(v, D.dps)}</b></span>`).join('') + (share.length > 5 ? `<span class="more">+${share.length - 5} more</span>` : '') + '</div>'
+        : `<div class="kvs">${IC('user')} No agents yet. Root cause: you, personally.</div>`);
+      setHTML(kpis, group('fire', COL.bad, 'Blast radius',
+        kpi('skull', 'Servers down', fmt(st.kills), `${fmt(st.kills / mins)} per minute`), kpi('bank', 'Bosses', fmt(st.bosses), 'legacy systems retired'),
+        kpi('coin', 'Zero-days', fmt(st.golden), 'golden packages popped'), kpi('speaker-slash', 'Linters down', fmt(st.drones), 'code review, silenced')) +
+        group('crosshair', COL.cannon, 'Firepower',
+        kpi('crosshair', 'Shots fired', fmt(st.shots), `${fmt(st.shots / mins)} per minute`), kpi('clover', 'Crits', fmt(st.crits), `${pct(st.crits, st.shots)} of shots · x${fmt(D.critMult)}`),
+        kpi('link-simple', 'Best combo', 'x' + fmt(st.combo), 'kills in one cascade'), kpi('lightning', 'Damage mult', 'x' + fmt(D.dmg), 'hype × trophies × crabs')) +
+        group('coins', COL.good, 'Burn rate',
+        kpi('coins', 'This run', money(S.runEarned), fmtTime(S.runTime) + ' in'), kpi('coins', 'This era', money(S.eraEarned), 'since the last rewrite'),
+        kpi('island', 'Offline', money(st.offline), 'earned while away'), kpi('trend-up', 'Idle income', money(incomePerSec()) + '/s', 'with nobody watching')) +
+        group('briefcase', COL.hype, 'Corporate',
+        kpi('rocket-launch', 'Pivots', fmt(S.pivots), `${fmt(S.hype)} hype banked`), kpi('gear-six', 'Rewrites', fmt(S.rusts), `${fmt(S.crabs)} crabs`),
+        kpi('target', 'Milestones', E.milestones(S).length, `of ${E.UPGRADES.filter(u => u.kind !== 'cannon').length} active`), kpi('clock', 'Time played', fmtTime(st.played), 'not billable')));
+    };
   },
   settings() {
     const st = S.settings;
