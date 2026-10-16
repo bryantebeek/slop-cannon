@@ -1,9 +1,9 @@
 <p align="center">
-  <a href="https://bryantebeek.github.io/slop-cannon/"><img src="media/keyart.jpg" alt="SLOP CANNON: Idle Ops" width="100%"></a>
+  <a href="https://slopcannonthegame.com/"><img src="media/keyart.jpg" alt="SLOP CANNON: Idle Ops" width="100%"></a>
 </p>
 
 <h3 align="center">
-  <a href="https://bryantebeek.github.io/slop-cannon/">▶ PLAY NOW — free, in your browser, no signup</a>
+  <a href="https://slopcannonthegame.com/">▶ PLAY NOW — free, in your browser, no signup</a>
 </h3>
 
 <p align="center"><i>Production is a suggestion. You are the incident.</i></p>
