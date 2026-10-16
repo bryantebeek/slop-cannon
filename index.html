@@ -436,7 +436,7 @@ kbd{font:800 10px var(--mono);padding:1px 5px;border-radius:5px;border:1px solid
   #chBanner,#buffs{top:150px}
   #toasts{bottom:auto;top:8px;right:8px}.toast{width:290px}
   #toasts .toast:nth-child(n+3){display:none}
-  #foot{gap:10px;padding:5px 8px;font-size:9.5px;flex-wrap:nowrap;white-space:nowrap}#foot>*{flex:none}#foot .subs{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
+  #foot{gap:10px;padding:5px 8px;font-size:9.5px;flex-wrap:nowrap;white-space:nowrap}#foot>*{flex:none}#foot .subs{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}#foot .ongh{display:none}
   .wpn>span:not(.ib){display:none}
 }
 </style>
@@ -478,7 +478,7 @@ kbd{font:800 10px var(--mono);padding:1px 5px;border-radius:5px;border:1px solid
   <footer id="foot">
     <span>Vibed by <a href="https://x.com/bryantebeek" target="_blank" rel="noopener">@bryantebeek</a></span>
     <span class="subs">Subsidized by Dario, Sam, Elon and Mark</span>
-    <a href="https://github.com/bryantebeek/slop-cannon" target="_blank" rel="noopener">Open Slop on GitHub <i class="ph-duotone ph-github-logo"></i></a>
+    <a href="https://github.com/bryantebeek/slop-cannon" target="_blank" rel="noopener" aria-label="Open Slop on GitHub">Open Slop<span class="ongh"> on GitHub</span> <i class="ph-duotone ph-github-logo"></i></a>
   </footer>
 </div>
 <div id="tooltip" hidden></div>
@@ -498,11 +498,11 @@ kbd{font:800 10px var(--mono);padding:1px 5px;border-radius:5px;border:1px solid
   <div id="titleSub">Your progress saves automatically and keeps earning while you're away.</div>
   <div class="foot">No real servers were harmed. They were already like this.</div>
 </div>
-<script src="econ.js?v=202610161900"></script>
-<script src="content.js?v=202610161900"></script>
-<script src="scene.js?v=202610161900"></script>
-<script src="game.js?v=202610161900"></script>
-<script src="share.js?v=202610161900"></script>
+<script src="econ.js?v=202610161930"></script>
+<script src="content.js?v=202610161930"></script>
+<script src="scene.js?v=202610161930"></script>
+<script src="game.js?v=202610161930"></script>
+<script src="share.js?v=202610161930"></script>
 <script>if ('serviceWorker' in navigator && location.protocol === 'https:') addEventListener('load', () =>
   Promise.all([navigator.serviceWorker.register('/sw.js').then(() => navigator.serviceWorker.ready), document.fonts.ready])
     .then(([r]) => r.active.postMessage(['/', ...performance.getEntriesByType('resource').map(e => e.name).filter(u => u.startsWith('http'))])));</script>
