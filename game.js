@@ -565,7 +565,7 @@ function sim(dt) {
   if (buffs.some(b => b.t <= 0)) { const done = buffs.filter(b => b.t <= 0); buffs = buffs.filter(b => b.t > 0); for (const b of done) if (b.then) { addBuff(...b.then); const [, name, desc, , eff] = b.then; toast(eff.icon, name, desc, eff.col); banner(name, desc, eff.col); } markDirty(); }
   G.comboT -= dt; if (G.comboT <= 0) G.combo = 0;
   if (D.hiring) { hireT -= dt; if (hireT <= 0) { hireT = 8 / D.hiring; autoHire(); } }
-  if (E.lv(S.rust, 'cargo')) { cargoT -= dt; if (cargoT <= 0) { cargoT = 1.5; autoBuyCannon(); } }
+  if (E.lv(S.rust, 'cargo') || D.dependabot) { cargoT -= dt; if (cargoT <= 0) { cargoT = E.lv(S.rust, 'cargo') ? 1.5 : 8 / D.dependabot; autoBuyCannon(); } }
   for (let i = later.length - 1; i >= 0; i--) { const l = later[i]; l.t -= dt; if (l.t <= 0) { later.splice(i, 1); l.f(); } }
   achT -= dt; if (achT <= 0) { achT = .5; checkAchievements(); }
   saveT -= dt; if (saveT <= 0) { saveT = 15; save(); }

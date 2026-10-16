@@ -126,6 +126,7 @@ From incident 25 you can pivot to AI: burn the company down and restart for hype
 - Growth Hacker: more $
 - Cron Job: auto-shots every second, even while AFK or offline
 - Hiring Manager: auto-hires agents
+- Dependabot: auto-buys cannon mods and calibre
 - Deadline Extension: longer boss timers
 - Bug Bounty Hunter: more zero-days
 - Golden Parachute: start each run further in

@@ -191,6 +191,7 @@ const ECON = (() => {
     { id: 'growth', icon: 'trend-up', name: 'Growth Hacker', desc: l => `Downtime $ +${l * 20}%`, next: '+20% $', base: 1, g: 1.2 },
     { id: 'cron', icon: 'timer', name: 'Cron Job', desc: l => l ? `Auto-fires ${l} shot${l > 1 ? 's' : ''}/s (50% dmg), even while AFK or offline` : 'Auto-fires the cannon while you\'re AFK', next: '+1 auto-shot/s (for idlers)', base: 3, g: 1.6, max: 10 },
     { id: 'hiring', icon: 'handshake', name: 'Hiring Manager', desc: l => l ? `Auto-hires agents every ${(8 / l).toFixed(1)}s` : 'Hires agents for you', next: 'faster auto-hire', base: 5, g: 1.8, max: 10 },
+    { id: 'dependabot', icon: 'git-pull-request', name: 'Dependabot', desc: l => l ? `Auto-buys cannon mods and calibre every ${(8 / l).toFixed(1)}s` : 'Buys cannon upgrades for you', next: 'faster auto-buy', base: 4, g: 1.8, max: 10 },
     { id: 'deadline', icon: 'hourglass', name: 'Deadline Extension', desc: l => `Boss timer +${l * 3}s`, next: '+3s boss timer', base: 2, g: 1.5, max: 10 },
     { id: 'bounty', icon: 'bug', name: 'Bug Bounty Hunter', desc: l => `Zero-days +${l * 15}% more often, buffs +${l * 10}% longer`, next: '+15% zero-days', base: 3, g: 1.5, max: 10 },
     { id: 'severance', icon: 'briefcase', name: 'Golden Parachute', desc: l => l ? `Start each run at incident ${1 + l * 5}` : 'Skip early incidents after a pivot', next: '+5 starting incidents', base: 4, g: 1.7, max: 10 },
@@ -271,7 +272,7 @@ const ECON = (() => {
       bossGold: (1 + .5 * lv(S.board, 'legacy')) * (dn.friday ? 3 : 1),
       buffLen: 1 + .1 * lv(S.board, 'bounty'),
       offline: Math.min(1, .25 + .15 * lv(S.board, 'remote')),
-      cron: lv(S.board, 'cron'), hiring: lv(S.board, 'hiring'),
+      cron: lv(S.board, 'cron'), hiring: lv(S.board, 'hiring'), dependabot: lv(S.board, 'dependabot'),
     };
   }
   // Damage of one cannon shot (before weapon factor, crits and buffs).
