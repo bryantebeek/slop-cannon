@@ -3,12 +3,77 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
-<title>SLOP CANNON: Idle Ops — Break Prod Forever</title>
-<meta name="description" content="An idle/incremental game: hire AI agents to fire slop code at production servers. Pivot to AI, rewrite it in Rust, take down us-east-1.">
-<meta property="og:title" content="SLOP CANNON: Idle Ops">
-<meta property="og:description" content="Hire AI agents. Ship slop. Break prod. Pivot to AI. Rewrite it in Rust. Take down us-east-1.">
+<title>SLOP CANNON: Idle Ops — Free AI Idle Game in Your Browser</title>
+<meta name="description" content="Free browser idle game: hire AI agents to fire slop code at production servers. Break prod, pivot to AI, rewrite it in Rust and take down us-east-1. No signup.">
+<link rel="canonical" href="https://slopcannonthegame.com/">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="author" content="Bryan te Beek">
+<meta name="application-name" content="Slop Cannon">
+<meta name="apple-mobile-web-app-title" content="Slop Cannon">
 <meta name="theme-color" content="#07020f">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><radialGradient id='bg' cx='.5' cy='.35' r='.8'><stop offset='0' stop-color='%231d0b38'/><stop offset='1' stop-color='%2305010c'/></radialGradient><filter id='glow' x='-50%' y='-50%' width='200%' height='200%'><feGaussianBlur stdDeviation='2.2'/></filter><path id='a' d='M15 26V12M15 18Q15 12 21 12H24M29 26V12M29 17Q29 12 34 12Q39 12 39 17V26M39 17Q39 12 44 12Q49 12 49 17V26'/><path id='b' d='M14 45H22M28 52V38M28 44Q28 38 34 38H36M43 52V37Q43 32 48 32H51M38 39H49'/></defs><rect x='1' y='1' width='62' height='62' rx='14' fill='url(%23bg)' stroke='%23ff4dc8' stroke-opacity='.35' stroke-width='1.5'/><g fill='none' stroke-linecap='round' stroke-linejoin='round'><g stroke='%235dff9b'><use href='%23a' stroke-width='8' opacity='.55' filter='url(%23glow)'/><use href='%23a' stroke-width='4.2'/></g><g stroke='%23ff4d6d'><use href='%23b' stroke-width='8' opacity='.55' filter='url(%23glow)'/><use href='%23b' stroke-width='4.2'/></g><g stroke='%23fff' stroke-width='1.4' opacity='.85'><use href='%23a'/><use href='%23b'/></g></g></svg>">
+<meta name="color-scheme" content="dark">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SLOP CANNON">
+<meta property="og:url" content="https://slopcannonthegame.com/">
+<meta property="og:title" content="SLOP CANNON: Idle Ops — Break Prod Forever">
+<meta property="og:description" content="Hire AI agents. Ship slop. Break prod. Pivot to AI. Rewrite it in Rust. Take down us-east-1. Free in your browser, no signup.">
+<meta property="og:image" content="https://slopcannonthegame.com/media/og.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SLOP CANNON: Idle Ops. A cannon fires AI-generated code at burning server racks under a synthwave sunset.">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@bryantebeek">
+<meta name="twitter:creator" content="@bryantebeek">
+<meta name="twitter:title" content="SLOP CANNON: Idle Ops — Break Prod Forever">
+<meta name="twitter:description" content="Hire AI agents. Ship slop. Break prod. Take down us-east-1. Free in your browser.">
+<meta name="twitter:image" content="https://slopcannonthegame.com/media/og.jpg">
+<meta name="twitter:image:alt" content="SLOP CANNON: Idle Ops. A cannon fires AI-generated code at burning server racks under a synthwave sunset.">
+
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://slopcannonthegame.com/#website",
+      "url": "https://slopcannonthegame.com/",
+      "name": "SLOP CANNON",
+      "alternateName": ["Slop Cannon", "Slop Cannon: Idle Ops"],
+      "inLanguage": "en"
+    },
+    {
+      "@type": "VideoGame",
+      "@id": "https://slopcannonthegame.com/#game",
+      "name": "SLOP CANNON: Idle Ops",
+      "alternateName": "Slop Cannon",
+      "url": "https://slopcannonthegame.com/",
+      "image": "https://slopcannonthegame.com/media/og.jpg",
+      "screenshot": "https://slopcannonthegame.com/media/gameplay.jpg",
+      "description": "A free idle/incremental browser game. Hire AI agents to fire slop code at production servers, pivot to AI for hype, rewrite it in Rust, and take down us-east-1.",
+      "genre": ["Idle game", "Incremental game", "Clicker game", "Parody"],
+      "keywords": "idle game, incremental game, clicker game, browser game, AI game, vibe coding, programmer humor",
+      "gamePlatform": "Web browser",
+      "applicationCategory": "GameApplication",
+      "operatingSystem": "Any",
+      "playMode": "SinglePlayer",
+      "isAccessibleForFree": true,
+      "inLanguage": "en",
+      "datePublished": "2026-10-14",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      "author": { "@type": "Person", "name": "Bryan te Beek", "url": "https://x.com/bryantebeek", "sameAs": ["https://github.com/bryantebeek"] },
+      "sameAs": ["https://github.com/bryantebeek/slop-cannon"],
+      "isPartOf": { "@id": "https://slopcannonthegame.com/#website" }
+    }
+  ]
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Orbitron:wght@700;900&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -135,7 +200,7 @@ canvas{display:block;width:100%;height:100%;cursor:none;touch-action:none}
 #phead{flex:none;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 16px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.03),transparent)}
 #ptitle{display:flex;align-items:center;gap:12px;min-width:0}
 #ptitle .ib{width:38px;height:38px;border-radius:11px;font-size:21px}
-#ptitle h1{margin:0;font:900 16px/1.1 var(--disp);letter-spacing:.8px;white-space:nowrap}
+#ptitle h2{margin:0;font:900 16px/1.1 var(--disp);letter-spacing:.8px;white-space:nowrap}
 #psub{font:600 11.5px var(--mono);color:var(--dim);margin-top:3px;white-space:nowrap}
 #buyAmt{flex:none;display:flex;gap:3px;width:min(360px,50%);padding:3px;border-radius:11px;background:rgba(0,0,0,.3);border:1px solid var(--line)}
 #buyAmt button{flex:1;padding:5px 0;border-radius:8px;font:800 11px var(--mono);color:var(--dim);transition:.15s}
@@ -281,7 +346,8 @@ kbd{font:800 10px var(--mono);padding:1px 5px;border-radius:5px;border:1px solid
 /* ── title ──────────────────────────────────────────────── */
 #title{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:radial-gradient(circle at 50% 40%,rgba(30,8,60,.72),rgba(4,1,10,.97));backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);cursor:pointer;transition:opacity .6s}
 #title.gone{opacity:0;pointer-events:none}
-.glitch{position:relative;font:900 clamp(48px,11vw,140px)/.95 var(--disp);letter-spacing:4px;text-align:center}
+#title h1{margin:0;font-weight:inherit;display:flex;flex-direction:column;align-items:center;gap:8px}
+.glitch{display:block;position:relative;font:900 clamp(48px,11vw,140px)/.95 var(--disp);letter-spacing:4px;text-align:center}
 .glitch::before,.glitch::after{content:attr(data-t);position:absolute;inset:0;mix-blend-mode:screen}
 .glitch::before{color:rgba(255,40,90,.75);transform:translate(-4px,0);animation:gl 2.6s infinite steps(1)}
 .glitch::after{color:rgba(40,200,255,.75);transform:translate(4px,1px);animation:gl 3.1s infinite steps(1) reverse}
@@ -311,7 +377,7 @@ kbd{font:800 10px var(--mono);padding:1px 5px;border-radius:5px;border:1px solid
   #logo,#railFoot{display:none}
   .tab{flex:1;min-width:54px;flex-direction:column;gap:3px;padding:7px 4px}.tab i{font-size:21px}.tab .tn{font-size:8.5px}
   .tab.sel::before{bottom:auto;top:-7px}
-  #phead{gap:8px;padding:6px 10px}#ptitle .ib{display:none}#ptitle h1{font-size:14px}#psub{font-size:10px;overflow:hidden;text-overflow:ellipsis}
+  #phead{gap:8px;padding:6px 10px}#ptitle .ib{display:none}#ptitle h2{font-size:14px}#psub{font-size:10px;overflow:hidden;text-overflow:ellipsis}
   #buyAmt{width:auto;flex:0 1 190px;min-width:0}#buyAmt button{padding:4px 0;font-size:10px}.hint{display:none}
   .list,.list.wide,.split .list{grid-template-columns:1fr}.split{grid-template-columns:1fr}.split>.card{position:static}
   #hud{inset:6px 6px auto 6px;grid-template-columns:1fr auto;gap:6px}
@@ -354,7 +420,7 @@ kbd{font:800 10px var(--mono);padding:1px 5px;border-radius:5px;border:1px solid
     <nav id="rail"><div id="logo"><i class="ph-duotone ph-crosshair"></i></div><div id="railTabs" style="display:contents"></div><div id="railFoot"><button class="railbtn" id="muteBtn" title="Mute (M)"></button><button class="railbtn" id="collapseBtn" title="Collapse panel"></button></div></nav>
     <div id="main">
       <header id="phead">
-        <div id="ptitle"><span class="ib" id="picon"></span><div><h1 id="pname"></h1><div id="psub"></div></div></div>
+        <div id="ptitle"><span class="ib" id="picon"></span><div><h2 id="pname"></h2><div id="psub"></div></div></div>
         <div id="buyAmt"><button data-n="1">x1</button><button data-n="10">x10</button><button data-n="25">x25</button><button data-n="100">x100</button><button data-n="max">MAX</button></div>
       </header>
       <div id="tabBody"></div>
@@ -369,8 +435,8 @@ kbd{font:800 10px var(--mono);padding:1px 5px;border-radius:5px;border:1px solid
 <div id="tooltip" hidden></div>
 <div id="modal" hidden></div>
 <div id="title">
-  <div class="glitch g1" data-t="SLOP">SLOP</div>
-  <div class="glitch" data-t="CANNON">CANNON</div>
+  <h1><span class="glitch g1" data-t="SLOP">SLOP</span>
+ <span class="glitch" data-t="CANNON">CANNON</span></h1>
   <div class="idle">IDLE · OPS</div>
   <div class="tag">Hire AI agents. Ship slop. Break prod. Pivot to AI. Rewrite it in Rust.<br>Take down us-east-1.</div>
   <div class="feats">
